@@ -44,11 +44,11 @@ const Login = () => {
 
   useEffect(() => {
     if (auth && auth.accessToken) {
-      const t = auth.accessToken;
-      const decode = parseJwt(t);
-      const role = decode.roles;
-      console.log(decode)
-      if (role === "admin") {
+      // const t = auth.accessToken;
+      // const decode = parseJwt(t);
+      // const role = decode.roles;
+      console.log(auth.roles)
+      if (auth.roles === "admin") {
         console.log("congratulations !!!!");
         // const token = localStorage.getItem('authtoken');
         // console.log(token);
@@ -80,15 +80,15 @@ const Login = () => {
       return;
     }
 
-  
+
     try {
       const encodedPassword = btoa(password);
       const data = await userLogin({ "email": userName, "password": password });
       console.log("request sent waiting for response");
-      const {roles, sub: email} = parseJwt(data.accessToken);      
-      console.log({roles, email,"accessToken": data.accessToken});
+      const { roles, sub: email } = parseJwt(data.accessToken);
+      console.log({ roles, email, "accessToken": data.accessToken });
       // console.log(response.data);
-      dispatch(login(data));
+      dispatch(login({ roles, email, "accessToken": data.accessToken }));
       window.localStorage.setItem('authtoken', data.accessToken);
       console.log("accessToken is ", data.accessToken);
     } catch (error) {
