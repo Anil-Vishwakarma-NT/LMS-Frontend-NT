@@ -47,17 +47,18 @@ const Login = () => {
       const t = auth.accessToken;
       const decode = parseJwt(t);
       const role = decode.roles;
+      console.log(decode)
       if (role === "admin") {
         console.log("congratulations !!!!");
-        const token = localStorage.getItem('authtoken');
-        console.log(token);
+        // const token = localStorage.getItem('authtoken');
+        // console.log(token);
         console.log('token stored in localstorage!!');
         navigate('/admin');
       } else {
         navigate('/user');
       }
     }
-  }, [auth]);
+  }, [auth?.accessToken]);
 
   const validateForm = () => {
     let formErrors = {};
@@ -79,11 +80,13 @@ const Login = () => {
       return;
     }
 
+  
     try {
       const encodedPassword = btoa(password);
       const data = await userLogin({ "email": userName, "password": password });
       console.log("request sent waiting for response");
-      console.log(data);
+      const {roles, sub: email} = parseJwt(data.accessToken);      
+      console.log({roles, email,"accessToken": data.accessToken});
       // console.log(response.data);
       dispatch(login(data));
       window.localStorage.setItem('authtoken', data.accessToken);
