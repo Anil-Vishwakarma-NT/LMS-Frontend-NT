@@ -44,14 +44,9 @@ const Login = () => {
 
   useEffect(() => {
     if (auth && auth.accessToken) {
-      // const t = auth.accessToken;
-      // const decode = parseJwt(t);
-      // const role = decode.roles;
       console.log(auth.roles)
       if (auth.roles === "admin") {
         console.log("congratulations !!!!");
-        // const token = localStorage.getItem('authtoken');
-        // console.log(token);
         console.log('token stored in localstorage!!');
         navigate('/admin');
       } else {
