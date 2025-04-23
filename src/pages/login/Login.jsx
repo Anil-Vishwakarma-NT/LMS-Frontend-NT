@@ -84,6 +84,7 @@ const Login = () => {
       console.log({ roles, email, "accessToken": data.accessToken });
       // console.log(response.data);
       dispatch(login({ roles, email, "accessToken": data.accessToken }));
+      window.localStorage.removeItem('authToken');
       window.localStorage.setItem('authtoken', data.accessToken);
       console.log("accessToken is ", data.accessToken);
     } catch (error) {

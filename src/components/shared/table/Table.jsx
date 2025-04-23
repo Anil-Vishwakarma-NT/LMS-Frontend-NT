@@ -171,7 +171,7 @@ const Table = ({
                                 ></img>
                               </Tooltip>
                             )}
-                          {type === "user" && (
+                          {/* {type === "user" && (
                             <Tooltip tooltipText="Issue Book">
                               <img
                                 src={assignBook}
@@ -180,7 +180,7 @@ const Table = ({
                                 onClick={() => onAssignClick(item)}
                               ></img>
                             </Tooltip>
-                          )}
+                          )} */}
                           {type === "book" && (
                             <Tooltip tooltipText="Issue Book">
                               <img

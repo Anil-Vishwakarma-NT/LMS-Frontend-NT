@@ -24,14 +24,14 @@ const UsersModal = ({
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
-    employeeNumber: "",
+    userName: "",
     email: "",
-    mobileNumber: "",
     roleId: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
+  const [userPassword, setUserPassword] = useState("")
 
   const roleOptions = [
     { id: 1, label: "Admin" },
@@ -46,7 +46,6 @@ const UsersModal = ({
         lastName: selectedUser.lastName || "",
         userName: selectedUser.userName || "",
         email: selectedUser.email || "",
-        mobileNumber: selectedUser.mobileNumber || "",
         roleId: selectedUser.roleId || "",
         password: "",
       });
@@ -56,9 +55,8 @@ const UsersModal = ({
         lastName: "",
         userName: "",
         email: "",
-        mobileNumber: "",
         roleId: "",
-        password: "",
+        // password: "",
       });
     }
     setErrors({});
@@ -70,7 +68,6 @@ const UsersModal = ({
       firstName: userData.firstName.trim(),
       lastName: userData.lastName.trim(),
       email: userData.email.trim(),
-      mobileNumber: userData.mobileNumber.trim(),
       password: userData.password.trim(),
     };
 
@@ -95,13 +92,13 @@ const UsersModal = ({
       isValid = false;
     }
 
-    if (!validateNotEmpty(trimmedData.mobileNumber)) {
-      newErrors.mobileNumber = "Mobile number is required!";
-      isValid = false;
-    } else if (!validateMobile(trimmedData.mobileNumber)) {
-      newErrors.mobileNumber = "Enter a valid 10-digit mobile number.";
-      isValid = false;
-    }
+    // if (!validateNotEmpty(trimmedData.mobileNumber)) {
+    //   newErrors.mobileNumber = "Mobile number is required!";
+    //   isValid = false;
+    // } else if (!validateMobile(trimmedData.mobileNumber)) {
+    //   newErrors.mobileNumber = "Enter a valid 10-digit mobile number.";
+    //   isValid = false;
+    // }
 
     if (!selectedUser && !validatePassword(trimmedData.password)) {
       newErrors.password =
@@ -126,7 +123,7 @@ const UsersModal = ({
         setLoading(true);
         const token = localStorage.getItem("authtoken");
         const data = await createUser(userData, token);
-        console.log("createUser")
+        console.log("userData", userData)
         setToastMessage(data?.message || "User added successfully!");
         setToastType("success");
         setShowToast(true);
@@ -148,7 +145,9 @@ const UsersModal = ({
     if (validateUser()) {
       try {
         setLoading(true);
-        const data = await updateUser(userData, selectedUser?.mobileNumber);
+        console.log(userData);
+
+        const data = await updateUser(userData, selectedUser?.id);
         setToastMessage(data?.message || "User updated successfully!");
         setToastType("success");
         setShowToast(true);
@@ -196,7 +195,7 @@ const UsersModal = ({
           className="login-input"
           type="text"
           id="userName"
-          value={userData.employeeNumber}
+          value={userData.userName}
           onChange={handleChange}
         />
       </div>
@@ -213,7 +212,7 @@ const UsersModal = ({
         {errors.email && <div className="error-text">{errors.email}</div>}
       </div>
 
-      <div className="form-group">
+      {/* <div className="form-group">
         <label htmlFor="mobileNumber" className="label-text">Mobile Number:</label>
         <input
           className="login-input"
@@ -225,19 +224,21 @@ const UsersModal = ({
         {errors.mobileNumber && (
           <div className="error-text">{errors.mobileNumber}</div>
         )}
-      </div>
+      </div> */}
 
-      <div className="form-group">
-        <label htmlFor="password" className="label-text">Password:</label>
-        <input
-          className="login-input"
-          type="password"
-          id="password"
-          value={userData.password}
-          onChange={handleChange}
-        />
-        {errors.password && <div className="error-text">{errors.password}</div>}
-      </div>
+      {!selectedUser &&
+        <div className="form-group">
+          <label htmlFor="password" className="label-text">Password:</label>
+          <input
+            className="login-input"
+            type="password"
+            id="password"
+            value={userData.password}
+            onChange={handleChange}
+
+          />
+          {errors.password && <div className="error-text">{errors.password}</div>}
+        </div>}
 
       <div className="form-group">
         <label htmlFor="roleId" className="label-text">Role:</label>

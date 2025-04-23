@@ -112,7 +112,7 @@ const UsersAdmin = ({ setLoading }) => {
     entry: {
       srNo: index + 1,
       name: `${user.firstName} ${user.lastName}`,
-      mobile: user.mobile || "N/A",
+      manager: user.manager || "N/A",
       email: user.email,
       id: user.userId,
     },
@@ -127,7 +127,7 @@ const UsersAdmin = ({ setLoading }) => {
   const handleDeleteUser = async () => {
     try {
       setLoading(true)
-      const data = await deleteUsers(userToDelete?.mobileNumber);
+      const data = await deleteUsers(userToDelete?.id);
       setToastMessage(data?.message || "User deleted successfully!");
       setToastType("success");
       setShowToast(true);
@@ -209,7 +209,7 @@ const UsersAdmin = ({ setLoading }) => {
           entries={processedUsers.map(user => user.entry)}
           type={"user"}
           onDeleteClick={handleOpenConfirmDeletePopup}
-          onAssignClick={openAssignUser}
+          // onAssignClick={openAssignUser}
           pageNumber={pageNumber}
           pageSize={pageSize}
           rowKeyAccessor={(row, index) => processedUsers[index].id}
@@ -237,6 +237,7 @@ const UsersAdmin = ({ setLoading }) => {
         setToastType={setToastType}
         setShowToast={setShowToast}
         setLoading={setLoading}
+
       />
       <div className="paginate">
         {userList && userList.length > 0 ?
