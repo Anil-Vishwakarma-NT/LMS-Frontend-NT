@@ -1,52 +1,23 @@
-import app from "./serviceLMS"
+import axios from "axios";
 
-export async function fetchBooks() {
-    try {
-        const response = await app.get('/api/books')
-        return response.data
-    } catch (error) {
-        throw new Error(error?.response?.data?.message);
-    }
+export async function fetchAllCourses() {
+  try {
+    const response = await axios.get("http://localhost:8082/api/course");
+    return response.data; // Returns an array of courses
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch courses"
+    );
+  }
 }
 
-    export async function deleteBooks(id) {
-        try {
-            const response = await app.delete(`/api/books/${id}`)
-            return response.data
-        } catch (error) {
-            throw new Error(error?.response?.data?.message);
-        }
-    }
-
-    export async function fetchAllBooks(pageNumber, pageSize, search) {
-        try{
-        const response = await app.get('/api/books/paginatedBooks', {
-            params: {
-                pageNumber: Number(pageNumber),
-                pageSize: Number(pageSize),
-                search: search
-            }
-        })
-        return response.data
-    } catch(error){
-        throw new Error(error?.response?.data?.message);
-    }
+export async function deleteCourse(courseId) {
+  try {
+    const response = await axios.delete(
+      `http://localhost:8082/api/course/${courseId}`
+    );
+    return response.data; // Returns success message
+  } catch (error) {
+    throw new Error(error?.response?.data?.message || "Course deletion failed");
+  }
 }
-
-    export async function createBook(bookData) {
-        try {
-            const response = await app.post('/api/books/addBook', bookData);
-            return response.data;
-        } catch (error) {
-            throw new Error(error?.response?.data?.message);
-        }
-    }
-
-    export async function updateBook(bookData, id) {
-        try {
-            const response = await app.put(`/api/books/${id}`, bookData);
-            return response.data;
-        } catch (error) {
-            throw new Error(error?.response?.data?.message);
-        }
-    }

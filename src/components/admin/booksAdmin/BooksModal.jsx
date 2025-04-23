@@ -2,221 +2,180 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../shared/modal/Modal";
 import "./BooksAdmin.css";
 import Button from "../../shared/button/Button";
-import { createBook, updateBook } from "../../../service/BookService";
-import { fetchCategories } from "../../../service/CategoryService";
+import { createCourse, updateCourse } from "../../../service/BookService";
 import {
   validateAlphabet,
   validateMinLength,
   validateNotEmpty,
 } from "../../../utility/validation";
 
-const BooksModal = ({
+
+const CoursesModal = ({
   title,
   isModalOpen,
   handleCloseModal,
-  handleAddBook,
-  selectedBook,
+  selectedCourse,
   setToastMessage,
   setToastType,
   setShowToast,
-  setLoading
+  setLoading,
+  loadCourses
 }) => {
-  const [bookData, setBookData] = useState({
+  const [courseData, setCourseData] = useState({
     title: "",
-    author: "",
-    quantity: 1,
-    image: "",
-    categoryName: "",
+    ownerId: "",
+    description: "",
+    courseLevel: "",
+    image: ""
   });
-  const [categoriesList, setcategoriesList] = useState([]);
+
   const [errors, setErrors] = useState({
     title: "",
-    author: "",
-    quantity: "",
-    categoryName: "",
+    ownerId: "",
+    description: "",
+    courseLevel: "",
   });
 
-  useEffect(()=> {
-    if(!isModalOpen){
-      setBookData({
+  useEffect(() => {
+    if (!isModalOpen) {
+      setCourseData({
         title: "",
-        author: "",
-        quantity: 1,
-        image: "",
-        categoryName: "",
-      })
+        ownerId: "",
+        description: "",
+        courseLevel: "",
+        image: ""
+      });
     }
-  }, [isModalOpen])
+  }, [isModalOpen]);
 
   useEffect(() => {
-    if (selectedBook) {
-      // console.log(categoriesList);
-      
-      const catItemObj = categoriesList.find(catItem => catItem.name === selectedBook.categoryName);
-      // console.log(catItemObj);
-      
-
-      setBookData({
-        title: selectedBook.title,
-        author: selectedBook.author,
-        quantity: selectedBook.quantity,
-        image: selectedBook.image,
-        categoryName: Number(catItemObj?.id) || "",
+    if (selectedCourse) {
+      setCourseData({
+        id: selectedCourse.courseId,
+        title: selectedCourse.title,
+        ownerId: selectedCourse.ownerId,
+        description: selectedCourse.description,
+        courseLevel: selectedCourse.level || "",
+        image: selectedCourse.image
       });
     } else {
-      setBookData({
+      setCourseData({
         title: "",
-        author: "",
-        quantity: 1,
-        image: "",
-        categoryName: "",
+        ownerId: "",
+        description: "",
+        courseLevel: "",
+        image: ""
       });
     }
 
     setErrors({
       title: "",
-      author: "",
-      quantity: "",
-      categoryName: "",
+      ownerId: "",
+      description: "",
+      courseLevel: "",
     });
-  }, [selectedBook]);
+  }, [selectedCourse]);
 
-  
-
-  const getCategoriesList = async () => {
-    const categoryData = await fetchCategories();
-    setcategoriesList(categoryData);
-  };
-
-  useEffect(() => {
-    getCategoriesList();
-  }, []);
-
-  const validateBook = () => {
-    
-    bookData.author = bookData?.author?.trim();
-    bookData.title = bookData?.title?.trim();
+  const validateCourse = () => {
+    courseData.title = courseData?.title?.trim();
 
     let isValid = true;
     const newErrors = {
       title: "",
-      author: "",
-      quantity: "",
-      categoryName: "",
+      ownerId: "",
+      description: "",
+      courseLevel: "",
     };
 
-    if (!validateNotEmpty(bookData.title)) {
+    if (!validateNotEmpty(courseData.title)) {
       newErrors.title = `Title is required!`;
       isValid = false;
-    } else if (!validateMinLength(bookData.title, 3)) {
-      newErrors.title = `Title should have atleast 3 characters!`;
-      isValid = false;
-    } else if (!validateAlphabet(bookData.title)) {
-      newErrors.title = `Special characters/numbers are not alowed!`;
+    } else if (!validateMinLength(courseData.title, 3)) {
+      newErrors.title = `Title should have at least 3 characters!`;
       isValid = false;
     }
 
-    if (!validateNotEmpty(bookData.author)) {
-      newErrors.author = `Author name is required!`;
-      isValid = false;
-    } else if (!validateMinLength(bookData.author, 3)) {
-      newErrors.author = `Author name should have atleast 3 characters!`;
-      isValid = false;
-    } else if (!validateAlphabet(bookData.author)) {
-      newErrors.author = `Special characters/numbers are not alowed!`;
+    if (!validateNotEmpty(courseData.ownerId)) {
+      newErrors.ownerId = `Owner ID is required!`;
       isValid = false;
     }
 
-    if (!validateNotEmpty(bookData.categoryName)) {
-      newErrors.categoryName = `Category is required!`;
+    if (!validateNotEmpty(courseData.description)) {
+      newErrors.description = `Description is required!`;
       isValid = false;
     }
 
-    if (!validateNotEmpty(bookData.quantity)) {
-      newErrors.quantity = `Quantity is required!`;
-      isValid = false;
-    } else if (bookData.quantity < 1) {
-      newErrors.quantity = `Quantity can't be less than 1`;
+    if (!validateNotEmpty(courseData.courseLevel)) {
+      newErrors.courseLevel = `Course level is required!`;
       isValid = false;
     }
 
     if (!isValid) {
       setErrors(newErrors);
     }
-    
+
     return isValid;
   };
 
-  const handleAdd = async () => {
-    if (validateBook()) {
-      try {
-        const catId = Number(bookData.categoryName);
-        delete bookData.categoryName;
-        bookData.categoryId = catId;
-        setLoading(true)
-        const data = await createBook(bookData);
-        setToastMessage(data?.message || "Book added successfully!");
-        setShowToast(true);
+const handleEdit = async () => {
+  if (validateCourse()) {
+    try {
+      setLoading(true);
+      const data = await updateCourse(selectedCourse.courseId, courseData);
+      if (data) { // ✅ Ensure API response confirms success
+        setToastMessage(data?.message || "Course updated successfully!");
         setToastType("success");
-        handleAddBook();
-        handleCloseModal();
-      } catch (error) {
-        setToastMessage(error?.message || "Error occurred while saving the book.");
-        setToastType("error");
         setShowToast(true);
-      } finally {
-        setLoading(false)
-        setErrors({
-          title: "",
-          author: "",
-          quantity: "",
-          categoryName: "",
-        });
-        setBookData({
-          author: '',
-          categoryName: '',
-          image: null,
-          quantity: '',
-          title: '',
-        })
+      } else {
+        throw new Error("API did not return a success response"); // 🚨 Handle unexpected failure
       }
+      
+      await loadCourses();// 🔄 Refresh course list instead of calling another function
+    } catch (error) {
+      setToastMessage(error?.message || "Error in updating this course!");
+      setShowToast(true);
+      setToastType("error");
+    } finally {
+      handleCloseModal();
+      setLoading(false);
     }
-  };
+  }
+};
 
-  const handleEdit = async () => {
-    if (validateBook()) {
-      try {
-        const catId = Number(bookData.categoryName);
-        delete bookData.categoryName;
-        bookData.categoryId = catId;
+const handleCreateCourse = async () => {
+  if (validateCourse()) {
+    try {
+      setLoading(true);
+      const updatedCourseData = { 
+        title: courseData.title,
+        ownerId: parseInt(courseData.ownerId, 10), // ✅ Ensure integer format
+        description: courseData.description,
+        courseLevel: courseData.courseLevel,
+        image: courseData.image // ✅ Maintain original structure
+      };
 
-        setLoading(true)
-        const data = await updateBook(bookData, selectedBook?.id);
-        setToastMessage(data?.message || "Book updated successfully!");
-        setShowToast(true);
-        setToastType("success");
-        handleAddBook();
-      } catch (error) {
-        setToastMessage(error?.message || "Error in updating this book!");
-        setShowToast(true);
-        setToastType("error");
-      } finally {
-        handleCloseModal();
-        setLoading(false)
-        setErrors({
-          title: "",
-          author: "",
-          quantity: "",
-          categoryName: "",
-        });
-      }
+      await createCourse(updatedCourseData); // ⬅ Send correctly ordered payload
+
+      setToastMessage("Course added successfully!");
+      setToastType("success");
+      setShowToast(true);
+
+      await loadCourses(); // 🔄 Refresh course list so the new course appears
+    } catch (error) {
+      setToastMessage(error?.message || "Error adding the course!");
+      setToastType("error");
+      setShowToast(true);
+    } finally {
+      handleCloseModal();
+      setLoading(false);
     }
-  };
+  }
+};
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setErrors({ ...errors, [e.target.id]: '' });
-    setBookData((prevData) => ({
+    setErrors({ ...errors, [id]: '' });
+    setCourseData((prevData) => ({
       ...prevData,
       [id]: value,
     }));
@@ -226,121 +185,41 @@ const BooksModal = ({
     <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={title}>
       <div>
         <div className="form-group">
-          <label
-            htmlFor="title"
-            className="label-text"
-            style={{ marginBottom: "5px" }}
-          >
-            Title:
-          </label>
-          <div>
-          <input
-            className="login-input"
-            type="text"
-            id="title"
-            value={bookData.title}
-            onChange={handleChange}
-            required
-          />
+          <label htmlFor="title" className="label-text">Title:</label>
+          <input type="text" id="title" value={courseData.title} onChange={handleChange} required />
           {errors.title && <div className="error-text">{errors.title}</div>}
-          </div>
         </div>
+
         <div className="form-group">
-          <label
-            htmlFor="author"
-            className="label-text"
-            style={{ marginBottom: "5px" }}
-          >
-            Author:
-          </label>
-          <div>
-          <input
-            className="login-input"
-            type="text"
-            id="author"
-            value={bookData.author}
-            onChange={handleChange}
-            required
-          />
-          {errors.author && <div className="error-text">{errors.author}</div>}
-          </div>
+          <label htmlFor="ownerId" className="label-text">Owner ID:</label>
+          <input type="text" id="ownerId" value={courseData.ownerId} onChange={(e) => handleChange({ target: { id: "ownerId", value: e.target.value.trim() } })} required />
+          {errors.ownerId && <div className="error-text">{errors.ownerId}</div>}
         </div>
+
         <div className="form-group">
-          <label
-            htmlFor="quantity"
-            className="label-text"
-            style={{ marginBottom: "5px" }}
-          >
-            Quantity:
-          </label>
-          <div>
-          <input
-            className="login-input"
-            type="number"
-            id="quantity"
-            value={bookData.quantity}
-            onChange={handleChange}
-            required
-          />
-          {errors.quantity && (
-            <div className="error-text">{errors.quantity}</div>
-          )}
-          </div>
+          <label htmlFor="description" className="label-text">Description:</label>
+          <input type="text" id="description" value={courseData.description} onChange={handleChange} required />
+          {errors.description && <div className="error-text">{errors.description}</div>}
         </div>
+
         <div className="form-group">
-          <label
-            htmlFor="image"
-            className="label-text"
-            style={{ marginBottom: "5px" }}
-          >
-            Image:
-          </label>
-          <input
-            className="login-input"
-            type="text"
-            id="image"
-            value={bookData.image}
-            onChange={handleChange}
-            required
-          />
+          <label htmlFor="courseLevel" className="label-text">Course Level:</label> {/* Fixed missing field */}
+          <input type="text" id="courseLevel" value={courseData.courseLevel} onChange={handleChange} required />
+          {errors.courseLevel && <div className="error-text">{errors.courseLevel}</div>}
         </div>
+
         <div className="form-group">
-          <label
-            htmlFor="quantity"
-            className="label-text"
-            style={{ marginBottom: "5px" }}
-          >
-            Category:
-          </label>
-          <div className="select-parent">
-          <select
-            className="login-input modal-select select-error"
-            value={bookData.categoryName}
-            id="categoryName"
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            {categoriesList.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          {errors.categoryName && <div className="error-text">{errors.categoryName}</div>}
-          </div>
+          <label htmlFor="image" className="label-text">Image:</label>
+          <input type="text" id="image" value={courseData.image} onChange={handleChange} required />
         </div>
+
         <div className="modal-button">
-          {!selectedBook && (
-            <Button onClick={handleAdd} type="submit" text={"Add"} />
-          )}
-          {selectedBook && (
-            <Button onClick={handleEdit} type="submit" text={"Edit"} />
-          )}
+          {!selectedCourse && <Button onClick={handleCreateCourse} type="submit" text={"Add"} />}
+          {selectedCourse && <Button onClick={handleEdit} type="submit" text={"Edit"} />}
         </div>
       </div>
     </Modal>
   );
 };
 
-export default BooksModal;
+export default CoursesModal;
