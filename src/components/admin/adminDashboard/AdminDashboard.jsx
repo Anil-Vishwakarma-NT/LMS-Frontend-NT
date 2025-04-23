@@ -7,7 +7,7 @@ import users from "../../../assets/group.png";
 import inHouse from "../../../assets/reading.png";
 import category from "../../../assets/category.png";
 import { useNavigate } from "react-router-dom";
-import { fetchAllUsers } from "../../../service/UserService";
+import { fetchAllActiveUsers } from "../../../service/UserService";
 import { fetchAllCategories } from "../../../service/CategoryService";
 import { fetchAllBooks } from "../../../service/BookService";
 import BookCard from "../../shared/bookCard/BookCard";
@@ -66,7 +66,8 @@ const AdminDashboard = ({ setLoading }) => {
   const loadUsers = async () => {
     try {
       setLoading(true)
-      const data = await fetchAllUsers(pageNumber, pageSize);
+      const token = localStorage.getItem('authtoken');
+      const data = await fetchAllActiveUsers(token);
       setUserDashList(data?.content)
     } catch (error) {
       console.log(error);

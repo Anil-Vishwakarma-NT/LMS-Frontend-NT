@@ -5,8 +5,9 @@ import Table from "../../shared/table/Table";
 import UsersModal from "./UsersModal";
 import Paginate from "../../shared/pagination/Paginate";
 import {
-  fetchAllUsers,
+  fetchAllActiveUsers,
   deleteUsers,
+  fetchAllInactiveUsers,
 } from "../../../service/UserService";
 import AssignBookModal from "./AssignBookModal";
 import Toast from "../../shared/toast/Toast";
@@ -22,10 +23,12 @@ const UsersAdmin = ({ setLoading }) => {
   const [userList, setUserList] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const auth = useSelector(state => state.auth);
+  const [inactiveUserList, setInactiveUserList] = useState([]);
+  const [isInactive, setIsInactive] = useState(false);
+  const [btnText, setbtnText] = useState("Inactive Users");
   let height = window.innerHeight;
 
   const pageSizeByHeight = () => {
-
     if (height >= 1024) {
       return 15
     } else if (height <= 1024) {
@@ -57,7 +60,7 @@ const UsersAdmin = ({ setLoading }) => {
       try {
         setLoading(true)
         const token = localStorage.getItem('authtoken');
-        const data = await fetchAllUsers(token);
+        const data = await fetchAllActiveUsers(token);
         console.log(data);
         setUserList(data);
         setTotalPages(data?.totalPages);
@@ -66,6 +69,22 @@ const UsersAdmin = ({ setLoading }) => {
       } finally {
         setLoading(false)
       }
+    }
+  }
+
+  const loadInactiveUsers = async () => {
+    try {
+      console.log("button inactive user");
+      setLoading(true)
+      const token = localStorage.getItem('authtoken');
+      const data = await fetchAllInactiveUsers(token);
+      console.log(data);
+      setInactiveUserList(data);
+      setTotalPages(data?.totalPages);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -108,18 +127,6 @@ const UsersAdmin = ({ setLoading }) => {
   ];
 
 
-  const processedUsers = userList.map((user, index) => ({
-    entry: {
-      srNo: index + 1,
-      name: `${user.firstName} ${user.lastName}`,
-      manager: user.manager || "N/A",
-      email: user.email,
-      id: user.userId,
-    },
-    id: user.userId, // You don't need to wrap this in another object
-  }));
-
-
   const handleAddUser = () => {
     loadUsers();
   };
@@ -146,6 +153,19 @@ const UsersAdmin = ({ setLoading }) => {
   const handleOpenConfirmDeletePopup = (user) => {
     setIsConfirmPopupOpen(true);
     setUserToDelete(user);
+  };
+
+  const handleInactiveUsers = async () => {
+    const nextValue = !isInactive;
+    setIsInactive(nextValue);
+    setbtnText(nextValue ? "Active Users" : "Inactive Users");
+    setPageNumber(0); // Reset pagination if needed
+
+    if (nextValue) {
+      await loadInactiveUsers();
+    } else {
+      await loadUsers();
+    }
   };
 
 
@@ -180,6 +200,17 @@ const UsersAdmin = ({ setLoading }) => {
     setIsAssignModalOpen(true);
   };
 
+
+  const processedUsers = (isInactive ? inactiveUserList : userList).map((user, index) => ({
+    entry: {
+      srNo: index + 1,
+      name: `${user.firstName} ${user.lastName}`,
+      manager: user.manager || "N/A",
+      email: user.email,
+      id: user.userId,
+    },
+    id: user.userId, // You don't need to wrap this in another object
+  }));
   return (
     <div className="admin-section">
       <div className="admin-page-mid">
@@ -199,6 +230,11 @@ const UsersAdmin = ({ setLoading }) => {
             text="Add new Employee"
             type="button"
             onClick={() => handleOpenModal(null)}
+          />
+          <Button
+            text={btnText}
+            type="button"
+            onClick={() => handleInactiveUsers()}
           />
         </div>
       </div>

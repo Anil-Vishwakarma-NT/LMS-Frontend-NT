@@ -19,7 +19,7 @@ export async function deleteUsers(id) {
     }
 }
 
-export async function fetchAllUsers(token) {
+export async function fetchAllActiveUsers(token) {
     try {
         console.log("token");
         console.log(token);
@@ -30,6 +30,21 @@ export async function fetchAllUsers(token) {
         });
         return response.data
     } catch (error) {
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+export async function fetchAllInactiveUsers(token) {
+    try {
+        console.log("getting inactive users");
+        const response = await app.get('/admin/inactive-employees', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    }
+    catch (error) {
         throw new Error(error?.response?.data?.message);
     }
 }
