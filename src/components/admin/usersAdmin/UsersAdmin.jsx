@@ -201,7 +201,10 @@ const UsersAdmin = ({ setLoading }) => {
   };
 
 
-  const processedUsers = (isInactive ? inactiveUserList : userList).map((user, index) => ({
+  const processedUsers = (Array.isArray(isInactive ? inactiveUserList : userList)
+    ? (isInactive ? inactiveUserList : userList)
+    : []
+  ).map((user, index) => ({
     entry: {
       srNo: index + 1,
       name: `${user.firstName} ${user.lastName}`,
@@ -209,8 +212,9 @@ const UsersAdmin = ({ setLoading }) => {
       email: user.email,
       id: user.userId,
     },
-    id: user.userId, // You don't need to wrap this in another object
+    id: user.userId,
   }));
+
   return (
     <div className="admin-section">
       <div className="admin-page-mid">
