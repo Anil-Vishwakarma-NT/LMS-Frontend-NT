@@ -49,8 +49,11 @@ const Login = () => {
         console.log("congratulations !!!!");
         console.log('token stored in localstorage!!');
         navigate('/admin');
-      } else {
+      } else if (auth.roles === "employee") {
         navigate('/user');
+      }
+      else {
+        navigate('/')
       }
     }
   }, [auth?.accessToken]);

@@ -108,6 +108,11 @@ export async function getUserByToken(token) {
     }
 }
 
-export const logoutUser = () => {
+export async function logoutUser(token) {
+    const response = await app.post('/api/auth/logout', {
+        headers: {
+            Authorization: token
+        }
+    })
     window.localStorage.removeItem('authtoken')
 }

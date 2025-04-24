@@ -106,29 +106,30 @@ const UsersAdmin = ({ setLoading }) => {
     },
     {
       index: 2,
+      title: "Employee Id",
+      key: "employeeId", // optional, if you handle this somewhere
+    },
+    {
+      index: 3,
       title: "Name",
       key: "name",
     },
     {
-      index: 3,
+      index: 4,
       title: "Manager",
       key: "manager",
     },
     {
-      index: 4,
+      index: 5,
       title: "E-Mail",
       key: "email", // if Table handles buttons internally
     },
     {
-      index: 5,
+      index: 6,
       title: "Role",
       key: "role", // optional, if you handle this somewhere
     },
-    {
-      index: 6,
-      title: "Employee Id",
-      key: "employeeId", // optional, if you handle this somewhere
-    },
+
   ];
 
 
@@ -212,12 +213,13 @@ const UsersAdmin = ({ setLoading }) => {
   ).map((user, index) => ({
     entry: {
       srNo: index + 1,
+      employeeId: user.username,
       name: `${user.firstName} ${user.lastName}`,
       manager: user.manager || "N/A",
       email: user.email,
       id: user.userId,
       role: user.role,
-      employeeId: user.username
+
     },
     id: user.userId,
   }));

@@ -7,9 +7,9 @@ const UserRoutes = ({children}) => {
     const auth = useSelector((state) => state.auth)
     const [isVerified, setIsVerified] = useState(false)
     useEffect(() => {
-      if (auth && auth.token){
+      if (auth && auth.accessToken){
           try{
-              if(auth.role === 'employee'){
+              if(auth.roles === 'employee'){
                   setIsVerified(true)
               } else {
                 navigate('/')
