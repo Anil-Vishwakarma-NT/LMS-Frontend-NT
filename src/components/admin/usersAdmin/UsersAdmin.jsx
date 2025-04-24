@@ -121,8 +121,13 @@ const UsersAdmin = ({ setLoading }) => {
     },
     {
       index: 5,
-      title: "",
-      key: "", // optional, if you handle this somewhere
+      title: "Role",
+      key: "role", // optional, if you handle this somewhere
+    },
+    {
+      index: 6,
+      title: "Employee Id",
+      key: "employeeId", // optional, if you handle this somewhere
     },
   ];
 
@@ -211,6 +216,8 @@ const UsersAdmin = ({ setLoading }) => {
       manager: user.manager || "N/A",
       email: user.email,
       id: user.userId,
+      role: user.role,
+      employeeId: user.username
     },
     id: user.userId,
   }));
@@ -249,7 +256,7 @@ const UsersAdmin = ({ setLoading }) => {
           entries={processedUsers.map(user => user.entry)}
           type={"user"}
           onDeleteClick={handleOpenConfirmDeletePopup}
-          // onAssignClick={openAssignUser}
+          is_Inactive={isInactive}
           pageNumber={pageNumber}
           pageSize={pageSize}
           rowKeyAccessor={(row, index) => processedUsers[index].id}

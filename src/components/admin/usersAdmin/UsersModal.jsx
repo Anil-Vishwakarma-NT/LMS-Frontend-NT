@@ -34,7 +34,6 @@ const UsersModal = ({
   const [userPassword, setUserPassword] = useState("")
 
   const roleOptions = [
-    { id: 1, label: "Admin" },
     { id: 2, label: "Manager" },
     { id: 3, label: "Employee" },
   ];

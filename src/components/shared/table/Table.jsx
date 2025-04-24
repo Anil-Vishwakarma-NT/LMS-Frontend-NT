@@ -17,6 +17,7 @@ const Table = ({
   onAssignClick,
   pageNumber,
   pageSize,
+  is_Inactive,
 }) => {
   const navigate = useNavigate();
 
@@ -50,7 +51,7 @@ const Table = ({
                         return null;
                       }
                       if (type === "user") {
-                        if (key !== "role" && key !== "token") {
+                        if (key !== "token") {
                           return (
                             <td>
                               {typeof value === "object" ? value?.name : value}
@@ -142,7 +143,7 @@ const Table = ({
                       }
                     })}
 
-                    {type !== "dash-category" && type !== "dash-user" && (
+                    {type !== "dash-category" && type !== "dash-user" && !is_Inactive && (
                       <td>
                         <div className="modifications">
                           {type !== "dash-category" &&

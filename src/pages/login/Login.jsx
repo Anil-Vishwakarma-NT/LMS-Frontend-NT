@@ -78,13 +78,13 @@ const Login = () => {
 
     try {
       const encodedPassword = btoa(password);
+      window.localStorage.removeItem('authToken');
       const data = await userLogin({ "email": userName, "password": password });
       console.log("request sent waiting for response");
       const { roles, sub: email } = parseJwt(data.accessToken);
       console.log({ roles, email, "accessToken": data.accessToken });
       // console.log(response.data);
       dispatch(login({ roles, email, "accessToken": data.accessToken }));
-      window.localStorage.removeItem('authToken');
       window.localStorage.setItem('authtoken', data.accessToken);
       console.log("accessToken is ", data.accessToken);
     } catch (error) {
