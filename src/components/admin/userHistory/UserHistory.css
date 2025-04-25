@@ -1,0 +1,26 @@
+.user-history-table {
+    font-family: Josefin Sans;
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: 7px;
+    margin-top: 7px;
+    padding-top: 7px;
+}
+
+@media (max-width: 1300px) {
+    .main-content {
+        flex-wrap: wrap;
+    }
+
+    .dash-tables {
+        flex-direction: column;
+    }
+
+    .user-dash-table {
+        width: 100%;
+    }
+
+    .welcome-admin {
+        padding-top: 0;
+    }
+}

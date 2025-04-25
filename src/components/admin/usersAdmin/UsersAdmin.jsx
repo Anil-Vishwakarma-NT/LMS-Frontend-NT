@@ -239,11 +239,11 @@ const UsersAdmin = ({ setLoading }) => {
             <div className="search-icon" onClick={handleSearchClick}></div>
             <img src={searchLogo} alt="!" className="search-logo" />
           </div>
-          <Button
+          {!isInactive && <Button
             text="Add new Employee"
             type="button"
             onClick={() => handleOpenModal(null)}
-          />
+          />}
           <Button
             text={btnText}
             type="button"
@@ -277,7 +277,7 @@ const UsersAdmin = ({ setLoading }) => {
         setShowToast={setShowToast}
         setLoading={setLoading}
       />
-      <AssignBookModal
+      {/* <AssignBookModal
         title={"Assign Book"}
         isAssignModalOpen={isAssignModalOpen}
         closeAssignModal={closeAssignBook}
@@ -287,7 +287,7 @@ const UsersAdmin = ({ setLoading }) => {
         setShowToast={setShowToast}
         setLoading={setLoading}
 
-      />
+      /> */}
       <div className="paginate">
         {userList && userList.length > 0 ?
           <Paginate

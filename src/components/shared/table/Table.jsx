@@ -30,6 +30,23 @@ const Table = ({
     navigate(`/user-history/${id}`);
   };
 
+  const renderProgressBar = (value) => {
+    const percentage = parseInt(value); // Convert "80%" to 80
+    return (
+      <div style={{ width: '100%', background: '#eee', borderRadius: 4 }}>
+        <div
+          style={{
+            width: `${percentage}%`,
+            background: percentage > 80 ? '#4caf50' : '#ff9800',
+            height: '10px',
+            borderRadius: 4,
+            transition: 'width 0.3s ease',
+          }}
+        ></div>
+        <div style={{ fontSize: 12, textAlign: 'right' }}>{value}</div>
+      </div>
+    );
+  }
   return (
     <div className="table-container">
       <div className="table-parent">
@@ -115,8 +132,8 @@ const Table = ({
                         type === "book-history"
                       ) {
 
-                        if (key === 'actualReturnTime') {
-                          return value ? <td>{new Date(value).toLocaleDateString('en-GB')} {' , '} {new Date(value).toLocaleTimeString()}</td> : <td>NA</td>
+                        if (key === 'Progress') {
+                          return <td>N/A</td>
                         }
 
                         if (typeof value === "object") {
