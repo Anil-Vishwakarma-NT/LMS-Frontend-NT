@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import "./BooksAdmin.css";
 import Button from "../../shared/button/Button";
-import Table from "../../shared/table/Table";
+import CourseTable from "../../shared/table/CourseTable";
 import Toast from "../../shared/toast/Toast";
 import searchLogo from "../../../assets/magnifying-glass.png";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import CoursesModal from "./BooksModal";
 import { fetchAllCourses, deleteCourse, updateCourse, fetchCourseById } from "../../../service/BookService"; // Updated import
-import handleCreateCourse from "../booksAdmin/BooksModal"
+import handleCreateCourse from "../booksAdmin/BooksModal";
 
 const CoursesAdmin = ({ setLoading }) => {
   const [search, setSearch] = useState('');
@@ -20,62 +20,65 @@ const CoursesAdmin = ({ setLoading }) => {
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [filterType, setFilterType] = useState('all'); // Initial filter: 'all'
 
   const loadCourses = async () => {
     try {
       setLoading(true);
       const data = await fetchAllCourses();
-      setCourseList(data);
+      const mappedData = data.map(course => ({
+        ...course,
+        isActive: course.active,
+        createdAt: course.createdAt, // Ensure correct mapping of createdAt
+      }));
+      setCourseList(mappedData); 
     } catch (error) {
-      console.log(error);
+      console.log("Error in loadCourses:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value.trim());
-  };
-
-  const handleSearchById = async () => {
-  if (!search || isNaN(search)) {
-    setToastMessage("Please enter a valid Course ID!");
-    setToastType("error");
-    setShowToast(true);
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const data = await fetchCourseById(search); // 🔄 Call service function
-    setCourseList([data]); // ✅ Display only the searched course
-  } catch (error) {
-    setToastMessage(error?.message || "Course not found!");
-    setToastType("error");
-    setShowToast(true);
-  } finally {
-    setLoading(false);
-  }
-};
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (search.length > 2 || search.length === 0) {
+        console.log("Calling loadCourses due to search:", search); // Debug search state
         loadCourses();
       }
     }, 1000);
     return () => clearTimeout(timeout);
   }, [search]);
 
+useEffect(() => {
+  let filtered = courseList;
+
+  if (filterType === 'active') {
+    filtered = courseList.filter(course => course.isActive);
+  } else if (filterType === 'inactive') {
+    filtered = courseList.filter(course => !course.isActive);
+  }
+
+  if (search.trim()) {
+    filtered = filtered.filter(course =>
+      course.title.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  setFilteredCourses(filtered);
+}, [search, courseList, filterType]);
+
   const handleDeleteCourse = async () => {
     try {
       setLoading(true);
       const data = await deleteCourse(courseToDelete?.courseId); // Fetch ID dynamically
+      console.log("Delete course response:", data); // Debug delete response
       setToastMessage(data?.message || "Course deleted successfully!");
       setToastType("success");
       setShowToast(true);
       await loadCourses(); // Refresh course list
     } catch (error) {
+      console.log("Error during course deletion:", error.message);
       setToastMessage(error?.message || "Course cannot be deleted.");
       setToastType("error");
       setShowToast(true);
@@ -89,12 +92,17 @@ const CoursesAdmin = ({ setLoading }) => {
   const handleEditCourse = async (updatedCourse) => {
     try {
       setLoading(true);
-      const data = await updateCourse(updatedCourse.courseId, updatedCourse);
+      const data = await updateCourse(updatedCourse.courseId, {
+        ...updatedCourse,
+        active: updatedCourse.isActive, // Send 'active' to backend, not 'isActive'
+      });
+      console.log("Edit course response:", data); // Debug edit response
       setToastMessage(data?.message || "Course updated successfully!");
       setToastType("success");
       setShowToast(true);
       await loadCourses(); // Refresh course list
     } catch (error) {
+      console.log("Error during course editing:", error.message);
       setToastMessage(error?.message || "Course update failed.");
       setToastType("error");
       setShowToast(true);
@@ -105,35 +113,46 @@ const CoursesAdmin = ({ setLoading }) => {
     }
   };
 
+  const toggleFilterType = () => {
+  setFilterType(prevFilter => {
+    if (prevFilter === 'all') return 'active';
+    if (prevFilter === 'active') return 'inactive';
+    return 'all';
+  });
+};
+
   const handleOpenConfirmDeletePopup = (course) => {
     if (!course?.courseId) {
       console.error("Error: Received undefined courseId in delete popup.");
       return;
     }
-  
-    console.log("Confirm delete popup opened for course ID:", course.courseId); // Debugging line
-    setCourseToDelete(course); // Ensure the full course object is stored
+
+    console.log("Confirm delete popup opened for course ID:", course.courseId); // Debug delete popup
+    setCourseToDelete(course);
     setIsConfirmPopupOpen(true);
   };
 
   const handleOpenEditPopup = (course) => {
-    console.log("Edit popup opened for course ID:", course.courseId); // Debugging line
+    console.log("Edit popup opened for course ID:", course.courseId); // Debug edit popup
     setEditingCourse(course);
     setIsEditPopupOpen(true);
   };
 
   const handleOpenModal = () => {
-  setEditingCourse(null); // Ensure no course is pre-selected for edit
-  setIsEditPopupOpen(true); // Open modal for course creation
-};
+    console.log("Opening modal for course creation."); // Debug modal action
+    setEditingCourse(null);
+    setIsEditPopupOpen(true);
+  };
 
   const fields = [
-    { index: 1, title: "Sr. No." },
+    { index: 1, title: "Course ID" },
     { index: 2, title: "Title" },
-    { index: 3, title: "Owner ID" },
+    { index: 3, title: "Description" },
     { index: 4, title: "Level" },
-    { index: 5, title: "Description" },
-    { index: 6, title: "Actions" },
+    { index: 5, title: "Owner ID" },
+    { index: 6, title: "Is Active" },
+    { index: 7, title: "Updated At" },
+    { index: 8, title: "Created At" },
   ];
 
   return (
@@ -145,28 +164,38 @@ const CoursesAdmin = ({ setLoading }) => {
             <div className="search">
               <input
                 type="text"
-                placeholder="Search by ID"
+                placeholder="Search by name"
                 className="searchbar"
-                onChange={handleSearchChange}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)} 
               />
-            <div className="search-icon" onClick={handleSearchById}>
-              <img src={searchLogo} alt="🔍" className="search-logo" />
             </div>
-            </div>
-            <Button text="Add Course" type="button" onClick={handleOpenModal} />          
-            </div>
+            <Button text="Add Course" type="button" onClick={handleOpenModal} /> 
+            <Button 
+            text={
+              filterType === 'all' 
+                ? 'Show Active Courses' 
+                : filterType === 'active' 
+                  ? 'Show Inactive Courses' 
+                  : 'Show All Courses'
+            }
+            onClick={toggleFilterType}
+          />         
+          </div>
         </div>
       </div>
-      {courseList && courseList.length > 0 ? (
-        <Table 
-          fields={fields} 
-          entries={courseList} 
-          type={"course"} 
-          onDeleteClick={handleOpenConfirmDeletePopup} 
-          onEditClick={handleOpenEditPopup} // Pass edit function
-        />
+      {filteredCourses && filteredCourses.length > 0 ? (
+        (
+          <CourseTable 
+            fields={fields} 
+            entries={filteredCourses}  
+            type={"course"} 
+            onDeleteClick={handleOpenConfirmDeletePopup} 
+            onEditClick={handleOpenEditPopup} 
+          />
+        )
       ) : (
-        <div className="no-data-found">No data found</div>
+        <div className="no-data-found"></div>
       )}
       <Toast
         message={toastMessage}
@@ -182,14 +211,14 @@ const CoursesAdmin = ({ setLoading }) => {
       <CoursesModal
         isModalOpen={isEditPopupOpen}
         handleCloseModal={() => setIsEditPopupOpen(false)}
-        selectedCourse={editingCourse} // Null when adding a new course
-        handleCreateCourse={handleCreateCourse} // Function for new course creation
-        handleUpdateCourse={handleEditCourse} // Function for editing
+        selectedCourse={editingCourse}
+        handleCreateCourse={handleCreateCourse}
+        handleUpdateCourse={handleEditCourse}
         setToastMessage={setToastMessage}
         setToastType={setToastType}
         setShowToast={setShowToast}
         setLoading={setLoading}
-        title={editingCourse ? "Edit Course" : "Add New Course"} // Dynamic modal title
+        title={editingCourse ? "Edit Course" : "Add New Course"}
         loadCourses={loadCourses}
       />
     </div>
@@ -197,3 +226,6 @@ const CoursesAdmin = ({ setLoading }) => {
 };
 
 export default AdminHOC(CoursesAdmin);
+
+
+
