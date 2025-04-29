@@ -175,16 +175,6 @@ const applyFilters = () => {
           />
         </div>
       </div>
-      {errorMessage && (
-        <div className="error-message">
-          {errorMessage}
-          <Button
-            text="Retry"
-            onClick={loadCourseContent}
-            className="common-btn"
-          />
-        </div>
-      )}
       {filteredContent.length === 0 && !errorMessage ? (
         <div className="no-data-found">No content available for this course.</div>
       ) : (
