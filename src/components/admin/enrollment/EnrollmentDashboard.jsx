@@ -24,6 +24,7 @@ import {
   Form,
   Radio,
   message,
+  Empty
 } from 'antd';
 import {
   UserOutlined,
@@ -39,6 +40,15 @@ import {
   ClockCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import {
+  getCourseColumns,
+  getBundleColumns,
+  getEntityColumns,
+  userEnrollmentColumns,
+  expandCourseRow,
+  expandBundleRow,
+  expandEntityRow
+} from './EnrollmentTables';
 import AddEnrollmentModal from './AddEnrollmentModal';
 import AdminDashboard from '../adminDashboard/AdminDashboard';
 import EnrollmentService from './enrollmentService';
@@ -56,6 +66,11 @@ const EnrollmentDashboard = () => {
   const [status, setStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // State for expanded rows
+  const [expandedCourseRows, setExpandedCourseRows] = useState([]);
+  const [expandedBundleRows, setExpandedBundleRows] = useState([]);
+  const [expandedEntityRows, setExpandedEntityRows] = useState([]);
   
   // State for add enrollment modal
   const [isModalVisible, setIsModalVisible] = useState(false);  
@@ -105,13 +120,38 @@ const EnrollmentDashboard = () => {
       ]);
       
       // Process user enrollments to format for users & groups views
-      const users = userEnrollmentsResponse?.filter(item => item.entityType === 'user') || [];
-      const groups = userEnrollmentsResponse?.filter(item => item.entityType === 'group') || [];
+      // Process user enrollments to format for users & groups views
+      const users = userEnrollmentsResponse || [];
+      const groups = []; // Currently not implementing groups view correctly
+      
+      // Process courses to ensure they have unique keys
+      const processedCourses = (userCoursesResponse || []).map(course => ({
+        ...course,
+        key: `course-${course.courseId || Math.random().toString(36).substring(2, 11)}`
+      }));
+      
+      // Process bundles to ensure they have unique keys
+      const processedBundles = (userBundlesResponse || []).map(bundle => ({
+        ...bundle,
+        key: `bundle-${bundle.bundleId || Math.random().toString(36).substring(2, 11)}`
+      }));
       
       setDashboardData({
-        courses: userCoursesResponse || [],
-        bundles: userBundlesResponse || [],
-        users: users,
+        courses: processedCourses,
+        bundles: processedBundles,
+        users: users.map(user => ({
+          key: `user-${user.userId || Math.random().toString(36).substring(2, 11)}`,
+          entityId: user.userId,
+          entityName: user.userName,
+          courseEnrollments: user.courseEnrollments || 0,
+          bundleEnrollments: user.bundleEnrollments || 0,
+          totalCourses: user.totalCourses || 0,
+          averageCompletion: user.averageCompletion || 0,
+          upcomingDeadlines: user.upcomingDeadlines || 0,
+          active: user.status !== false, // Convert to boolean if it's not already
+          enrolledCoursesList: user.enrolledCoursesList || [],
+          enrolledBundlesList: user.enrolledBundlesList || []
+        })),
         groups: groups,
         statistics: statsResponse || {
           totalEnrollments: 0,
@@ -134,6 +174,10 @@ const EnrollmentDashboard = () => {
   // Fetch data on filter change
   useEffect(() => {
     fetchDashboardData();
+    // Reset expanded rows when filters change
+    setExpandedCourseRows([]);
+    setExpandedBundleRows([]);
+    setExpandedEntityRows([]);
   }, [viewType, timeRange, status, searchTerm]);
   
   // Handle filter changes
@@ -150,316 +194,19 @@ const EnrollmentDashboard = () => {
     setIsModalVisible(false);
   };
   
-  // Helper function to render deadline status with color
-  const renderDeadlineStatus = (deadline) => {
-    if (!deadline) return <Tag color="default">No deadline</Tag>;
-    
-    const today = new Date();
-    const deadlineDate = new Date(deadline);
-    const daysUntilDeadline = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
-    
-    if (deadlineDate < today) {
-      return <Tag color="red">Overdue</Tag>;
-    } else if (daysUntilDeadline <= 7) {
-      return <Tag color="orange">Due in {daysUntilDeadline} days</Tag>;
-    } else {
-      return <Tag color="green">{deadline}</Tag>;
-    }
+  // Handle row expansion for courses
+  const onCourseExpand = (expanded, record) => {
+    setExpandedCourseRows(expanded ? [record.key] : []);
   };
   
-  // Updated Course table columns
-  const courseColumns = [
-    {
-      title: 'Course',
-      dataIndex: 'courseName', // Updated field name based on API
-      key: 'courseName',
-      render: (text, record) => (
-        <Space>
-          <BookOutlined style={{ color: '#1890ff' }} />
-          <Text strong>{text}</Text>
-          {record.featured && <Tag color="gold">Featured</Tag>}
-        </Space>
-      ),
-    },
-    {
-      title: 'Individual Enrollments',
-      dataIndex: 'individualEnrollments',
-      key: 'individualEnrollments',
-      render: (count) => (
-        <Space>
-          <UserOutlined />
-          <span>{count || 0}</span>
-        </Space>
-      ),
-    },
-    {
-      title: 'Owner Name',
-      dataIndex: 'ownerName',
-      key: 'ownerName',
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      dataIndex: 'active', // Updated field name based on API
-      render: (active) => {
-        let status = active ? 'active' : 'inactive';
-        let color = active ? 'green' : 'default';
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
-      },
-      filters: [
-        { text: 'Active', value: true },
-        { text: 'Inactive', value: false },
-      ],
-      onFilter: (value, record) => record.active === value,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" size="small" onClick={() => viewEntityDetails('course', record.courseId)}>View Details</Button>
-      ),
-    },
-  ];
-  
-  // Updated Bundle table columns
-  const bundleColumns = [
-    {
-      title: 'Bundle',
-      dataIndex: 'bundleName', // Updated field name based on API
-      key: 'bundleName',
-      render: (text, record) => (
-        <Space>
-          <AppstoreOutlined style={{ color: '#722ed1' }} />
-          <Text strong>{text}</Text>
-          <Tag color="purple">{record.totalCourses} Courses</Tag>
-        </Space>
-      ),
-    },
-    {
-      title: 'Individual Enrollments',
-      dataIndex: 'individualEnrollments',
-      key: 'individualEnrollments',
-      render: (count) => (
-        <Space>
-          <UserOutlined />
-          <span>{count || 0}</span>
-        </Space>
-      ),
-    },
-    {
-      title: 'Avg. Completion',
-      dataIndex: 'averageCompletion',
-      key: 'averageCompletion',
-      render: (rate) => <Progress percent={rate || 0} size="small" />,
-      sorter: (a, b) => (a.averageCompletion || 0) - (b.averageCompletion || 0),
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      dataIndex: 'active', // Updated field name based on API
-      render: (active) => {
-        let status = active ? 'active' : 'inactive';
-        let color = active ? 'green' : 'default';
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
-      },
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" size="small" onClick={() => viewEntityDetails('bundle', record.bundleId)}>View Details</Button>
-      ),
-    },
-  ];
-  
-  // Updated user enrollment columns for expanded rows
-  const userEnrollmentColumns = [
-    { 
-      title: 'Name', 
-      dataIndex: 'userName', // Updated field name based on API
-      key: 'userName' 
-    },
-    { 
-      title: 'Progress', 
-      dataIndex: 'progress', 
-      key: 'progress', 
-      render: (progress) => <Progress percent={progress || 0} size="small" /> 
-    },
-    { 
-      title: 'Assigned By', 
-      dataIndex: 'assignedBy', 
-      key: 'assignedBy' 
-    },
-    { 
-      title: 'Enrollment Date', 
-      dataIndex: 'enrollmentDate', 
-      key: 'enrollmentDate' 
-    },
-    {
-      title: 'Deadline',
-      dataIndex: 'deadline',
-      key: 'deadline',
-      render: (deadline) => renderDeadlineStatus(deadline)
-    }
-  ];
-  
-  // User/Group table columns
-  const entityColumns = [
-    {
-      title: viewType === 'users' ? 'User' : 'Group',
-      dataIndex: 'entityName',
-      key: 'entityName',
-      render: (text, record) => (
-        <Space>
-          {viewType === 'users' ? <UserOutlined /> : <TeamOutlined />}
-          <Text strong>{text}</Text>
-          {viewType === 'groups' && record.memberCount && <Tag color="blue">{record.memberCount} Members</Tag>}
-        </Space>
-      ),
-    },
-    {
-      title: 'Course Enrollments',
-      dataIndex: 'courseEnrollments',
-      key: 'courseEnrollments',
-      render: (courses) => <Tag color="blue">{Array.isArray(courses) ? courses.length : (courses || 0)}</Tag>,
-    },
-    {
-      title: 'Bundle Enrollments',
-      dataIndex: 'bundleEnrollments',
-      key: 'bundleEnrollments',
-      render: (bundles) => <Tag color="purple">{Array.isArray(bundles) ? bundles.length : (bundles || 0)}</Tag>,
-    },
-    {
-      title: 'Total Courses',
-      dataIndex: 'totalCourses',
-      key: 'totalCourses',
-    },
-    {
-      title: 'Average Completion',
-      dataIndex: 'averageCompletion',
-      key: 'averageCompletion',
-      render: (rate) => <Progress percent={rate || 0} size="small" />,
-      sorter: (a, b) => (a.averageCompletion || 0) - (b.averageCompletion || 0),
-    },
-    {
-      title: 'Upcoming Deadlines',
-      dataIndex: 'upcomingDeadlines',
-      key: 'upcomingDeadlines',
-      render: (count) => count > 0 ? <Badge count={count} style={{ backgroundColor: count > 2 ? '#f5222d' : '#faad14' }} /> : '0',
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      dataIndex: 'active',
-      render: (active) => {
-        let status = active ? 'active' : 'inactive';
-        let color = active ? 'green' : 'default';
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
-      },
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" size="small" onClick={() => viewEntityDetails(viewType === 'users' ? 'user' : 'group', record.entityId)}>View Details</Button>
-      ),
-    },
-  ];
-  
-  // View details handler
-  const viewEntityDetails = (type, id) => {
-    message.info(`Viewing details for ${type} ID: ${id}`);
-    // Implementation for viewing details would go here
-    // Could navigate to a detail page or open a modal with more info
+  // Handle row expansion for bundles
+  const onBundleExpand = (expanded, record) => {
+    setExpandedBundleRows(expanded ? [record.key] : []);
   };
   
-  // Render enrolled users for a course
-  const expandCourseRow = (record) => {
-    // With the updated API structure, we'll use the enrolledUserDTOList if available
-    const enrolledUsers = record.enrolledUserDTOList || [];
-    
-    return (
-      <div style={{ margin: 0 }}>
-        <Text strong>Enrolled Users:</Text>
-        <Table 
-          columns={userEnrollmentColumns} 
-          dataSource={enrolledUsers.map(user => ({
-            key: user.userId,
-            userName: user.userName,
-            progress: user.progress || 0,
-            enrollmentDate: user.enrollmentDate || 'N/A',
-            deadline: user.deadline || 'N/A',
-            assignedBy: user.assignedBy || 'System'
-          }))}
-          pagination={false}
-          size="small"
-        />
-      </div>
-    );
-  };
-  
-  // Render enrolled users for a bundle
-  const expandBundleRow = (record) => {
-    // With the updated API structure, we'll use the enrolledUserDTOList if available
-    const enrolledUsers = record.enrolledUserDTOList || [];
-    
-    return (
-      <div style={{ margin: 0 }}>
-        <Text strong>Enrolled Users:</Text>
-        <Table 
-          columns={userEnrollmentColumns}
-          dataSource={enrolledUsers.map(user => ({
-            key: user.userId,
-            userName: user.userName,
-            progress: user.progress || 0,
-            enrollmentDate: user.enrollmentDate || 'N/A',
-            deadline: user.deadline || 'N/A',
-            assignedBy: user.assignedBy || 'System'
-          }))}
-          pagination={false}
-          size="small"
-        />
-      </div>
-    );
-  };
-  
-  // Function to handle expanded row rendering for users/groups
-  const expandEntityRow = (record) => {
-    // Since we don't have direct API for entity details with the updated API structure,
-    // We'll use the available data from the record
-    
-    return (
-      <div style={{ margin: 0 }}>
-        <Tabs defaultActiveKey="enrolled-courses">
-          <TabPane tab="Enrolled Courses" key="enrolled-courses">
-            <Table 
-              columns={[
-                { title: 'Name', dataIndex: 'name', key: 'name' },
-                { title: 'Progress', dataIndex: 'progress', key: 'progress', render: (progress) => <Progress percent={progress || 0} size="small" /> },
-                { title: 'Enrollment Date', dataIndex: 'enrollmentDate', key: 'enrollmentDate' },
-                { title: 'Deadline', dataIndex: 'deadline', key: 'deadline', render: (deadline) => renderDeadlineStatus(deadline) }
-              ]}
-              dataSource={record.courseEnrollments || []}
-              pagination={false}
-              size="small"
-            />
-          </TabPane>
-          <TabPane tab="Enrolled Bundles" key="enrolled-bundles">
-            <Table 
-              columns={[
-                { title: 'Name', dataIndex: 'name', key: 'name' },
-                { title: 'Progress', dataIndex: 'progress', key: 'progress', render: (progress) => <Progress percent={progress || 0} size="small" /> },
-                { title: 'Enrollment Date', dataIndex: 'enrollmentDate', key: 'enrollmentDate' },
-                { title: 'Deadline', dataIndex: 'deadline', key: 'deadline', render: (deadline) => renderDeadlineStatus(deadline) }
-              ]}
-              dataSource={record.bundleEnrollments || []}
-              pagination={false}
-              size="small"
-            />
-          </TabPane>
-        </Tabs>
-      </div>
-    );
+  // Handle row expansion for entities (users/groups)
+  const onEntityExpand = (expanded, record) => {
+    setExpandedEntityRows(expanded ? [record.key] : []);
   };
   
   return (
@@ -613,34 +360,40 @@ const EnrollmentDashboard = () => {
                   
                   <TabPane tab="Courses" key="2">
                     <Table 
-                      columns={courseColumns} 
+                      columns={getCourseColumns()} 
                       dataSource={dashboardData.courses}
-                      rowKey="courseId"
                       expandable={{
                         expandedRowRender: expandCourseRow,
+                        onExpand: onCourseExpand,
+                        expandedRowKeys: expandedCourseRows
                       }}
+                      rowKey="key"
                     />
                   </TabPane>
                   
                   <TabPane tab="Bundles" key="3">
                     <Table 
-                      columns={bundleColumns} 
+                      columns={getBundleColumns()} 
                       dataSource={dashboardData.bundles}
-                      rowKey="bundleId"
                       expandable={{
                         expandedRowRender: expandBundleRow,
+                        onExpand: onBundleExpand,
+                        expandedRowKeys: expandedBundleRows
                       }}
+                      rowKey="key"
                     />
                   </TabPane>
                   
                   <TabPane tab={viewType === 'users' ? 'Users' : 'Groups'} key="4">
                     <Table 
-                      columns={entityColumns} 
+                      columns={getEntityColumns(viewType)} 
                       dataSource={viewType === 'users' ? dashboardData.users : dashboardData.groups}
-                      rowKey="entityId"
                       expandable={{
                         expandedRowRender: expandEntityRow,
+                        onExpand: onEntityExpand,
+                        expandedRowKeys: expandedEntityRows
                       }}
+                      rowKey="key"
                     />
                   </TabPane>
                 </Tabs>
@@ -657,8 +410,7 @@ const EnrollmentDashboard = () => {
         onSuccess={() => {
           setIsModalVisible(false);
           fetchDashboardData(); // Refresh dashboard data after successful enrollment
-          }
-        }
+        }}
       />
     </div>
   );

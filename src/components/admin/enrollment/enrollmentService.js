@@ -67,40 +67,76 @@ class EnrollmentService {
     }
   }
 
-  /**
-   * Fetch user enrollment data
-   * @param {Object} filters - Optional filter parameters
-   * @returns {Promise} Promise with user enrollment data
-   */
-  async fetchUserEnrollments(filters = {}) {
-    try {
-      const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/user-enrollments`, { 
-        params: filters 
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user enrollments:', error);
-      throw error;
-    }
+/**
+ * Fetch user enrollment data from the LMS backend.
+ * 
+ * This function retrieves a list of users along with detailed enrollment information, including:
+ * - Basic user info (`userId`, `userName`)
+ * - Number of course and bundle enrollments
+ * - Average course completion percentage
+ * - Count of upcoming deadlines
+ * - Enrollment details for each course and/or bundle (if enrolled), including progress, enrollment date, and deadline
+ * 
+ * @param {Object} filters - Optional query parameters to filter user enrollment data (e.g., by status or userId)
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of user enrollment objects
+ * 
+ * Each user enrollment object includes:
+ * - userId: number
+ * - userName: string
+ * - courseEnrollments: number
+ * - bundleEnrollments: number
+ * - totalCourses: number|null
+ * - averageCompletion: number
+ * - upcomingDeadlines: number
+ * - status: boolean
+ * - enrolledCoursesList: Array<{ courseId, courseName, progress, enrollmentDate, deadline }> | null
+ * - enrolledBundlesList: Array<{ bundleId, bundleName, progress, enrollmentDate, deadline }> | null
+ */
+async fetchUserEnrollments(filters = {}) {
+  try {
+    const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/user-enrollments`, { 
+      params: filters 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user enrollments:', error);
+    throw error;
   }
+}
+
   
-  /**
-   * Create a new enrollment
-   * @param {Object} enrollmentData - Enrollment data
-   * @returns {Promise} Promise with created enrollment
-   */
-  async createEnrollment(enrollmentData) {
-    try {
-      const response = await axios.post(
-        `${USER_API_BASE_URL}/api/enrollment/enroll`, 
-        enrollmentData
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error creating enrollment:', error);
-      throw error;
-    }
+/**
+ * Create a new enrollment
+ * @param {Object} enrollmentData - Enrollment data including:
+ * - userId: User ID (null if enrolling a group)
+ * - groupId: Group ID (null if enrolling a user)
+ * - courseId: Course ID (null if enrolling to a bundle)
+ * - bundleId: Bundle ID (null if enrolling to a course)
+ * - deadline: Deadline in ISO format (YYYY-MM-DDThh:mm:ss)
+ * - assignedBy: ID of the user creating the enrollment
+ * @returns {Promise} Promise with created enrollment
+ */
+async createEnrollment(enrollmentData) {
+  try {
+    const formattedData = {
+      userId: enrollmentData.userId,
+      groupId: enrollmentData.groupId,
+      courseId: enrollmentData.courseId,
+      bundleId: enrollmentData.bundleId,
+      deadline: enrollmentData.deadline,
+      assignedBy: enrollmentData.assignedBy || 6 
+    };
+    
+    const response = await axios.post(
+      `${USER_API_BASE_URL}/api/enrollment/enroll`, 
+      formattedData
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating enrollment:', error);
+    throw error;
   }
+}
 
   /**
    * Update an enrollment

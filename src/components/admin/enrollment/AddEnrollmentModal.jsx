@@ -89,13 +89,14 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
 
   const handleSubmit = async (values) => {
     try {
-      // Format enrollment data according to updated API
+      // Format enrollment data according to the required API format
       const enrollmentData = {
-        entityType: values.enrollmentType,
-        entityId: values.entityId,
-        contentType: values.contentType,
-        contentId: values.contentId,
-        deadline: values.deadline.format('YYYY-MM-DD')
+        userId: values.enrollmentType === 'user' ? values.entityId : null,
+        groupId: values.enrollmentType === 'group' ? values.entityId : null,
+        courseId: values.contentType === 'course' ? values.contentId : null,
+        bundleId: values.contentType === 'bundle' ? values.contentId : null,
+        deadline: values.deadline.format('YYYY-MM-DDThh:mm:ss'),
+        assignedBy: 6 // This should be the ID of the user doing the assignment, possibly get from auth context
       };
       
       await EnrollmentService.createEnrollment(enrollmentData);
