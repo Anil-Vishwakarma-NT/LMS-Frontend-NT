@@ -50,8 +50,8 @@ import {
   expandEntityRow
 } from './EnrollmentTables';
 import AddEnrollmentModal from './AddEnrollmentModal';
-import AdminDashboard from '../adminDashboard/AdminDashboard';
 import EnrollmentService from './enrollmentService';
+import AdminHOC from '../../shared/HOC/AdminHOC';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -211,6 +211,7 @@ const EnrollmentDashboard = () => {
   
   return (
     <div className="admin-section">
+      <Content style={{ margin: '0 16px' }}>
       <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ background: '#fff', padding: '0 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -402,6 +403,8 @@ const EnrollmentDashboard = () => {
           )}
         </Content>
       </Layout>
+      </Content>
+      
 
       {/* Add Enrollment Modal */}
       <AddEnrollmentModal 
@@ -416,4 +419,4 @@ const EnrollmentDashboard = () => {
   );
 };
 
-export default EnrollmentDashboard;
+export default AdminHOC(EnrollmentDashboard);
