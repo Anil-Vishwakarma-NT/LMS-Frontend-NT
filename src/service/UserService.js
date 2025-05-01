@@ -1,4 +1,4 @@
-import app from "./serviceLMS"
+import {app} from "./serviceLMS"
 
 
 export async function fetchUsers() {
