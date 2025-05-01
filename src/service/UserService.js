@@ -10,6 +10,26 @@ export async function fetchUsers() {
     }
 }
 
+export async function userStats(userId, token) {
+    try {
+        console.log("inside userStats");
+        console.log(userId);
+        const response = await app.get(`/api/users/enrollments/${userId}/statistics`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+        console.log("userStats response", response);
+
+        return response.data;
+    } catch (error) {
+        console.log("userStat error");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
 export async function deleteUsers(id) {
     try {
         const response = await app.delete(`/admin/remove-user/${id}`)
@@ -69,7 +89,7 @@ export async function createUser(userData, token) {
 
 export async function updateUser(userData, id) {
     try {
-        const response = await app.put(`/admin/update-user/${id}`, userData);
+        const response = await app.patch(`/admin/update-user/${id}`, userData);
         return response.data;
     } catch (error) {
         throw new Error(error?.response?.data?.message);

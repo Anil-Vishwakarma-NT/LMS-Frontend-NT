@@ -8,3 +8,4 @@ export async function dashStats() {
         throw new Error(error?.response?.data?.message);
     }
 }
+

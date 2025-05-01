@@ -29,9 +29,9 @@ function App() {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
-  useEffect(()=> {
+  useEffect(() => {
     const token = window.localStorage.getItem('authtoken')
-    if(token){
+    if (token) {
       getUser(token)
     } else {
       navigate('/')
@@ -46,12 +46,12 @@ function App() {
   }, [location])
 
   const getUser = async (token) => {
-    try{
+    try {
       const data = await getUserByToken(token);
-      
+
       dispatch(login(data))
       window.localStorage.setItem('authtoken', data.token)
-    } catch(error){
+    } catch (error) {
       navigate('/')
     }
   }
@@ -71,7 +71,7 @@ function App() {
         <Route path="/users" element={<AdminRoutes><UsersAdmin /></AdminRoutes>} />
         <Route path="/categories" element={<AdminRoutes><CategoriesAdmin /></AdminRoutes>} />
         <Route path="/issuance" element={<AdminRoutes><IssuanceAdmin /></AdminRoutes>} />
-        <Route path="/user-history/:mobileNumber" element={<AdminRoutes><UserHistory /></AdminRoutes>} />
+        <Route path="/user-history/:id" element={<AdminRoutes><UserHistory /></AdminRoutes>} />
         <Route path="/book-history/:id" element={<AdminRoutes><BookHistory /></AdminRoutes>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

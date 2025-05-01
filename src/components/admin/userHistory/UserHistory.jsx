@@ -10,14 +10,23 @@ import users from "../../../assets/group.png";
 import inHouse from "../../../assets/reading.png";
 import category from "../../../assets/category.png";
 import './UserHistory.css'
+import { useDispatch, useSelector } from 'react-redux'
+import { userStats } from "../../../service/UserService";
+
 const UserHistory = ({ setLoading }) => {
 
   const { id } = useParams();
 
   const [userHistoryData, setUserHistoryData] = useState([])
   const [pageNumber, setPageNumber] = useState(0);
+  const [dashStatsData, setDashStatsData] = useState({
+    enrollments: 0,
+    groups: 0,
+  })
 
   let height = window.innerHeight;
+
+  const auth = useSelector(state => state.auth);
 
   const pageSizeByHeight = () => {
 
@@ -102,6 +111,18 @@ const UserHistory = ({ setLoading }) => {
     },
   ];
 
+  const loadCount = async () => {
+    console.log("calling userStat")
+    const statsData = await userStats(id, auth.accessToken)
+    setDashStatsData(statsData)
+
+  }
+
+  useEffect(() => {
+    loadCount();
+  }, [])
+
+
   const loadUserHistory = async () => {
     try {
       setLoading(true)
@@ -118,11 +139,14 @@ const UserHistory = ({ setLoading }) => {
   useEffect(() => {
     loadUserHistory();
   }, [pageNumber, pageSize]);
-
+  // const loadCount = async () => {
+  //     const statsData = await dashStats()
+  //     setDashStatsData(statsData)
+  //   }
 
   const data = [
-    { id: 1, title: "Total Enrollments", number: 10, logo: users },
-    { id: 2, title: "Total Groups", number: 6, logo: book },
+    { id: 1, title: "Total Enrollments", number: dashStatsData?.enrollments, logo: users },
+    { id: 2, title: "Total Groups", number: dashStatsData?.groups, logo: book },
     { id: 3, title: "Total Completed Courses", number: 6, logo: category },
     { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
     { id: 5, title: "Defaulters", number: 1, logo: inHouse }

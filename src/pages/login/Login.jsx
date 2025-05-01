@@ -53,7 +53,7 @@ const Login = () => {
         navigate('/user');
       }
       else {
-        navigate('/')
+        navigate('/user')
       }
     }
   }, [auth?.accessToken]);
