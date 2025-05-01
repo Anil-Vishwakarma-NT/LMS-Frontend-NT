@@ -4,15 +4,15 @@ import AdminHOC from "../../shared/HOC/AdminHOC";
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Divider } from 'antd';
 import { DashboardOutlined } from '@ant-design/icons';
-import { 
-  getTotalUsers, 
+import {
+  getTotalUsers,
   getTotalCourses,
   getRecentUser,
   getRecentCourse,
   getRecentBundle,
   getTotalBundles,
   getRecentGroups,
-  getTotalGroups, 
+  getTotalGroups,
   getTotalEnrollment
 } from "../../../service/AdminService";
 import DashboardStats from './DashboardStats';
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
   const [enrollmentCount, setEnrollmentCount] = useState(0);
   const [activeUsers, setActiveUsers] = useState(5); // Could be replaced with API data
   const [stalledProgress, setStalledProgress] = useState(10); // Could be replaced with API data
-  
+
   // State for recent data
   const [recentUserList, setRecentUserList] = useState([]);
   const [recentCourseList, setRecentCourseList] = useState([]);
@@ -63,7 +63,7 @@ const AdminDashboard = () => {
     const response = await getTotalUsers();
     setUserCount(response.message);
   };
-  
+
   const fetchCourseCount = async () => {
     const response = await getTotalCourses();
     setCourseCount(response.message);
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
     const response = await getTotalGroups();
     setGroupCount(response.message);
   };
-  
+
   const fetchEnrollmentCount = async () => {
     const response = await getTotalEnrollment();
     setEnrollmentCount(response.totalEnrollments);
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
     const response = await getRecentUser();
     setRecentUserList(response);
   };
-  
+
   const fetchRecentCourse = async () => {
     const response = await getRecentCourse();
     setRecentCourseList(response);
@@ -99,7 +99,7 @@ const AdminDashboard = () => {
     const response = await getRecentBundle();
     setRecentBundleList(response);
   };
-  
+
   const fetchRecentGroup = async () => {
     const response = await getRecentGroups();
     setRecentGroupList(response);
@@ -131,10 +131,10 @@ const AdminDashboard = () => {
             <Title level={2} style={{ margin: 0 }}>Dashboard Overview</Title>
           </div>
           <Divider style={{ marginTop: 0 }} />
-          
+
           {/* Key Metrics Cards */}
           <DashboardStats {...statProps} />
-          
+
           {/* Activity Timeline / Recent Additions Tabs */}
           <RecentDataTabs {...tabsProps} />
         </div>

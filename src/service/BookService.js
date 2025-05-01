@@ -1,8 +1,9 @@
-import {app} from "./serviceLMS"
+import { app } from "./serviceLMS"
+import axios from 'axios';
 
 export const fetchAllCourses = async () => {
   try {
-    const response = await axios.get("http://localhost:8082/api/course");
+    const response = await axios.get("http://localhost:8080/api/course");
     return response.data; // Return the course data
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -15,7 +16,7 @@ export const fetchAllCourses = async () => {
 export async function deleteCourse(courseId) {
   try {
     const response = await axios.delete(
-      `http://localhost:8082/api/course/${courseId}`
+      `http://localhost:8080/api/course/${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -26,7 +27,7 @@ export async function deleteCourse(courseId) {
 export async function updateCourse(courseId, updatedData) {
   try {
     const response = await axios.put(
-      `http://localhost:8082/api/course/${courseId}`,
+      `http://localhost:8080/api/course/${courseId}`,
       updatedData
     );
     return response.data;
@@ -38,7 +39,7 @@ export async function updateCourse(courseId, updatedData) {
 export async function createCourse(courseData) {
   try {
     const response = await axios.post(
-      "http://localhost:8082/api/course",
+      "http://localhost:8080/api/course",
       courseData
     );
     return response.data;
@@ -50,7 +51,7 @@ export async function createCourse(courseData) {
 export async function fetchCourseById(courseId) {
   try {
     const response = await axios.get(
-      `http://localhost:8082/api/course/${courseId}`
+      `http://localhost:8080/api/course/${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -61,7 +62,7 @@ export async function fetchCourseById(courseId) {
 export async function fetchCourseContentByCourseId(courseId) {
   try {
     const response = await axios.get(
-      `http://localhost:8082/api/course-content/courseid/${courseId}`
+      `http://localhost:8080/api/course-content/courseid/${courseId}`
     );
     return response.data; // Return the course content data
   } catch (error) {
@@ -74,7 +75,7 @@ export async function fetchCourseContentByCourseId(courseId) {
 export async function deleteCourseContent(id) {
   try {
     const response = await axios.delete(
-      `http://localhost:8082/api/course-content/${id}`
+      `http://localhost:8080/api/course-content/${id}`
     );
     return response.data; // Return success message or response
   } catch (error) {
@@ -87,7 +88,7 @@ export async function deleteCourseContent(id) {
 export async function updateCourseContent(id, updatedData) {
   try {
     const response = await axios.put(
-      `http://localhost:8082/api/course-content/${id}`,
+      `http://localhost:8080/api/course-content/${id}`,
       updatedData
     );
     return response.data; // Return the updated content
@@ -101,7 +102,7 @@ export async function updateCourseContent(id, updatedData) {
 export async function createCourseContent(newData) {
   try {
     const response = await axios.post(
-      "http://localhost:8082/api/course-content",
+      "http://localhost:8080/api/course-content",
       newData
     );
     return response.data; // Return the newly created content
