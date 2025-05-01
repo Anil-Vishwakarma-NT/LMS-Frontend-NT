@@ -9,7 +9,7 @@ import category from "../../../assets/category.png";
 import { useNavigate } from "react-router-dom";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 import { fetchAllCategories } from "../../../service/CategoryService";
-import { fetchAllBooks } from "../../../service/BookService";
+// import { fetchAllBooks } from "../../../service/BookService";
 import BookCard from "../../shared/bookCard/BookCard";
 import Table from "../../shared/table/Table";
 import { useSelector } from "react-redux";
@@ -76,22 +76,21 @@ const AdminDashboard = ({setLoading}) => {
     }
   }
 
-  const loadBooks = async () => {
-    try{
-      setLoading(true)
-      const data = await fetchAllBooks(pageNumber, pageSize)
-      setBookDashList(data?.content)
-    } catch(error){
-      console.log(error);
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const loadBooks = async () => {
+  //   try{
+  //     setLoading(true)
+  //     const data = await fetchAllBooks(pageNumber, pageSize)
+  //     setBookDashList(data?.content)
+  //   } catch(error){
+  //     console.log(error);
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   useEffect(()=> {
     loadCategories();
     loadUsers();
-    loadBooks();
   }, [pageNumber, pageSize]);
 
 
