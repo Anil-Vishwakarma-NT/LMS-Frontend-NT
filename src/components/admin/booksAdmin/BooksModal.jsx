@@ -55,7 +55,7 @@ const CoursesModal = ({
         // Reset form for Add mode
         setCourseData({
           title: "",
-          ownerId: "",
+          ownerId: 1,
           description: "",
           courseLevel: "",
           image: "",
