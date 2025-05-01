@@ -15,12 +15,12 @@ import Table from "../../shared/table/Table";
 import { useSelector } from "react-redux";
 import { dashStats } from "../../../service/dashboardService";
 
-const AdminDashboard = ({ setLoading }) => {
+const AdminDashboard = ({setLoading}) => {
 
   const auth = useSelector(state => state.auth);
   const [pageNumber, setPageNumber] = useState(0)
   const [pageSize, setPageSize] = useState(5)
-  const [categoryDashList, setCategoryDashList] = useState([])
+  const [categoryDashList, setCategoryDashList] =useState([])
   const [userDashList, setUserDashList] = useState([])
   const [bookDashList, setBookDashList] = useState([])
   const [dashStatsData, setDashStatsData] = useState({
@@ -50,26 +50,26 @@ const AdminDashboard = ({ setLoading }) => {
 
   useEffect(() => {
     loadCount();
-  }, [])
+  },[])
 
   const loadCategories = async () => {
-    try {
+    try{
       setLoading(true)
       const data = await fetchAllCategories(pageNumber, pageSize);
       setCategoryDashList(data?.content)
-    } catch (error) {
+    } catch(error) {
       console.log(error);
     } finally {
       setLoading(false)
     }
   }
   const loadUsers = async () => {
-    try {
+    try{
       setLoading(true)
       const token = localStorage.getItem('authtoken');
       const data = await fetchAllActiveUsers(token);
       setUserDashList(data?.content)
-    } catch (error) {
+    } catch(error) {
       console.log(error);
     } finally {
       setLoading(false)
@@ -77,18 +77,18 @@ const AdminDashboard = ({ setLoading }) => {
   }
 
   const loadBooks = async () => {
-    try {
+    try{
       setLoading(true)
       const data = await fetchAllBooks(pageNumber, pageSize)
       setBookDashList(data?.content)
-    } catch (error) {
+    } catch(error){
       console.log(error);
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
+  useEffect(()=> {
     loadCategories();
     loadUsers();
     loadBooks();
@@ -97,7 +97,7 @@ const AdminDashboard = ({ setLoading }) => {
 
 
   const data = [
-    { id: 1, title: "Total Employees", number: dashStatsData?.totalUsers, logo: users },
+    { id: 1, title: "Total Users", number: dashStatsData?.totalUsers, logo: users },
     { id: 2, title: "Total Unique Books", number: dashStatsData?.totalBooks, logo: book },
     { id: 3, title: "Total Categories", number: dashStatsData?.totalCategories, logo: category },
     { id: 4, title: "Active Issuances", number: dashStatsData?.currentIssuances, logo: inHouse },
@@ -158,26 +158,26 @@ const AdminDashboard = ({ setLoading }) => {
       <div className="dash-tables">
         <div className="user-dash-table">
           <p className="user-dash-table-header">Recently Added Users</p>
-          <Table fields={userFields} entries={userDashList} type={'dash-user'} pageNumber={0} pageSize={5} />
+          <Table fields={userFields} entries={userDashList} type={'dash-user'} pageNumber={0} pageSize={5}/>
           <div className="see-more-container">
-            <button className="see-more" onClick={handleUserSeeMoreClick}>
-              See more
-            </button>
+          <button className="see-more" onClick={handleUserSeeMoreClick}>
+            See more
+          </button>
           </div>
         </div>
         <div className="user-dash-table">
           <p className="user-dash-table-header">Recently Added Categories</p>
-          <Table fields={categoryFields} entries={categoryDashList} type={'dash-category'} pageNumber={0} pageSize={5} />
+          <Table fields={categoryFields} entries={categoryDashList} type={'dash-category'} pageNumber={0} pageSize={5}/>
           <div className="see-more-container">
-            <button className="see-more" onClick={handleCategorySeeMoreClick}>
-              See more
-            </button>
+          <button className="see-more" onClick={handleCategorySeeMoreClick}>
+            See more
+          </button>
           </div>
         </div>
       </div>
       <div className="book-title-parent">
-        <div className="book-title">Recently Added Books</div>
-        <div className="book-line"></div>
+      <div className="book-title">Recently Added Books</div>
+      <div className="book-line"></div>
       </div>
       <div className="main-content">
         {bookDashList?.map((data) => (

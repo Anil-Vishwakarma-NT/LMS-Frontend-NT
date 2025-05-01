@@ -24,10 +24,8 @@ const Table = ({
   const handleViewBookClick = (id) => {
     navigate(`/book-history/${id}`);
   };
-  const handleViewUserClick = (id) => {
-    console.log("getting user details")
-    console.log(id);
-    navigate(`/user-history/${id}`);
+  const handleViewUserClick = (mobileNumber) => {
+    navigate(`/user-history/${mobileNumber}`);
   };
 
   const renderProgressBar = (value) => {
@@ -65,7 +63,7 @@ const Table = ({
                   <tr key={item.index}>
                     {Object.entries(item).map(([key, value]) => {
                       if (key === "id") {
-                        return null;
+                        return <td>{pageNumber * pageSize + i + 1}</td>;
                       }
                       if (type === "user") {
                         if (key !== "token") {
@@ -76,7 +74,7 @@ const Table = ({
                           );
                         }
                       } else if (type === "dash-user") {
-                        if (key !== "role" && key !== 'token') {
+                        if (key !== "role" && key!=='token') {
                           return (
                             <td>
                               {typeof value === "object" ? value?.name : value}
@@ -101,7 +99,7 @@ const Table = ({
                         if (key === 'actualReturnTime') {
                           return value ? <td>{new Date(value).toLocaleDateString('en-GB')} {' , '} {new Date(value).toLocaleTimeString()}</td> : <td>NA</td>
                         }
-
+                        
 
                         if (typeof value === "object") {
                           return key === "user" ? (
@@ -117,9 +115,9 @@ const Table = ({
                             return (
                               <td>
                                 {
-                                  <div>
-                                    {new Date(value).toLocaleDateString('en-GB')} {' , '} {new Date(value).toLocaleTimeString()}
-                                  </div>
+                                    <div>
+                                      {new Date(value).toLocaleDateString('en-GB')} {' , '} {new Date(value).toLocaleTimeString()}
+                                    </div>
                                 }
                               </td>
                             );
@@ -145,14 +143,14 @@ const Table = ({
                         } else {
                           if (
                             key === "issueTime" ||
-                            key === "expectedReturnTime"
+                            key === "expectedReturnTime" 
                           ) {
-                            return (
-                              <td>
-                                {new Date(value).toLocaleDateString("en-GB")}{" "}
-                                {" , "} {new Date(value).toLocaleTimeString()}
-                              </td>
-                            );
+                              return (
+                                <td>
+                                  {new Date(value).toLocaleDateString("en-GB")}{" "}
+                                  {" , "} {new Date(value).toLocaleTimeString()}
+                                </td>
+                              );
                           } else {
                             return <td>{value}</td>;
                           }
@@ -189,7 +187,7 @@ const Table = ({
                                 ></img>
                               </Tooltip>
                             )}
-                          {/* {type === "user" && (
+                          {type === "user" && (
                             <Tooltip tooltipText="Issue Book">
                               <img
                                 src={assignBook}
@@ -198,7 +196,7 @@ const Table = ({
                                 onClick={() => onAssignClick(item)}
                               ></img>
                             </Tooltip>
-                          )} */}
+                          )}
                           {type === "book" && (
                             <Tooltip tooltipText="Issue Book">
                               <img
@@ -227,10 +225,10 @@ const Table = ({
                       <td>
                         <div className="view-btn">
                           <Button
-                            text="Details"
+                            text="View"
                             className="books-view"
                             onClick={() =>
-                              handleViewUserClick(item?.id)
+                              handleViewUserClick(item?.mobileNumber)
                             }
                           />
                         </div>

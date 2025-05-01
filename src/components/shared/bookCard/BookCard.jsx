@@ -1,24 +1,23 @@
 import React from "react";
-import'./BookCard.css'
+import './BookCard.css'; // Rename CSS file accordingly
 import { useNavigate } from "react-router-dom";
 
-const BookCard = ({ data }) => {
-
-  const navigate = useNavigate()
+const CourseCard = ({ data }) => {
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate('/books')
-  }
+    navigate('/courses'); // Updated route
+  };
 
   return (
-    <div className="book-data-card" onClick={handleCardClick}>
-      <div className="book-data-details">
-        <img src={data.image} alt={data.title} className="book-data-photo"></img>
+    <div className="course-data-card" onClick={handleCardClick}>
+      <div className="course-data-details">
+        <img src={data.image} alt={data.title} className="course-data-photo"></img>
       </div>
-      <p className="book-data-name">{data.title}</p>
-      <p className="data-author">{data.author}</p>
+      <p className="course-data-name">{data.title}</p>
+      <p className="data-level">{data.level}</p>
     </div>
   );
 };
 
-export default BookCard;
+export default CourseCard;
