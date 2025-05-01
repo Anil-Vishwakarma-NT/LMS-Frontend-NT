@@ -21,6 +21,7 @@ import ContactUs from "./components/shared/contactUs/ContactUs";
 import AboutUs from "./components/shared/aboutUs/AboutUs";
 import Loader from "./components/shared/loader/Loader";
 import NotFound from "./pages/notFound/NotFound";
+import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboard";
 
 function App() {
 
@@ -74,6 +75,7 @@ function App() {
         <Route path="/user-history/:id" element={<AdminRoutes><UserHistory /></AdminRoutes>} />
         <Route path="/book-history/:id" element={<AdminRoutes><BookHistory /></AdminRoutes>} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/enroll" element={<AdminRoutes><EnrollmentDashboard /></AdminRoutes>} />
       </Routes>
     </>
   );
