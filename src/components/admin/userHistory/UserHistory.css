@@ -7,6 +7,11 @@
     padding-top: 7px;
 }
 
+.main-content {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 @media (max-width: 1300px) {
     .main-content {
         flex-wrap: wrap;
