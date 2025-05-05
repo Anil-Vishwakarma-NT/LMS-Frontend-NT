@@ -1,10 +1,11 @@
 import axios from 'axios';
 
+
 // Base API URL - replace with your actual API endpoint
 const USER_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
 const COURSE_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
-
+const token = localStorage.getItem('authtoken');
 class EnrollmentService {
   /**
    * Fetch enrollment statistics
@@ -129,7 +130,7 @@ async createEnrollment(enrollmentData) {
     
     const response = await axios.post(
       `${USER_API_BASE_URL}/api/enrollment/enroll`, 
-      formattedData
+      formattedData,
     );
     return response.data;
   } catch (error) {
@@ -184,9 +185,16 @@ async createEnrollment(enrollmentData) {
  * - manager: Manager name
  * - message: Optional message
  */
+ 
 async fetchActiveEmployees() {
   try {
-    const response = await axios.get(`${USER_API_BASE_URL}/admin/active-employees`);
+    console.log('API URL:', `${USER_API_BASE_URL}/admin/active-employees`);
+    const response = await axios.get(`${USER_API_BASE_URL}/admin/active-employees`,
+    {
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching active employees:', error);
@@ -203,7 +211,12 @@ async fetchActiveEmployees() {
  */
 async fetchAllGroups() {
   try {
-    const response = await axios.get(`${USER_API_BASE_URL}/group/all-groups`);
+    const response = await axios.get(`${USER_API_BASE_URL}/group/all-groups`,
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
     return response.data;
   } catch (error) {
     console.error('Error fetching all groups:', error);
@@ -225,7 +238,12 @@ async fetchAllGroups() {
  */
 async fetchAllCourses() {
   try {
-    const response = await axios.get(`${COURSE_API_BASE_URL}/course`);
+    const response = await axios.get(`${COURSE_API_BASE_URL}/course`,
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
     return response.data;
   } catch (error) {
     console.error('Error fetching courses:', error);
@@ -244,7 +262,13 @@ async fetchAllCourses() {
  */
 async fetchAllBundles() {
   try {
-    const response = await axios.get(`${COURSE_API_BASE_URL}/bundles`);
+    const response = await axios.get(`${COURSE_API_BASE_URL}/bundles`,
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching bundles:', error);
