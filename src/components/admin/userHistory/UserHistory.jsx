@@ -64,8 +64,8 @@ const UserHistory = ({ setLoading }) => {
     },
     {
       index: 4,
-      key: "Group name",
-      title: "Group name"
+      key: "Group/Individual",
+      title: "Group/Individual"
     },
     {
       index: 5,
@@ -113,6 +113,7 @@ const UserHistory = ({ setLoading }) => {
 
   const loadCount = async () => {
     console.log("calling userStat")
+    console.log("calling user History ", id)
     const statsData = await userStats(id, auth.accessToken)
     setDashStatsData(statsData)
 
@@ -126,6 +127,7 @@ const UserHistory = ({ setLoading }) => {
   const loadUserHistory = async () => {
     try {
       setLoading(true)
+
       const data = await userHistory(id);
       setUserHistoryData(data?.content);
       setTotalPages(data?.totalPages)
