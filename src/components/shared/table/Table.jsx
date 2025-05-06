@@ -3,7 +3,6 @@ import edit from "../../../assets/edit.png";
 import './Table.css'
 import deleteLogo from "../../../assets/delete.png";
 import assignUser from "../../../assets/clipboard.png";
-import assignBook from "../../../assets/book.png";
 import Button from "../button/Button";
 import { useNavigate } from "react-router-dom";
 import Tooltip from "../tooltip/Tooltip";
@@ -24,8 +23,8 @@ const Table = ({
   const handleViewBookClick = (id) => {
     navigate(`/book-history/${id}`);
   };
-  const handleViewUserClick = (mobileNumber) => {
-    navigate(`/user-history/${mobileNumber}`);
+  const handleViewUserClick = (id) => {
+    navigate(`/user-history/${id}`);
   };
 
   const renderProgressBar = (value) => {
@@ -225,10 +224,10 @@ const Table = ({
                       <td>
                         <div className="view-btn">
                           <Button
-                            text="View"
+                            text="Details"
                             className="books-view"
                             onClick={() =>
-                              handleViewUserClick(item?.mobileNumber)
+                              handleViewUserClick(item?.id)
                             }
                           />
                         </div>
