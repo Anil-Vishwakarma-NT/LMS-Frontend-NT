@@ -23,6 +23,8 @@ import Loader from "./components/shared/loader/Loader";
 import NotFound from "./pages/notFound/NotFound";
 import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboard";
 import CourseContentAdmin from "./components/admin/booksAdmin/CourseContentAdmin";
+import MyCourses from "./components/user/myCourses/MyCourses";
+import CourseContentUser from "./components/user/myCourses/CourseContentUser";
 
 function App() {
   const dispatch = useDispatch();
@@ -79,6 +81,22 @@ function App() {
             </UserRoutes>
           }
         />
+        <Route
+          path="/my-courses"
+          element={
+            <UserRoutes>
+              <MyCourses />
+            </UserRoutes>
+          }
+        />
+        <Route
+          path="/course-content-user/:courseId"
+          element={
+            <UserRoutes>
+              <CourseContentUser />
+            </UserRoutes>
+          }
+        ></Route>
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/about" element={<AboutUs />} />
