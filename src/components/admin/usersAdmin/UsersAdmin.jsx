@@ -221,7 +221,7 @@ const UsersAdmin = ({ setLoading }) => {
       role: user.role,
 
     },
-    id: user.userId,
+
   }));
 
   return (

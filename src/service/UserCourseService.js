@@ -43,6 +43,7 @@ export async function getUserEnrolledCourseDetails(userId) {
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
+        
       );
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
 
@@ -56,8 +57,8 @@ export async function getUserEnrolledCourseDetails(userId) {
           roundedCompletion === 100
             ? "Completed"
             : roundedCompletion > 0
-            ? "In Progress"
-            : "Not Started",
+              ? "In Progress"
+              : "Not Started",
       };
     });
 

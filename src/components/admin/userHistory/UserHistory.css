@@ -1,3 +1,14 @@
+.main-content {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    /* Ensure it wraps at all screen sizes */
+    gap: 20px;
+    /* Optional: spacing between cards */
+    margin-bottom: 40px;
+    /* Push the next section down */
+}
+
 .user-history-table {
     font-family: Josefin Sans;
     font-size: 1.25rem;
@@ -7,9 +18,14 @@
     padding-top: 7px;
 }
 
-.main-content {
-    display: flex;
-    justify-content: space-evenly;
+.no-data-found {
+    position: relative;
+}
+
+.dash-card {
+    position: relative;
+    /* instead of absolute */
+    width: 100%;
 }
 
 @media (max-width: 1300px) {
