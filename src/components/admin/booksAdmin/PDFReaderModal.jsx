@@ -64,7 +64,7 @@ const PDFReaderModal = ({ isOpen, pdfUrl, onClose, blockTime }) => {
 
         {/* PDF Viewer */}
         <div className="pdf-viewer-container">
-          <Worker workerUrl={`https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`}>
+          <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js`}>
             <Viewer fileUrl={pdfUrl} />
           </Worker>
         </div>
