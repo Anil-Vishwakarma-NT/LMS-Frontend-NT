@@ -1,4 +1,4 @@
-import {app} from "./serviceLMS"
+import { app } from "./serviceLMS"
 
 
 export async function fetchUsers() {
@@ -13,7 +13,6 @@ export async function fetchUsers() {
 export async function userStats(userId, token) {
     try {
         console.log("inside userStats");
-        console.log(userId);
         const response = await app.get(`/api/users/enrollments/${userId}/statistics`,
             {
                 headers: {

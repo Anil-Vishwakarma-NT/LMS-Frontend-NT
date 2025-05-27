@@ -13,6 +13,7 @@ import './UserHistory.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { userStats } from "../../../service/UserService";
 import UserCourseTable from "../../shared/table/UserCourseTable";
+import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";import UserCourseTable from "../../shared/table/UserCourseTable";
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
 const UserHistory = ({ setLoading }) => {
   const { id } = useParams();
@@ -44,6 +45,7 @@ const UserHistory = ({ setLoading }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
+
   useEffect(() => {
     const loadCount = async () => {
       console.log("calling userStat")
@@ -63,21 +65,28 @@ const UserHistory = ({ setLoading }) => {
         console.log("Error fetching user courses:", error);
       }
     };
+
     fetchCourses();
     loadCount();
   }, []);
+
   // const loadCount = async () => {
   //   console.log("calling userStat")
   //   console.log("calling user History ", id)
   //   const statsData = await userStats(id, auth.accessToken)
   //   setDashStatsData(statsData)
+
   // }
+
   // useEffect(() => {
   //   loadCount();
   // }, [])
+
+
   const loadUserHistory = async () => {
     try {
       setLoading(true)
+
       const data = await userHistory(id);
       setUserHistoryData(data?.content);
       setTotalPages(data?.totalPages)
@@ -90,6 +99,8 @@ const UserHistory = ({ setLoading }) => {
   useEffect(() => {
     loadUserHistory();
   }, [pageNumber, pageSize]);
+
+
   const data = [
     { id: 1, title: "Total Enrollments", number: dashStatsData?.enrollments, logo: users },
     { id: 2, title: "Total Groups", number: dashStatsData?.groups, logo: book },
@@ -105,9 +116,17 @@ const UserHistory = ({ setLoading }) => {
       <div className="main-content">
         {data?.map((data) => (
           <DashCard data={data} />
+          <DashCard data={data} />
         ))}
       </div>
+
       <div className='user-history-table'>
+        {filteredCourses.length > 0 ? (
+          <UserCourseTable entries={filteredCourses} />
+
+        ) : (
+          <div className="no-data-found">No enrolled courses found.</div>
+        )}
         {filteredCourses.length > 0 ? (
           <UserCourseTable entries={filteredCourses} />
         ) : (
