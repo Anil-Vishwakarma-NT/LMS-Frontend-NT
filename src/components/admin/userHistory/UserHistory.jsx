@@ -13,8 +13,8 @@ import './UserHistory.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { userStats } from "../../../service/UserService";
 import UserCourseTable from "../../shared/table/UserCourseTable";
-import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";import UserCourseTable from "../../shared/table/UserCourseTable";
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
+
 const UserHistory = ({ setLoading }) => {
   const { id } = useParams();
   const [userHistoryData, setUserHistoryData] = useState([])
@@ -116,7 +116,6 @@ const UserHistory = ({ setLoading }) => {
       <div className="main-content">
         {data?.map((data) => (
           <DashCard data={data} />
-          <DashCard data={data} />
         ))}
       </div>
 
@@ -127,11 +126,7 @@ const UserHistory = ({ setLoading }) => {
         ) : (
           <div className="no-data-found">No enrolled courses found.</div>
         )}
-        {filteredCourses.length > 0 ? (
-          <UserCourseTable entries={filteredCourses} />
-        ) : (
-          <div className="no-data-found">No enrolled courses found.</div>
-        )}
+        
         <div className="paginate">
           {userHistoryData && userHistoryData.length > 0 ?
             <Paginate
