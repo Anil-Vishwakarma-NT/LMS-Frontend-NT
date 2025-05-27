@@ -38,12 +38,15 @@ export async function fetchCourseProgress(userId, courseId) {
 export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
+    console.log("Enrolled coursed fetched " , enrollments);
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
+      console.log("details fetched for course", courseDetails);
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
       );
+      console.log("Completion percentage fetched", completionPercentage);
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
 
       return {
