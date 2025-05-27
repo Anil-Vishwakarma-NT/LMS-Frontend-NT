@@ -123,6 +123,7 @@ import React, { useEffect, useState, useRef } from "react";
 import * as pdfjs from "pdfjs-dist";
 import { updateContentProgress } from "../../../service/UserCourseService";
 import "../../admin/booksAdmin/PDFReaderModal.css";
+import { useSelector } from "react-redux";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js`;
 
@@ -130,7 +131,6 @@ const UserPDFReaderModal = ({
   isOpen,
   pdfUrl,
   onClose,
-  userId = 2,
   contentId,
   courseId,
   blockTime = 30, // default to 30 seconds if not provided
@@ -141,6 +141,8 @@ const UserPDFReaderModal = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [remainingTime, setRemainingTime] = useState(blockTime);
   const [timerActive, setTimerActive] = useState(true);
+  const userId = useSelector(state => state.auth.userId);
+
   let activeRenderTask = null;
 
   // Reset timer and page state when modal opens
