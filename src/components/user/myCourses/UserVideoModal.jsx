@@ -3,11 +3,16 @@ import ReactPlayer from "react-player";
 import axios from "axios";
 import { updateContentProgress } from "../../../service/UserCourseService";
 import "../../admin/booksAdmin/VideoModal.css";
+import { useSelector } from "react-redux";
 
-const UserVideoModal = ({ isOpen, videoUrl, onClose, userId = 2, contentId, courseId }) => {
+
+
+const UserVideoModal = ({ isOpen, videoUrl, onClose, contentId, courseId }) => {
   const [lastPosition, setLastPosition] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const userId = useSelector(state => state.auth.userId);
+  
 
   useEffect(() => {
     if (isOpen) {

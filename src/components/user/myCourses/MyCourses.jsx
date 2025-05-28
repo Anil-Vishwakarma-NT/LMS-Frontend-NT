@@ -67,10 +67,11 @@
 
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector , useDispatch} from "react-redux";
 import UserHOC from "../../shared/HOC/UserHOC"; 
 import UserCourseTable from "../../shared/table/UserCourseTable";
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
+import { setUserId as setUserIdAction} from "../../../redux/authentication/authActions";
 
 const MyCourses = () => {
   const [search, setSearch] = useState('');
@@ -79,6 +80,7 @@ const MyCourses = () => {
   const [userId, setUserId] = useState(null);
 
   const auth = useSelector(state => state.auth);
+  const dispatch = useDispatch();
   const email = auth?.email;
 
 const fetchUserId = async (email) => {
@@ -92,8 +94,7 @@ const fetchUserId = async (email) => {
     });
 
     const rawData = await response.text();
-    console.log("Raw response from API:", rawData); // Debugging step
-
+    console.log("Raw response from API:", rawData); 
     const userData = JSON.parse(rawData); // Ensure valid JSON
     return userData;
   } catch (error) {
@@ -106,7 +107,8 @@ const fetchUserId = async (email) => {
     if (email) {
       fetchUserId(email).then(userId => {
         console.log("Fetched User ID:", userId);
-        setUserId(userId);  // Store user ID once received
+        setUserId(userId);
+        dispatch(setUserIdAction(userId));  // Store user ID once received
       });
     }
   }, [email]);
