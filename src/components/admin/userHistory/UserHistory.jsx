@@ -18,7 +18,7 @@ import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService
 const UserHistory = ({ setLoading }) => {
   const { id } = useParams();
   const location = useLocation();
-  const userName = location.state?.name;
+  const userName = location.state?.name || "N/A";
   const [userHistoryData, setUserHistoryData] = useState([])
   const [pageNumber, setPageNumber] = useState(0);
   const [dashStatsData, setDashStatsData] = useState({
