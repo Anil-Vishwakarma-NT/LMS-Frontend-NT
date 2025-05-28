@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams , useLocation } from 'react-router-dom'
 import Table from '../../shared/table/Table'
 import AdminHOC from '../../shared/HOC/AdminHOC'
 import { userHistory } from '../../../service/IssuanceService'
@@ -17,6 +17,8 @@ import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService
 
 const UserHistory = ({ setLoading }) => {
   const { id } = useParams();
+  const location = useLocation();
+  const userName = location.state?.name;
   const [userHistoryData, setUserHistoryData] = useState([])
   const [pageNumber, setPageNumber] = useState(0);
   const [dashStatsData, setDashStatsData] = useState({
@@ -104,13 +106,13 @@ const UserHistory = ({ setLoading }) => {
   const data = [
     { id: 1, title: "Total Enrollments", number: dashStatsData?.enrollments, logo: users },
     { id: 2, title: "Total Groups", number: dashStatsData?.groups, logo: book },
-    { id: 3, title: "Total Completed Courses", number: 6, logo: category },
-    { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
-    { id: 5, title: "Defaulters", number: 1, logo: inHouse }
+    // { id: 3, title: "Total Completed Courses", number: 6, logo: category },
+    // { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
+    // { id: 5, title: "Defaulters", number: 1, logo: inHouse }
   ];
   return (
     <div className="admin-section">
-      <h2 className="admin-page-header" style={{ marginTop: '10px' }}>Employee Details</h2>
+      <h2 className="admin-page-header" style={{ marginTop: '10px' }}>{userName} Details</h2>
       <div className="admin-page-mid">
       </div>
       <div className="main-content">
