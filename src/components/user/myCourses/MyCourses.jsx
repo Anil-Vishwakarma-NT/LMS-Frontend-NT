@@ -93,9 +93,8 @@ const fetchUserId = async (email) => {
       }
     });
 
-    const rawData = await response.text();
-    console.log("Raw response from API:", rawData); 
-    const userData = JSON.parse(rawData); // Ensure valid JSON
+     const userData = await response.json(); // Read and parse JSON in one step
+    console.log("✅ Parsed JSON response:", userData);
     return userData;
   } catch (error) {
     console.error("❌ Error fetching user ID:", error);
@@ -103,15 +102,19 @@ const fetchUserId = async (email) => {
   }
 };
 
-  useEffect(() => {
-    if (email) {
-      fetchUserId(email).then(userId => {
-        console.log("Fetched User ID:", userId);
-        setUserId(userId);
-        dispatch(setUserIdAction(userId));  // Store user ID once received
-      });
-    }
-  }, [email]);
+useEffect(() => {
+  if (email) {
+    fetchUserId(email).then((user) => {
+      if (user && user.userId) {
+        console.log("Fetched User ID:", user.userId);
+        setUserId(user.userId); // ✅ Only set the ID
+        dispatch(setUserIdAction(user.id)); // ✅ Dispatch only the ID
+      } else {
+        console.warn("No valid user returned from API.");
+      }
+    });
+  }
+}, [email]);
 
   // Fetch courses once user ID is available
   useEffect(() => {
