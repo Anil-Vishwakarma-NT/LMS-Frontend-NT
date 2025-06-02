@@ -108,7 +108,7 @@ useEffect(() => {
       if (user && user.userId) {
         console.log("Fetched User ID:", user.userId);
         setUserId(user.userId); // ✅ Only set the ID
-        dispatch(setUserIdAction(user.id)); // ✅ Dispatch only the ID
+        dispatch(setUserIdAction(user.userId)); // ✅ Dispatch only the ID
       } else {
         console.warn("No valid user returned from API.");
       }
@@ -159,7 +159,7 @@ useEffect(() => {
       </div>
 
       {filteredCourses.length > 0 ? (
-        <UserCourseTable entries={filteredCourses} />
+        <UserCourseTable entries={filteredCourses} showViewAction={true}/>
       ) : (
         <div className="no-data-found">No enrolled courses found.</div>
       )}

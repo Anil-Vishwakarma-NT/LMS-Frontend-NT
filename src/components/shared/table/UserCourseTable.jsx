@@ -4,7 +4,7 @@ import Tooltip from "../tooltip/Tooltip";
 import { MdVisibility } from "react-icons/md";
 import { useSelector } from "react-redux";
 
-const UserCourseTable = ({ fields, entries }) => {
+const UserCourseTable = ({ fields, entries, showViewAction }) => {
   const navigate = useNavigate();
   const auth = useSelector(state => state.auth);
   console.log("auth object", auth);  // Logs the entire auth object
@@ -24,7 +24,7 @@ const UserCourseTable = ({ fields, entries }) => {
               <th>Deadline</th>
               <th>Completion Percentage</th>
               <th>Status</th>
-              {auth.roles !== "admin" && <th>Action</th>}
+              {(auth.roles !== "admin" && showViewAction) && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -39,7 +39,7 @@ const UserCourseTable = ({ fields, entries }) => {
                 <td>{item.roundedCompletion}%</td>
                 <td>{item.status}</td>
                 {/* Conditionally render the action column */}
-                {auth.roles !== "admin" && (
+                {(auth.roles !== "admin" && showViewAction)&& (
                   <td>
                     <Tooltip tooltipText="View">
                       <MdVisibility

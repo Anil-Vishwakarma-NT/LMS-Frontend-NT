@@ -128,7 +128,7 @@ const AdminDashboard = () => {
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
             <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} />
-            <Title level={2} style={{ margin: 0 }}>Dashboard Overview</Title>
+            <Title level={2} style={{ margin: 0 }}>Admin Dashboard Overview</Title>
           </div>
           <Divider style={{ marginTop: 0 }} />
 
