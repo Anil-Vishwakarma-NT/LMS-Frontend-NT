@@ -110,12 +110,12 @@ const EnrollmentDashboard = () => {
       const [
         statsResponse,
         userCoursesResponse,
-        userBundlesResponse,
+       
         userEnrollmentsResponse
       ] = await Promise.all([
         EnrollmentService.fetchStats(),
         EnrollmentService.fetchUserCourses(filters),
-        EnrollmentService.fetchUserBundles(filters),
+       
         EnrollmentService.fetchUserEnrollments(filters)
       ]);
       
@@ -131,14 +131,14 @@ const EnrollmentDashboard = () => {
       }));
       
       // Process bundles to ensure they have unique keys
-      const processedBundles = (userBundlesResponse || []).map(bundle => ({
-        ...bundle,
-        key: `bundle-${bundle.bundleId || Math.random().toString(36).substring(2, 11)}`
-      }));
+      // const processedBundles = (userBundlesResponse || []).map(bundle => ({
+      //   ...bundle,
+      //   key: `bundle-${bundle.bundleId || Math.random().toString(36).substring(2, 11)}`
+      // }));
       
       setDashboardData({
         courses: processedCourses,
-        bundles: processedBundles,
+        // bundles: processedBundles,
         users: users.map(user => ({
           key: `user-${user.userId || Math.random().toString(36).substring(2, 11)}`,
           entityId: user.userId,

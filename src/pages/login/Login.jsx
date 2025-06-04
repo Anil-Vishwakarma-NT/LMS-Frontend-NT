@@ -25,8 +25,8 @@ const Login = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
-
-
+  const[userId, setUserId] = useState(null);
+  const[emp,setEmp] = useState(null);
   function parseJwt(token) {
     const base64Url = token.split('.')[1]; // Get payload part
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -42,6 +42,42 @@ const Login = () => {
   }
 
 
+  const fetchUserId = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
+          "Content-Type": "application/json"
+        }
+      });
+  
+       const userData = await response.json(); // Read and parse JSON in one step
+      console.log("✅ Parsed JSON response:", userData);
+      return userData;
+    } catch (error) {
+      console.error("❌ Error fetching user ID:", error);
+      return null;
+    }
+  };
+  
+useEffect(() => {
+  if (auth.email) {
+    console.log("📩 Fetching userId for email:", auth.email);
+    fetchUserId(auth.email).then((user) => {
+      if (user && user.userId) {
+        console.log("✅ User fetched:", user);
+        setUserId(user.userId);
+        setEmp(user.firstName + user.lastName);
+      } else {
+        console.warn("⚠️ No valid user returned or userId is missing:", user);
+      }
+    });
+  }
+}, [auth.email]);
+
+  
+
   useEffect(() => {
     if (auth && auth.accessToken) {
       console.log(auth.roles)
@@ -50,13 +86,13 @@ const Login = () => {
         console.log('token stored in localstorage!!');
         navigate('/admin');
       } else if (auth.roles === "employee") {
-        navigate('/user');
+        navigate('/user',{state: { userId: userId ,name: emp }});
       }
       else {
         navigate('/user')
       }
     }
-  }, [auth?.accessToken]);
+  }, [auth?.accessToken,userId]);
 
   const validateForm = () => {
     let formErrors = {};
@@ -109,7 +145,7 @@ const Login = () => {
           <p className="login-header">Login</p>
           <div className="login-info">
             <p>Welcome back!</p>
-            <p>Please log in to access your library account.</p>
+            <p>Please log in to access your learning management system.</p>
           </div>
           <label
             style={{ marginBottom: "5px", marginTop: '5px' }}

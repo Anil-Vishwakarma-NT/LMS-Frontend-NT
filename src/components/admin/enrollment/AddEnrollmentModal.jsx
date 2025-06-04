@@ -30,13 +30,13 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
       const [
         usersResponse,
         groupsResponse,
-        coursesResponse,
-        bundlesResponse
+        coursesResponse
+        
       ] = await Promise.all([
         EnrollmentService.fetchActiveEmployees(),
         EnrollmentService.fetchAllGroups(),
-        EnrollmentService.fetchAllCourses(),
-        EnrollmentService.fetchAllBundles()
+        EnrollmentService.fetchAllCourses()
+        
       ]);
       console.log("userResponse", usersResponse)
       // Format users data - only userId and full name
@@ -56,18 +56,17 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
         id: course.courseId,
         name: course.title
       })) || [];
-
-      // Format bundles data - only bundleId and bundleName
-      const formattedBundles = bundlesResponse?.map(bundle => ({
-        id: bundle.bundleId,
-        name: bundle.bundleName
-      })) || [];
-
+      
+      // // Format bundles data - only bundleId and bundleName
+      // const formattedBundles = bundlesResponse?.map(bundle => ({
+      //   id: bundle.bundleId,
+      //   name: bundle.bundleName
+      // })) || [];
+      
       setAvailableUsers(formattedUsers);
       setAvailableGroups(formattedGroups);
       setAvailableCourses(formattedCourses);
-      setAvailableBundles(formattedBundles);
-      console.log(availableUsers, "**")
+      // setAvailableBundles(formattedBundles);
     } catch (error) {
       message.error('Failed to fetch enrollment options');
       console.error('Error fetching enrollment options:', error);
@@ -95,9 +94,9 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
         userId: values.enrollmentType === 'user' ? values.entityId : null,
         groupId: values.enrollmentType === 'group' ? values.entityId : null,
         courseId: values.contentType === 'course' ? values.contentId : null,
-        bundleId: values.contentType === 'bundle' ? values.contentId : null,
+        // bundleId: values.contentType === 'bundle' ? values.contentId : null,
         deadline: values.deadline.format('YYYY-MM-DDThh:mm:ss'),
-        assignedBy: 6 // This should be the ID of the user doing the assignment, possibly get from auth context
+        assignedBy: 1 // This should be the ID of the user doing the assignment, possibly get from auth context
       };
 
       await EnrollmentService.createEnrollment(enrollmentData);

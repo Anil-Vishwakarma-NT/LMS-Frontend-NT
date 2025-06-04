@@ -38,13 +38,16 @@ export async function fetchCourseProgress(userId, courseId) {
 export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
+    console.log("Enrolled coursed fetched " , enrollments);
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
+      console.log("details fetched for course", courseDetails);
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
         
       );
+      console.log("Completion percentage fetched", completionPercentage);
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
 
       return {
@@ -68,6 +71,17 @@ export async function getUserEnrolledCourseDetails(userId) {
   }
 }
 
+export async function fetchContentProgress(userId, courseId, contentId) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
+    );
+    return response.data; // Returns content completion percentage
+  } catch (error) {
+    return 0; // Default to 0% if no entry exists
+  }
+}
+
 export async function updateContentProgress(
   userId,
   contentId,
@@ -77,15 +91,23 @@ export async function updateContentProgress(
   contentType
 ) {
   try {
-    const existingCompletionPercentage = await fetchCourseProgress(
+    const existingCompletionPercentage = await fetchContentProgress(
       userId,
-      courseId
+      courseId,
+      contentId
     );
-
     const finalCompletionPercentage = Math.max(
       existingCompletionPercentage,
       newCompletionPercentage
     );
+
+    // console.log(
+    //   newCompletionPercentage,
+    //   existingCompletionPercentage,
+    //   finalCompletionPercentage,
+    //   lastPosition,
+    //   contentId
+    // );
 
     const progressPayload = {
       userId,
@@ -96,6 +118,8 @@ export async function updateContentProgress(
       contentCompletionPercentage: finalCompletionPercentage,
       contentType,
     };
+
+    console.log(progressPayload);
 
     await axios.post(
       `http://localhost:8080/api/user-progress/update`,

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams , useLocation } from 'react-router-dom'
+import Table from '../../shared/table/Table'
 import AdminHOC from '../../shared/HOC/AdminHOC'
 import { userHistory } from '../../../service/IssuanceService'
 import Paginate from '../../shared/pagination/Paginate'
@@ -16,22 +17,18 @@ import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService
 import { Table } from "antd";
 
 const UserHistory = ({ setLoading }) => {
-
   const { id } = useParams();
-
+  const location = useLocation();
+  const userName = location.state?.name || "N/A";
   const [userHistoryData, setUserHistoryData] = useState([])
   const [pageNumber, setPageNumber] = useState(0);
   const [dashStatsData, setDashStatsData] = useState({
     enrollments: 0,
     groups: 0,
   })
-
   let height = window.innerHeight;
-
   const auth = useSelector(state => state.auth);
-
   const pageSizeByHeight = () => {
-
     if (height >= 1024) {
       return 11
     } else if (height <= 1024) {
@@ -44,12 +41,10 @@ const UserHistory = ({ setLoading }) => {
     const newSize = pageSizeByHeight();
     setPageSize(newSize);
   };
-
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [height]);
-
   const [totalPages, setTotalPages] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -130,7 +125,6 @@ const UserHistory = ({ setLoading }) => {
       setLoading(false)
     }
   }
-
   useEffect(() => {
     loadUserHistory();
   }, [pageNumber, pageSize]);
@@ -139,14 +133,13 @@ const UserHistory = ({ setLoading }) => {
   const data = [
     { id: 1, title: "Total Enrollments", number: dashStatsData?.enrollments, logo: users },
     { id: 2, title: "Total Groups", number: dashStatsData?.groups, logo: book },
-    { id: 3, title: "Total Completed Courses", number: 6, logo: category },
-    { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
-    { id: 5, title: "Defaulters", number: 1, logo: inHouse }
+    // { id: 3, title: "Total Completed Courses", number: 6, logo: category },
+    // { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
+    // { id: 5, title: "Defaulters", number: 1, logo: inHouse }
   ];
-
   return (
     <div className="admin-section">
-      <h2 className="admin-page-header" style={{ marginTop: '10px' }}>Employee Details</h2>
+      <h2 className="admin-page-header" style={{ marginTop: '10px' }}>{userName} Details</h2>
       <div className="admin-page-mid">
       </div>
       <div className="main-content">
@@ -162,6 +155,7 @@ const UserHistory = ({ setLoading }) => {
         ) : (
           <div className="no-data-found">No enrolled courses found.</div>
         )}
+        
         <div className="paginate">
           {userHistoryData && userHistoryData.length > 0 ?
             <Paginate
@@ -174,5 +168,4 @@ const UserHistory = ({ setLoading }) => {
     </div>
   )
 }
-
 export default AdminHOC(UserHistory)
