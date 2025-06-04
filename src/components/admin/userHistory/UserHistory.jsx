@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Table from '../../shared/table/Table'
 import AdminHOC from '../../shared/HOC/AdminHOC'
 import { userHistory } from '../../../service/IssuanceService'
 import Paginate from '../../shared/pagination/Paginate'
@@ -14,6 +13,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { userStats } from "../../../service/UserService";
 import UserCourseTable from "../../shared/table/UserCourseTable";
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
+import { Table } from "antd";
+
 const UserHistory = ({ setLoading }) => {
 
   const { id } = useParams();
@@ -52,7 +53,44 @@ const UserHistory = ({ setLoading }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const columns =  [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title'
+    },
+    {
+      title: 'Level',
+      dataIndex: 'level',
 
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+
+    },
+    {
+      title: 'Assigned By',
+      dataIndex: 'assignedById',
+
+    },
+    {
+      title: 'Enrollment Date',
+      dataIndex: 'enrollmentDate'
+    },
+    {
+      title: 'Deadline',
+      dataIndex: 'deadline'
+    },
+    {
+      title: 'Completion Percentage',
+      dataIndex: 'roundedCompletion'
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status'
+    }
+  ]
   useEffect(() => {
     const loadCount = async () => {
       console.log("calling userStat")
@@ -77,17 +115,6 @@ const UserHistory = ({ setLoading }) => {
     loadCount();
   }, []);
 
-  // const loadCount = async () => {
-  //   console.log("calling userStat")
-  //   console.log("calling user History ", id)
-  //   const statsData = await userStats(id, auth.accessToken)
-  //   setDashStatsData(statsData)
-
-  // }
-
-  // useEffect(() => {
-  //   loadCount();
-  // }, [])
 
 
   const loadUserHistory = async () => {
@@ -130,7 +157,7 @@ const UserHistory = ({ setLoading }) => {
 
       <div className='user-history-table'>
         {filteredCourses.length > 0 ? (
-          <UserCourseTable entries={filteredCourses} />
+          <Table dataSource={filteredCourses} columns={columns} />
 
         ) : (
           <div className="no-data-found">No enrolled courses found.</div>
