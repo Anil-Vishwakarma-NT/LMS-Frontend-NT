@@ -23,9 +23,10 @@ const Table = ({
   const handleViewBookClick = (id) => {
     navigate(`/book-history/${id}`);
   };
-  const handleViewUserClick = (id , name) => {
+  const handleViewUserClick = (id, name) => {
     navigate(`/user-history/${id}`, {
-      state: { name: name }});
+      state: { name: name }
+    });
   };
 
   const renderProgressBar = (value) => {
@@ -146,7 +147,7 @@ const Table = ({
                           text="Details"
                           className="books-view"
                           onClick={() =>
-                            handleViewUserClick(item?.id,item?.name)                  
+                            handleViewUserClick(item?.id, item?.name)
 
 
                           }
