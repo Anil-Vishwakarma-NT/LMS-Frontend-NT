@@ -108,6 +108,7 @@ export async function userLogin(data) {
     try {
 
         const response = await app.post('/api/auth/login', data);
+        console.log("userLogin response", response.data.data);
         return response.data;
     } catch (error) {
         throw new Error(error?.response?.data?.message);

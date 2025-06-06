@@ -60,10 +60,10 @@ const UsersAdmin = ({ setLoading }) => {
       try {
         setLoading(true)
         const token = localStorage.getItem('authtoken');
-        const data = await fetchAllActiveUsers(token);
-        console.log(data);
-        setUserList(data);
-        setTotalPages(data?.totalPages);
+        const response = await fetchAllActiveUsers(token);
+        console.log(response);
+        setUserList(response.data);
+        setTotalPages(response.data?.totalPages);
       } catch (error) {
         console.error("Error loading users:", error);
       } finally {
@@ -77,10 +77,10 @@ const UsersAdmin = ({ setLoading }) => {
       console.log("button inactive user");
       setLoading(true)
       const token = localStorage.getItem('authtoken');
-      const data = await fetchAllInactiveUsers(token);
-      console.log(data);
-      setInactiveUserList(data);
-      setTotalPages(data?.totalPages);
+      const response = await fetchAllInactiveUsers(token);
+      console.log(response);
+      setInactiveUserList(response.data);
+      setTotalPages(response.data?.totalPages);
     } catch (error) {
       console.error("Error loading users:", error);
     } finally {

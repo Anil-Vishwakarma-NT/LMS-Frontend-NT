@@ -40,7 +40,7 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
       ]);
       console.log("userResponse", usersResponse)
       // Format users data - only userId and full name
-      const formattedUsers = usersResponse?.map(user => ({
+      const formattedUsers = usersResponse.data?.map(user => ({
         id: user.userId,
         name: `${user.firstName} ${user.lastName}`
       })) || [];
