@@ -118,14 +118,14 @@ useEffect(() => {
     try {
       const encodedPassword = btoa(password);
       window.localStorage.removeItem('authToken');
-      const data = await userLogin({ "email": userName, "password": password });
+      const response = await userLogin({ "email": userName, "password": password });
       console.log("request sent waiting for response");
-      const { roles, sub: email } = parseJwt(data.accessToken);
-      console.log({ roles, email, "accessToken": data.accessToken });
+      const { roles, sub: email } = parseJwt(response.data.accessToken);
+      console.log({ roles, email, "accessToken":response.data.accessToken });
       // console.log(response.data);
-      dispatch(login({ roles, email, "accessToken": data.accessToken }));
-      window.localStorage.setItem('authtoken', data.accessToken);
-      console.log("accessToken is ", data.accessToken);
+      dispatch(login({ roles, email, "accessToken": response.data.accessToken }));
+      window.localStorage.setItem('authtoken', response.data.accessToken);
+      console.log("accessToken is ", response.data.accessToken);
     } catch (error) {
       setToastMessage("Invalid credentials!");
       setToastType("error");
