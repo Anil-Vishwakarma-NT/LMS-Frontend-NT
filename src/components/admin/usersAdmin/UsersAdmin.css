@@ -1,74 +1,95 @@
+/* Main container */
 .admin-section {
-  padding: 2rem;
-  background-color: #f5f5f5;
-  min-height: 100vh;
+    padding: 5px;
+    max-width: fit-content;
+    box-sizing: border-box;
+    overflow-y: hidden;
+
 }
 
+/* Centered content */
 .admin-page-mid {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+    /* padding: 10px; */
+    max-width: fit-content;
+    box-sizing: border-box;
+    display: flex;
+    /* flex-direction: column; */
+    overflow-y: hidden;
 }
 
+/* Header bar */
+.admin-header-bar {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: 30px;
+    margin-top: 15px;
+    color: #333;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    top: 10px;
+}
+
+/* Header text */
 .admin-page-header {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
-  flex: 1 1 100%;
+    /* display: flex;
+    flex-wrap: wrap; */
+    gap: 16px;
+    margin-bottom: 24px;
+    margin-top: 24px;
+    justify-content: center;
 }
 
+/* Button group */
 .admin-page-search {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
 }
 
-.search {
-  position: relative;
-  display: flex;
-  align-items: center;
+/* Table wrapper */
+.user-table {
+    position: relative;
+    overflow-x: auto;
+    /* max-width: 100%; */
+    margin-left: 10px;
+    margin-right: 30px;
+    /* space from sidebar */
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.searchbar {
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 220px;
+.user-table .ant-table {
+    border-collapse: collapse;
+    /* width: 100%; */
 }
 
-.search-icon {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
+/* Action buttons inside the table */
+.ant-btn {
+    border-radius: 6px;
 }
 
-.search-logo {
-  position: absolute;
-  right: 10px;
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
+.ant-btn>.anticon {
+    vertical-align: middle;
 }
 
-.no-data-found {
-  text-align: center;
-  padding: 2rem;
-  color: #999;
-  font-size: 1.1rem;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+/* Add spacing between action buttons */
+.user-table .ant-table-cell .ant-btn {
+    position: relative;
+    margin-left: 8px;
+    display: flex;
+    flex-direction: row;
 }
 
-.paginate {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: center;
+
+@media (max-width: 768px) {
+    .admin-header-bar {
+        font-size: 1.4rem;
+    }
+
+    .admin-page-search {
+        flex-direction: column;
+        align-items: center;
+    }
+
 }

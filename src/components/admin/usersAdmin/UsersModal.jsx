@@ -14,12 +14,13 @@ const UsersModal = ({
   title,
   isModalOpen,
   handleCloseModal,
-  handleAddUser,
+  handleAddUser,//to re render the page when modal is closed
   selectedUser,
   setToastMessage,
   setToastType,
   setShowToast,
   setLoading,
+
 }) => {
   const [userData, setUserData] = useState({
     firstName: "",
@@ -46,7 +47,7 @@ const UsersModal = ({
         userName: selectedUser.userName || "",
         email: selectedUser.email || "",
         roleId: selectedUser.roleId || "",
-        password: "",
+        // password: "",
       });
     } else {
       setUserData({
@@ -55,7 +56,7 @@ const UsersModal = ({
         userName: "",
         email: "",
         roleId: "",
-        // password: "",
+        password: "",
       });
     }
     setErrors({});
@@ -91,14 +92,6 @@ const UsersModal = ({
       isValid = false;
     }
 
-    // if (!validateNotEmpty(trimmedData.mobileNumber)) {
-    //   newErrors.mobileNumber = "Mobile number is required!";
-    //   isValid = false;
-    // } else if (!validateMobile(trimmedData.mobileNumber)) {
-    //   newErrors.mobileNumber = "Enter a valid 10-digit mobile number.";
-    //   isValid = false;
-    // }
-
     if (!selectedUser && !validatePassword(trimmedData.password)) {
       newErrors.password =
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.";
@@ -122,11 +115,9 @@ const UsersModal = ({
         setLoading(true);
         const token = localStorage.getItem("authtoken");
         const data = await createUser(userData, token);
-        console.log("userData", userData)
         setToastMessage(data?.message || "User added successfully!");
         setToastType("success");
         setShowToast(true);
-        handleAddUser();
         handleCloseModal();
       } catch (error) {
         setToastMessage(
@@ -145,7 +136,6 @@ const UsersModal = ({
       try {
         setLoading(true);
         console.log(userData);
-
         const data = await updateUser(userData, selectedUser?.id);
         setToastMessage(data?.message || "User updated successfully!");
         setToastType("success");
@@ -210,20 +200,6 @@ const UsersModal = ({
         />
         {errors.email && <div className="error-text">{errors.email}</div>}
       </div>
-
-      {/* <div className="form-group">
-        <label htmlFor="mobileNumber" className="label-text">Mobile Number:</label>
-        <input
-          className="login-input"
-          type="text"
-          id="mobileNumber"
-          value={userData.mobileNumber}
-          onChange={handleChange}
-        />
-        {errors.mobileNumber && (
-          <div className="error-text">{errors.mobileNumber}</div>
-        )}
-      </div> */}
 
       {!selectedUser &&
         <div className="form-group">

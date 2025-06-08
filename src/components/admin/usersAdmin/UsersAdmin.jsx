@@ -1,312 +1,186 @@
 import React, { useEffect, useState } from "react";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import Button from "../../shared/button/Button";
-import Table from "../../shared/table/Table";
-import UsersModal from "./UsersModal";
-import Paginate from "../../shared/pagination/Paginate";
+import Toast from "../../shared/toast/Toast";
 import {
   fetchAllActiveUsers,
   deleteUsers,
   fetchAllInactiveUsers,
 } from "../../../service/UserService";
-import AssignBookModal from "./AssignBookModal";
-import Toast from "../../shared/toast/Toast";
-import searchLogo from "../../../assets/magnifying-glass.png";
-import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
-import { useDispatch, useSelector } from 'react-redux'
-
+import { useSelector } from "react-redux";
+import { Table, Empty, Button, Tag } from "antd";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined } from "@ant-design/icons";
+import UsersModal from "./UsersModal";
+import "./UsersAdmin.css"; // Importing CSS
 
 const UsersAdmin = ({ setLoading }) => {
-  const [search, setSearch] = useState('');
+  const [isInactive, setIsInactive] = useState(false);
+  const [userList, setUserList] = useState([]);
+  const [inactiveUserList, setInactiveUserList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [userList, setUserList] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
-  const auth = useSelector(state => state.auth);
-  const [inactiveUserList, setInactiveUserList] = useState([]);
-  const [isInactive, setIsInactive] = useState(false);
-  const [btnText, setbtnText] = useState("Inactive Users");
-  let height = window.innerHeight;
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState(null);
 
-  const pageSizeByHeight = () => {
-    if (height >= 1024) {
-      return 15
-    } else if (height <= 1024) {
-      return 10
-    }
-  }
-  const [pageSize, setPageSize] = useState(pageSizeByHeight());
-  const handleResize = () => {
-    height = window.innerHeight;
-    const newSize = pageSizeByHeight();
-    setPageSize(newSize);
-  };
+  const auth = useSelector((state) => state.auth);
 
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [height]);
-
-  const [totalPages, setTotalPages] = useState(0);
-  const [toastMessage, setToastMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState("");
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
-
-  const loadUsers = async () => {
-    if (search.length > 2 || search.length == 0) {
-      try {
-        setLoading(true)
-        const token = localStorage.getItem('authtoken');
-        const data = await fetchAllActiveUsers(token);
-        console.log(data);
-        setUserList(data);
-        setTotalPages(data?.totalPages);
-      } catch (error) {
-        console.error("Error loading users:", error);
-      } finally {
-        setLoading(false)
-      }
+    async function getUserLists() {
+      const activeUsers = await fetchAllActiveUsers(auth.accessToken);
+      const inactiveUsers = await fetchAllInactiveUsers(auth.accessToken);
+      setUserList(activeUsers);
+      setInactiveUserList(inactiveUsers);
     }
-  }
+    getUserLists();
+  }, []);
 
-  const loadInactiveUsers = async () => {
-    try {
-      console.log("button inactive user");
-      setLoading(true)
-      const token = localStorage.getItem('authtoken');
-      const data = await fetchAllInactiveUsers(token);
-      console.log(data);
-      setInactiveUserList(data);
-      setTotalPages(data?.totalPages);
-    } catch (error) {
-      console.error("Error loading users:", error);
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleOpenModal = (user = null) => {
+  const handleAddNew = () => {
+    setSelectedUser(null); // reset selected user for new entry
     setIsModalOpen(true);
-    setSelectedUser(user);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedUser(null);
+  };
+
+  const handleInactiveUsers = () => {
+    setIsInactive((prev) => !prev);
   };
 
   const fields = [
     {
-      index: 1,
+      dataIndex: "srNo",
       title: "Sr. No.",
       key: "srNo",
     },
     {
-      index: 2,
+      dataIndex: "employeeId",
       title: "Employee Id",
-      key: "employeeId", // optional, if you handle this somewhere
+      key: "employeeId",
     },
     {
-      index: 3,
+      dataIndex: "name",
       title: "Name",
       key: "name",
     },
     {
-      index: 4,
+      dataIndex: "manager",
       title: "Manager",
       key: "manager",
     },
     {
-      index: 5,
+      dataIndex: "email",
       title: "E-Mail",
-      key: "email", // if Table handles buttons internally
+      key: "email",
     },
     {
-      index: 6,
+      dataIndex: "role",
       title: "Role",
-      key: "role", // optional, if you handle this somewhere
+      key: "role",
+      render: (role) => {
+        const roleColor = {
+          employee: "purple",
+          manager: "blue",
+        }[role?.toLowerCase()] || "gray";
+        return <Tag color={roleColor}>{role || "Not Defined"}</Tag>;
+      },
+      filters: [
+        { text: 'employee', value: 'employee' },
+        { text: 'manager', value: 'manager' },
+      ],
+      onFilter: (value, record) => record.role === value,
     },
-
-  ];
-
-
-  const handleAddUser = () => {
-    loadUsers();
-  };
-
-  const handleDeleteUser = async () => {
-    try {
-      setLoading(true)
-      const data = await deleteUsers(userToDelete?.id);
-      setToastMessage(data?.message || "User deleted successfully!");
-      setToastType("success");
-      setShowToast(true);
-      await loadUsers();
-    } catch (error) {
-      setToastMessage(error?.message || "Error occurred while deleting the User.");
-      setToastType("error");
-      setShowToast(true);
-    } finally {
-      setIsConfirmPopupOpen(false);
-      setUserToDelete(null);
-      setLoading(false)
+    {
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
+        <>
+          <Button
+            icon={<EditOutlined />}
+            style={{ marginRight: 8 }}
+            onClick={() => console.log("Edit", record)}
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            style={{ marginRight: 8 }}
+            onClick={() => console.log("Delete", record)}
+          />
+          <Button
+            icon={<ExportOutlined />}
+            onClick={() => console.log("Export", record)}
+          />
+        </>
+      )
     }
-  };
-
-  const handleOpenConfirmDeletePopup = (user) => {
-    setIsConfirmPopupOpen(true);
-    setUserToDelete(user);
-  };
-
-  const handleInactiveUsers = async () => {
-    const nextValue = !isInactive;
-    setIsInactive(nextValue);
-    setbtnText(nextValue ? "Active Users" : "Inactive Users");
-    setPageNumber(0); // Reset pagination if needed
-
-    if (nextValue) {
-      await loadInactiveUsers();
-    } else {
-      await loadUsers();
-    }
-  };
-
-
-  useEffect(() => {
-    const timout = setTimeout(() => {
-      if (search.length > 2 || search.length == 0) {
-        if (search) {
-          setPageNumber(0)
-        }
-        loadUsers();
-      }
-
-    }, 1000)
-    return () => clearTimeout(timout);
-  }, [search, pageNumber, pageSize]);
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value.trim());
-  };
-
-  const handleSearchClick = async () => {
-    await loadUsers();
-  };
-
-  const closeAssignBook = () => {
-    setIsAssignModalOpen(false);
-    setSelectedUser(null);
-  };
-
-  const openAssignUser = (user = null) => {
-    setSelectedUser(user);
-    setIsAssignModalOpen(true);
-  };
-
-
-  const processedUsers = (Array.isArray(isInactive ? inactiveUserList : userList)
-    ? (isInactive ? inactiveUserList : userList)
-    : []
-  ).map((user, index) => ({
-    entry: {
-      srNo: index + 1,
-      employeeId: user.username,
-      name: `${user.firstName} ${user.lastName}`,
-      manager: user.manager || "N/A",
-      email: user.email,
-      id: user.userId,
-      role: user.role,
-
-    },
-
+  ]
+  const users = (isInactive ? inactiveUserList : userList) || [];
+  const processedUsers = users.map((user, index) => ({
+    key: user.userId,
+    srNo: index + 1,
+    employeeId: user.username,
+    name: `${user.firstName} ${user.lastName}`,
+    manager: user.manager || "N/A",
+    email: user.email,
+    role: user.role,
   }));
 
   return (
     <div className="admin-section">
       <div className="admin-page-mid">
-        <h2 className="admin-page-header">All Employees</h2>
-        <div className="admin-page-search">
-          <div className="search">
-            <input
-              type="text"
-              placeholder="Search by Name"
-              className="searchbar"
-              onChange={handleSearchChange}
-            />
-            <div className="search-icon" onClick={handleSearchClick}></div>
-            <img src={searchLogo} alt="!" className="search-logo" />
+        <div className="admin-header-bar">
+          <h2 className="admin-page-header">All Employees</h2>
+          <div className="admin-page-search">
+            {!isInactive && (
+              <Button
+                icon={<UserAddOutlined />}
+                onClick={handleAddNew}
+              >
+                Add New
+              </Button>
+            )}
+            <Button
+              icon={<UserAddOutlined />}
+              onClick={handleInactiveUsers}
+            >
+              {isInactive ? "Active Users" : "Inactive Users"}
+            </Button>
           </div>
-          {!isInactive && <Button
-            text="Add new Employee"
-            type="button"
-            onClick={() => handleOpenModal(null)}
-          />}
-          <Button
-            text={btnText}
-            type="button"
-            onClick={() => handleInactiveUsers()}
-          />
         </div>
-      </div>
-      {processedUsers && processedUsers.length > 0 ? (
-        <Table
-          onEditClick={handleOpenModal}
-          fields={fields}
-          entries={processedUsers.map(user => user.entry)}
-          type={"user"}
-          onDeleteClick={handleOpenConfirmDeletePopup}
-          is_Inactive={isInactive}
-          pageNumber={pageNumber}
-          pageSize={pageSize}
-          rowKeyAccessor={(row, index) => processedUsers[index].id}
-        />
-      ) : (
-        <div className="no-data-found">No data found</div>
-      )}
-      <UsersModal
-        title={selectedUser ? "Edit User" : "Add New User"}
-        isModalOpen={isModalOpen}
-        handleCloseModal={handleCloseModal}
-        selectedUser={selectedUser}
-        handleAddUser={handleAddUser}
-        setToastMessage={setToastMessage}
-        setToastType={setToastType}
-        setShowToast={setShowToast}
-        setLoading={setLoading}
-      />
-      {/* <AssignBookModal
-        title={"Assign Book"}
-        isAssignModalOpen={isAssignModalOpen}
-        closeAssignModal={closeAssignBook}
-        selectedUser={selectedUser}
-        setToastMessage={setToastMessage}
-        setToastType={setToastType}
-        setShowToast={setShowToast}
-        setLoading={setLoading}
+      
+          <div className="user-table">
+            {processedUsers.length > 0 ? (
+              <Table
+                dataSource={processedUsers}
+                columns={fields}
+                scroll={{ x: "100%" }}
+                locale={{ emptyText: "No users found." }}
+                rowKey="key"
+              />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+          </div>
+       
 
-      /> */}
-      <div className="paginate">
-        {userList && userList.length > 0 ?
-          <Paginate
-            currentPage={pageNumber}
-            totalPages={totalPages}
-            onPageChange={setPageNumber}
-          /> : <div></div>}
+        <UsersModal
+          title={selectedUser ? "Edit Employee Details" : "Add New Employee"}
+          isModalOpen={isModalOpen}
+          handleCloseModal={handleCloseModal}
+          selectedUser={selectedUser}
+          setToastMessage={setToastMessage}
+          setToastType={setToastType}
+          setShowToast={setShowToast}
+          setLoading={setLoading}
+        />
+
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          show={showToast}
+          onClose={() => setShowToast(false)}
+        />
       </div>
-      <Toast
-        message={toastMessage}
-        type={toastType}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
-      <ConfirmDeletePopup
-        isOpen={isConfirmPopupOpen}
-        onClose={() => setIsConfirmPopupOpen(false)}
-        onConfirm={handleDeleteUser}
-      />
+
     </div>
   );
 };
