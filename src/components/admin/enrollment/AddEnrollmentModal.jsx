@@ -40,33 +40,34 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
       ]);
       console.log("userResponse", usersResponse)
       // Format users data - only userId and full name
-      const formattedUsers = usersResponse.data?.map(user => ({
+      const formattedUsers = usersResponse?.map(user => ({
         id: user.userId,
         name: `${user.firstName} ${user.lastName}`
       })) || [];
-
+      console.log("formattedUsers", formattedUsers)
       // Format groups data - only groupId and group name
       const formattedGroups = groupsResponse?.map(group => ({
         id: group.groupId,
         name: group.groupName
       })) || [];
-
+      console.log("formattedGroups", formattedGroups)
       // Format courses data - only courseId and title
       const formattedCourses = coursesResponse?.map(course => ({
         id: course.courseId,
         name: course.title
       })) || [];
-      
+      console.log("formattedCourses", formattedCourses)
       // // Format bundles data - only bundleId and bundleName
       // const formattedBundles = bundlesResponse?.map(bundle => ({
       //   id: bundle.bundleId,
       //   name: bundle.bundleName
       // })) || [];
-      
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
       setAvailableUsers(formattedUsers);
       setAvailableGroups(formattedGroups);
       setAvailableCourses(formattedCourses);
       // setAvailableBundles(formattedBundles);
+      console.log("#########################################################")
     } catch (error) {
       message.error('Failed to fetch enrollment options');
       console.error('Error fetching enrollment options:', error);

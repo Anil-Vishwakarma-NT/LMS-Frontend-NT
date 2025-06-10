@@ -188,7 +188,8 @@ class EnrollmentService {
   async fetchActiveEmployees() {
     try {
       const response = await axios.get(`${USER_API_BASE_URL}/admin/active-employees`);
-      return response.data;
+      console.log("response fetched for active users", response.data.data)
+      return response.data.data
     } catch (error) {
       console.error('Error fetching active employees:', error);
       throw error;
@@ -205,7 +206,7 @@ class EnrollmentService {
   async fetchAllGroups() {
     try {
       const response = await axios.get(`${USER_API_BASE_URL}/group/all-groups`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching all groups:', error);
       throw error;
@@ -226,7 +227,7 @@ class EnrollmentService {
    */
   async fetchAllCourses() {
     try {
-      const response = await axios.get(`${COURSE_API_BASE_URL}/course`);
+      const response = await axios.get(`${COURSE_API_BASE_URL}/course`); 
       return response.data;
     } catch (error) {
       console.error('Error fetching courses:', error);
