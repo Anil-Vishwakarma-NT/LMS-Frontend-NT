@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from 'react-redux'
+import { useDispatch } from "react-redux";
 
 import "./App.css";
 import AdminDashboard from "./components/admin/adminDashboard/AdminDashboard";
@@ -21,63 +21,153 @@ import ContactUs from "./components/shared/contactUs/ContactUs";
 import AboutUs from "./components/shared/aboutUs/AboutUs";
 import Loader from "./components/shared/loader/Loader";
 import NotFound from "./pages/notFound/NotFound";
+import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboard";
+import CourseContentAdmin from "./components/admin/booksAdmin/CourseContentAdmin";
+import MyCourses from "./components/user/myCourses/MyCourses";
+import CourseContentUser from "./components/user/myCourses/CourseContentUser";
 
 function App() {
-
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
-  useEffect(()=> {
-    const token = window.localStorage.getItem('authtoken')
-    if(token){
-      getUser(token)
+  useEffect(() => {
+    const token = window.localStorage.getItem("authtoken");
+    if (token) {
+      getUser(token);
     } else {
-      navigate('/')
+      navigate("/");
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     setLoading(true);
     const timeOut = setTimeout(() => {
       setLoading(false);
-    }, 1000)
-  }, [location])
+    }, 1000);
+  }, [location]);
 
   const getUser = async (token) => {
-    try{
+    try {
       const data = await getUserByToken(token);
-      
-      dispatch(login(data))
-      window.localStorage.setItem('authtoken', data.token)
-    } catch(error){
-      navigate('/')
-    }
-  }
 
+      dispatch(login(data));
+      window.localStorage.setItem("authtoken", data.token);
+    } catch (error) {
+      navigate("/");
+    }
+  };
 
   return (
     <>
       {loading && <Loader />}
       <Navbar />
       <Routes>
-        <Route path="/admin" element={<AdminRoutes> <AdminDashboard /> </AdminRoutes>} />
-        <Route path="/user" element={<UserRoutes><UserDashboard /></UserRoutes>} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoutes>
+              {" "}
+              <AdminDashboard />{" "}
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/user"
+          element={
+            <UserRoutes>
+              <UserDashboard />
+            </UserRoutes>
+          }
+        />
+        <Route
+          path="/my-courses"
+          element={
+            <UserRoutes>
+              <MyCourses />
+            </UserRoutes>
+          }
+        />
+        <Route
+          path="/course-content-user/:courseId"
+          element={
+            <UserRoutes>
+              <CourseContentUser />
+            </UserRoutes>
+          }
+        ></Route>
         <Route path="/" element={<Home />} />
-        <Route path='/contact' element={<ContactUs />} />
-        <Route path='/about' element={<AboutUs />} />
-        <Route path="/books" element={<AdminRoutes><BooksAdmin /></AdminRoutes>} />
-        <Route path="/users" element={<AdminRoutes><UsersAdmin /></AdminRoutes>} />
-        <Route path="/categories" element={<AdminRoutes><CategoriesAdmin /></AdminRoutes>} />
-        <Route path="/issuance" element={<AdminRoutes><IssuanceAdmin /></AdminRoutes>} />
-        <Route path="/user-history/:mobileNumber" element={<AdminRoutes><UserHistory /></AdminRoutes>} />
-        <Route path="/book-history/:id" element={<AdminRoutes><BookHistory /></AdminRoutes>} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route
+          path="/books"
+          element={
+            <AdminRoutes>
+              <BooksAdmin />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <AdminRoutes>
+              <UsersAdmin />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <AdminRoutes>
+              <CategoriesAdmin />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/issuance"
+          element={
+            <AdminRoutes>
+              <IssuanceAdmin />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/user-history/:id"
+          element={
+            <AdminRoutes>
+              <UserHistory />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/book-history/:id"
+          element={
+            <AdminRoutes>
+              <BookHistory />
+            </AdminRoutes>
+          }
+        />
         <Route path="*" element={<NotFound />} />
+        <Route
+          path="/enroll"
+          element={
+            <AdminRoutes>
+              <EnrollmentDashboard />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/course-content/:courseId"
+          element={
+            <AdminRoutes>
+              <CourseContentAdmin />
+            </AdminRoutes>
+          }
+        ></Route>
       </Routes>
     </>
   );
 }
 
 export default App;
-

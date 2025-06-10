@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
-import {NavLink, useNavigate} from 'react-router-dom' 
+import { NavLink, useNavigate } from 'react-router-dom'
 import Button from '../button/Button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../../redux/authentication/authActions';
 import { logoutUser } from '../../../service/UserService';
 import ConfirmLogoutPopup from '../confirmLogoutPopup/ConfirmLogoutPopup';
@@ -15,8 +15,10 @@ const Sidebar = ({ items }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const auth = useSelector(state => state.auth);
+
   const handleLogout = () => {
-    logoutUser()
+    logoutUser(auth.accessToken)
     dispatch(logout())
     navigate('/')
   }
@@ -27,19 +29,19 @@ const Sidebar = ({ items }) => {
   return (
     <div className="sidebar">
       {items && items.length && items.map((item) => (
-        <NavLink key={item.path} to={item.path} className={({ isActive}) => (isActive ? "sidebar-item-active" : "sidebar-item")}>
-            <img className="side-logo" src={item.img} />
-            <div className="sidebar-text">{item.label}</div>
+        <NavLink key={item.path} to={item.path} className={({ isActive }) => (isActive ? "sidebar-item-active" : "sidebar-item")}>
+          <img className="side-logo" src={item.img} />
+          <div className="sidebar-text">{item.label}</div>
         </NavLink>
       ))}
       <div className="sidebar-logout-btn">
-      <Button text="Logout" type="submit" onClick={openPopop}/>
+        <Button text="Logout" type="submit" onClick={openPopop} />
       </div>
-      <ConfirmLogoutPopup 
+      <ConfirmLogoutPopup
         isOpen={isPopopOpen}
         onClose={closePopop}
         onConfirm={handleLogout}
-       />
+      />
     </div>
   );
 };

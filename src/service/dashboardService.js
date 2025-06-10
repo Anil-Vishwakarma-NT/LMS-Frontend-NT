@@ -1,4 +1,4 @@
-import app from "./serviceLMS";
+import {app} from "./serviceLMS";
 
 export async function dashStats() {
     try {
@@ -8,3 +8,4 @@ export async function dashStats() {
         throw new Error(error?.response?.data?.message);
     }
 }
+

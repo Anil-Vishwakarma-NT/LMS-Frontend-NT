@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchBooks } from "../../../service/BookService";
+// import { fetchBooks } from "../../../service/BookService";
 import { createIssuance } from "../../../service/IssuanceService";
 import Modal from "../../shared/modal/Modal";
 import Button from "../../shared/button/Button";
@@ -39,10 +39,10 @@ const AssignBookModal = ({
   });
 
   const resetState = () => setAssignBookData(initialState);
-  const loadBooks = async () => {
-    const data = await fetchBooks();
-    setBookList(data);
-  };
+  // const loadBooks = async () => {
+  //   const data = await fetchBooks();
+  //   setBookList(data);
+  // };
 
   const validate = () => {
     let isValid = true;
@@ -88,9 +88,9 @@ const AssignBookModal = ({
     }
   }, [isAssignModalOpen]);
 
-  useEffect(() => {
-    loadBooks();
-  }, []);
+  // useEffect(() => {
+  //   loadBooks();
+  // }, []);
 
   const getReturnTime = (type) => {
     if (type === 'Take away') {

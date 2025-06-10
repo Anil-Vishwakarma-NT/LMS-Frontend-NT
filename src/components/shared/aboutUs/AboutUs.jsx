@@ -46,7 +46,7 @@ const AboutUs = () => {
                   src="https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM="
                   alt="Team Member 1"
                 />
-                <h3>John Doe</h3>
+                <h3>Anil Vishwakarma</h3>
                 <p>CEO & Founder</p>
               </div>
               <div className="team-member">
@@ -54,7 +54,7 @@ const AboutUs = () => {
                   src="https://t4.ftcdn.net/jpg/02/14/74/61/240_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg"
                   alt="Team Member 2"
                 />
-                <h3>Aditya Agrawal</h3>
+                <h3>Akash Tiwari</h3>
                 <p>Lead Developer</p>
               </div>
               <div className="team-member">
@@ -62,7 +62,7 @@ const AboutUs = () => {
                   src="https://as2.ftcdn.net/v2/jpg/02/97/24/51/1000_F_297245133_gBPfK0h10UM3y7vfoEiBC3ZXt559KZar.jpg"
                   alt="Team Member 3"
                 />
-                <h3>Sam Wilson</h3>
+                <h3>Mohak Rajesh Gupta</h3>
                 <p>UI/UX Designer</p>
               </div>
             </div>
@@ -90,8 +90,8 @@ const AboutUs = () => {
           <p>
             <strong>Library Name:</strong> Page Palace<br/>
             <strong>Address:</strong> Brilliant Platina, Scheme 74c, Vijay Nagar, Indore<br/>
-            <strong>Email:</strong> aditya.agrawal2325@gmail.com<br/>
-            <strong>Phone:</strong> +91 8770602325
+            <strong>Email:</strong> anil.vishwakarma@nucleusteq.com<br/>
+            <strong>Phone:</strong> +91 9981356252
           </p>
         </section>
         </div>

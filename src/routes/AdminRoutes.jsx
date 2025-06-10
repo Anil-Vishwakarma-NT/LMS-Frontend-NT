@@ -10,7 +10,7 @@ const AdminRoutes = ({ children }) => {
     useEffect(() => {
         if (auth && auth.accessToken) {
             try {
-                if (auth.role === 'admin') {
+                if (auth.roles === 'admin') {
                     setIsVerified(true)
                 } else {
                     navigate('/')
