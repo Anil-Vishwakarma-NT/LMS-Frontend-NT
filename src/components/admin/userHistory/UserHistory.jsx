@@ -32,6 +32,10 @@ const UserHistory = ({ setLoading }) => {
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [dashStatsData, setDashStatsData] = useState({ enrollments: 0, groups: 0 });
+  const [completed, setCompleted] = useState(0);
+  const [inprogress, setInprogress] = useState(0);
+  const [defaulters, setDefaulters] = useState(0);
+  const [notStarted, setNotStarted] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,6 +47,7 @@ const UserHistory = ({ setLoading }) => {
 
   useEffect(() => {
     const loadData = async () => {
+      console.log("userHistory ", userName);
       setLoading(true);
       try {
         const [statsData, courses] = await Promise.all([
@@ -52,6 +57,11 @@ const UserHistory = ({ setLoading }) => {
         setDashStatsData(statsData);
         setCourseList(courses);
         setFilteredCourses(courses);
+        setCompleted(courses.filter(course => course.status === "Completed").length);
+        setInprogress(courses.filter(course => course.status === "In Progress").length);
+        setDefaulters(courses.filter(course => course.status === "Defaulter").length);
+        setNotStarted(courses.filter(course => course.status === "Not Started").length);
+        console.log(defaulters)
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
@@ -134,13 +144,15 @@ const UserHistory = ({ setLoading }) => {
         { text: 'Completed', value: 'Completed' },
         { text: 'In Progress', value: 'In Progress' },
         { text: 'Not Started', value: 'Not Started' },
+        { text: 'Defaulter', value: 'Defaulter' },
       ],
       onFilter: (value, record) => record.status === value,
       render: (status) => {
         const color = {
-          completed: 'purple',
+          completed: 'green',
           'in progress': 'orange',
-          'not started': 'red',
+          'not started': 'purple',
+          'defaulter': 'red'
         }[status?.toLowerCase()] || 'gray';
         return <span style={{ color }}>{status}</span>;
       },
@@ -165,23 +177,30 @@ const UserHistory = ({ setLoading }) => {
     {
       id: 3,
       title: 'Total Completed Courses',
-      number: 6,
+      number: completed,
       color: '#52c41a',
       icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
     },
     {
       id: 4,
       title: 'Incomplete Courses',
-      number: 3,
+      number: inprogress,
       color: '#faad14',
       icon: <SyncOutlined style={{ color: '#faad14' }} />,
     },
     {
       id: 5,
       title: 'Defaulters',
-      number: 1,
+      number: defaulters,
       color: '#f5222d',
       icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
+    },
+    {
+      id: 5,
+      title: 'Not Started',
+      number: inprogress,
+      color: '#fa8c16',
+      icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
   ];
 

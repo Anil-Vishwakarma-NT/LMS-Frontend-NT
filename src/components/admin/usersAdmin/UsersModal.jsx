@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Modal from "../../shared/modal/Modal";
-import Button from "../../shared/button/Button";
+import { Modal, Form, Input, Select, Button } from "antd";
 import { createUser, updateUser } from "../../../service/UserService";
 import {
   validateEmail,
@@ -8,32 +7,22 @@ import {
   validateNotEmpty,
   validatePassword,
 } from "../../../utility/validation";
-import ConfirmLogoutPopup from "../../shared/confirmLogoutPopup/ConfirmLogoutPopup";
+
+const { Option } = Select;
 
 const UsersModal = ({
   title,
   isModalOpen,
+  getUserLists,
   handleCloseModal,
-  handleAddUser,//to re render the page when modal is closed
+  handleAddUser,
   selectedUser,
   setToastMessage,
   setToastType,
   setShowToast,
   setLoading,
-
 }) => {
-  const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    roleId: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState({});
-  const [userPassword, setUserPassword] = useState("")
-
+  const [form] = Form.useForm();
   const roleOptions = [
     { id: 2, label: "Manager" },
     { id: 3, label: "Employee" },
@@ -41,204 +30,178 @@ const UsersModal = ({
 
   useEffect(() => {
     if (selectedUser) {
-      setUserData({
+      form.setFieldsValue({
         firstName: selectedUser.firstName || "",
         lastName: selectedUser.lastName || "",
-        userName: selectedUser.userName || "",
+        userName: selectedUser.employeeId || "",
         email: selectedUser.email || "",
-        roleId: selectedUser.roleId || "",
-        // password: "",
+        roleId: selectedUser.role || "",
+        password: "", // Hidden during editing
       });
     } else {
-      setUserData({
-        firstName: "",
-        lastName: "",
-        userName: "",
-        email: "",
-        roleId: "",
-        password: "",
-      });
+      form.resetFields();
     }
-    setErrors({});
-  }, [selectedUser, isModalOpen]);
+  }, [selectedUser, isModalOpen, form]);
 
-  const validateUser = () => {
-    const trimmedData = {
-      ...userData,
-      firstName: userData.firstName.trim(),
-      lastName: userData.lastName.trim(),
-      email: userData.email.trim(),
-      password: userData.password.trim(),
-    };
-
-    const newErrors = {};
+  const validateUser = (values) => {
+    const errors = {};
     let isValid = true;
 
-    if (!validateNotEmpty(trimmedData.firstName)) {
-      newErrors.firstName = "First name is required.";
+    if (!validateNotEmpty(values.firstName)) {
+      errors.firstName = "First name is required.";
       isValid = false;
     }
-
-    if (!validateNotEmpty(trimmedData.lastName)) {
-      newErrors.lastName = "Last name is required.";
+    if (!validateNotEmpty(values.lastName)) {
+      errors.lastName = "Last name is required.";
       isValid = false;
     }
-
-    if (!validateNotEmpty(trimmedData.email)) {
-      newErrors.email = "Email is required!";
+    if (!validateNotEmpty(values.email)) {
+      errors.email = "Email is required!";
       isValid = false;
-    } else if (!validateEmail(trimmedData.email)) {
-      newErrors.email = "Enter a valid email!";
-      isValid = false;
-    }
-
-    if (!selectedUser && !validatePassword(trimmedData.password)) {
-      newErrors.password =
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.";
+    } else if (!validateEmail(values.email)) {
+      errors.email = "Enter a valid email!";
       isValid = false;
     }
+    // if (!selectedUser && !validatePassword(values.password)) {
+    //   errors.password = "Password must meet criteria.";
+    //   isValid = false;
+    // }
 
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setUserData((prev) => ({ ...prev, [id]: value }));
-    setErrors((prev) => ({ ...prev, [id]: "" }));
+    return { isValid, errors };
   };
 
   const handleAdd = async () => {
-    if (validateUser()) {
-      console.log("inside if");
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("authtoken");
-        const data = await createUser(userData, token);
-        setToastMessage(data?.message || "User added successfully!");
-        setToastType("success");
-        setShowToast(true);
-        handleCloseModal();
-      } catch (error) {
-        setToastMessage(
-          error?.message || "User already exists with same credentials!"
-        );
-        setToastType("error");
-        setShowToast(true);
-      } finally {
-        setLoading(false);
+    try {
+      const values = await form.validateFields();
+      const { isValid, errors } = validateUser(values);
+      if (!isValid) {
+        form.setFields(errors);
+        return;
       }
+
+      setLoading(true);
+      const token = localStorage.getItem("authtoken");
+      const data = await createUser(values, token);
+      setToastMessage(data?.message || "User added successfully!");
+      setToastType("success");
+      setShowToast(true);
+      getUserLists()
+      handleCloseModal();
+    } catch (error) {
+      setToastMessage(error?.message || "User already exists!");
+      setToastType("error");
+      setShowToast(true);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEdit = async () => {
-    if (validateUser()) {
-      try {
-        setLoading(true);
-        console.log(userData);
-        const data = await updateUser(userData, selectedUser?.id);
-        setToastMessage(data?.message || "User updated successfully!");
-        setToastType("success");
-        setShowToast(true);
-        handleAddUser();
-        handleCloseModal();
-      } catch (error) {
-        setToastMessage(error?.message || "Update failed!");
-        setToastType("error");
-        setShowToast(true);
-      } finally {
-        setLoading(false);
+    try {
+      const values = await form.validateFields();
+      const { isValid, errors } = validateUser(values);
+      if (!isValid) {
+        form.setFields(errors);
+        return;
       }
+
+      setLoading(true);
+      const data = await updateUser(values, selectedUser?.id);
+      setToastMessage(data?.message || "User updated successfully!");
+      setToastType("success");
+      setShowToast(true);
+      getUserLists();
+      handleCloseModal();
+    } catch (error) {
+      setToastMessage(error?.message || "Update failed!");
+      setToastType("error");
+      setShowToast(true);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={title}>
-      <div className="form-group">
-        <label htmlFor="firstName" className="label-text">First Name:</label>
-        <input
-          className="login-input"
-          type="text"
-          id="firstName"
-          value={userData.firstName}
-          onChange={handleChange}
-        />
-        {errors.firstName && <div className="error-text">{errors.firstName}</div>}
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="lastName" className="label-text">Last Name:</label>
-        <input
-          className="login-input"
-          type="text"
-          id="lastName"
-          value={userData.lastName}
-          onChange={handleChange}
-        />
-        {errors.lastName && <div className="error-text">{errors.lastName}</div>}
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="userName" className="label-text">Employee Number:</label>
-        <input
-          className="login-input"
-          type="text"
-          id="userName"
-          value={userData.userName}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="email" className="label-text">Email:</label>
-        <input
-          className="login-input"
-          type="text"
-          id="email"
-          value={userData.email}
-          onChange={handleChange}
-        />
-        {errors.email && <div className="error-text">{errors.email}</div>}
-      </div>
-
-      {!selectedUser &&
-        <div className="form-group">
-          <label htmlFor="password" className="label-text">Password:</label>
-          <input
-            className="login-input"
-            type="password"
-            id="password"
-            value={userData.password}
-            onChange={handleChange}
-
-          />
-          {errors.password && <div className="error-text">{errors.password}</div>}
-        </div>}
-
-      <div className="form-group">
-        <label htmlFor="roleId" className="label-text">Role:</label>
-        <select
-          className="login-input"
-          id="roleId"
-          value={userData.roleId}
-          onChange={handleChange}
+    <Modal
+      title={selectedUser ? `Edit User` : `Add New User`}
+      visible={isModalOpen}
+      onCancel={handleCloseModal}
+      footer={[
+        <Button key="cancel" onClick={handleCloseModal}>
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          onClick={selectedUser ? handleEdit : handleAdd}
         >
-          <option value="">--Select a Role--</option>
-          {roleOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+          {selectedUser ? "Save" : "Add"}
+        </Button>,
+      ]}
+      destroyOnClose
+    >
+      <Form form={form} layout="vertical" name="user_form">
+        <Form.Item
+          label="First Name"
+          name="firstName"
+          rules={[{ required: true, message: "First name is required!" }]}
+        >
+          <Input autoComplete="off" />
+        </Form.Item>
 
-      <div className="modal-button">
-        {!selectedUser ? (
-          <Button onClick={handleAdd} type="submit" text="Add" />
-        ) : (
-          <Button onClick={handleEdit} type="submit" text="Save" />
+        <Form.Item
+          label="Last Name"
+          name="lastName"
+          rules={[{ required: true, message: "Last name is required!" }]}
+        >
+          <Input autoComplete="off" />
+        </Form.Item>
+
+        <Form.Item label="Employee Number" name="userName">
+          <Input autoComplete="off" />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: "Email is required!" },
+            { type: "email", message: "Invalid email!" },
+          ]}
+        >
+          <Input autoComplete="off" disabled={selectedUser} />
+        </Form.Item>
+
+        {!selectedUser && (
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              { required: true, message: "Password is required!" },
+              {
+                min: 8,
+                message: "Password must be at least 8 characters long.",
+              },
+            ]}
+          >
+            <Input.Password autoComplete="off" />
+          </Form.Item>
         )}
-      </div>
+
+        <Form.Item
+          label="Role"
+          name="roleId"
+          rules={[{ required: true, message: "Role is required!" }]}
+        >
+          <Select placeholder="Select a Role" disabled={selectedUser}>
+            {roleOptions.map((option) => (
+              <Option key={option.id} value={option.id}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };

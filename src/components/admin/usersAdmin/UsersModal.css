@@ -1,0 +1,46 @@
+/* General form group styling .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.label-text {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+
+.login-input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.login-input:focus {
+    border-color: #1890ff;
+}
+
+
+.error-text {
+    color: #f5222d;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+
+.modal-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modal-button button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+} */
