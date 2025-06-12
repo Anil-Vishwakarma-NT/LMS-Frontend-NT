@@ -51,9 +51,9 @@ const UserDashboard = () => {
 
   // Fetch userId and set it
   useEffect(() => {
-    const fetchUserId = async (email) => {
+    const fetchUserId = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+        const response = await fetch(`http://localhost:8081/api/users/getUserId`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
@@ -69,8 +69,8 @@ const UserDashboard = () => {
       }
     };
 
-    if (auth.email) {
-      fetchUserId(auth.email);
+    if (auth.accessToken) {
+       fetchUserId();
     }
   }, [auth.email]);
 

@@ -192,9 +192,9 @@ const MyCourses = () => {
   const dispatch = useDispatch();
   const email = auth?.email;
 
-  const fetchUserId = async (email) => {
+  const fetchUserId = async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+      const response = await fetch(`http://localhost:8081/api/users/getUserId`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -211,19 +211,17 @@ const MyCourses = () => {
     }
   };
 
-  useEffect(() => {
-    if (email) {
-      fetchUserId(email).then((user) => {
-        if (user && user.userId) {
-          console.log("Fetched User ID:", user.userId);
-          setUserId(user.userId);
-          dispatch(setUserIdAction(user.userId));
-        } else {
-          console.warn("No valid user returned from API.");
-        }
-      });
-    }
-  }, [email]);
+useEffect(() => {
+  if (auth?.email) {
+    fetchUserId().then((user) => {
+      if (user && user.userId) {
+        setUserId(user.userId);
+        dispatch(setUserIdAction(user.userId));
+      }
+    });
+  }
+}, [auth?.email]);
+
 
   useEffect(() => {
     const fetchCourses = async () => {

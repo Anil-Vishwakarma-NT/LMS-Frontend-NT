@@ -42,9 +42,9 @@ const Login = () => {
   }
 
 
-  const fetchUserId = async (email) => {
+  const fetchUserId = async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+      const response = await fetch(`http://localhost:8081/api/users/getUserId`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
@@ -62,19 +62,16 @@ const Login = () => {
   };
   
 useEffect(() => {
-  if (auth.email) {
-    console.log("📩 Fetching userId for email:", auth.email);
-    fetchUserId(auth.email).then((user) => {
+  if (auth.accessToken) {
+    fetchUserId().then((user) => {
       if (user && user.userId) {
         console.log("✅ User fetched:", user);
         setUserId(user.userId);
-        setEmp(user.firstName + user.lastName);
-      } else {
-        console.warn("⚠️ No valid user returned or userId is missing:", user);
+        setEmp(user.firstName + " " + user.lastName);
       }
     });
   }
-}, [auth.email]);
+}, [auth.accessToken]);
 
   
 
