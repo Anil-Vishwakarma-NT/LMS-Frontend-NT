@@ -25,8 +25,8 @@ const Login = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
-  const[userId, setUserId] = useState(null);
-  const[emp,setEmp] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [emp, setEmp] = useState(null);
   function parseJwt(token) {
     const base64Url = token.split('.')[1]; // Get payload part
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -51,8 +51,8 @@ const Login = () => {
           "Content-Type": "application/json"
         }
       });
-  
-       const userData = await response.json(); // Read and parse JSON in one step
+
+      const userData = await response.json(); // Read and parse JSON in one step
       console.log("✅ Parsed JSON response:", userData);
       return userData;
     } catch (error) {
@@ -60,20 +60,23 @@ const Login = () => {
       return null;
     }
   };
-  
-useEffect(() => {
-  if (auth.accessToken) {
-    fetchUserId().then((user) => {
-      if (user && user.userId) {
-        console.log("✅ User fetched:", user);
-        setUserId(user.userId);
-        setEmp(user.firstName + " " + user.lastName);
-      }
-    });
-  }
-}, [auth.accessToken]);
 
-  
+  useEffect(() => {
+    if (auth.email) {
+      console.log("📩 Fetching userId for email:", auth.email);
+      fetchUserId(auth.email).then((user) => {
+        if (user && user.userId) {
+          console.log("✅ User fetched:", user);
+          setUserId(user.userId);
+          setEmp(user.firstName + user.lastName);
+        } else {
+          console.warn("⚠️ No valid user returned or userId is missing:", user);
+        }
+      });
+    }
+  }, [auth.email]);
+
+
 
   useEffect(() => {
     if (auth && auth.accessToken) {
@@ -83,13 +86,13 @@ useEffect(() => {
         console.log('token stored in localstorage!!');
         navigate('/admin');
       } else if (auth.roles === "employee") {
-        navigate('/user',{state: { userId: userId ,name: emp }});
+        navigate('/user', { state: { userId: userId, name: emp } });
       }
       else {
-        navigate('/user')
+        navigate('/')
       }
     }
-  }, [auth?.accessToken,userId]);
+  }, [auth?.accessToken, userId]);
 
   const validateForm = () => {
     let formErrors = {};
@@ -114,14 +117,14 @@ useEffect(() => {
 
     try {
       const encodedPassword = btoa(password);
-      window.localStorage.removeItem('authToken');
-      const response = await userLogin({ "email": userName, "password": password });
+
+      const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
-      const { roles, sub: email } = parseJwt(response.data.accessToken);
-      console.log({ roles, email, "accessToken":response.data.accessToken });
+      const { roles, sub: email } = parseJwt(response.accessToken);
+      console.log({ roles, email, "accessToken": response.accessToken });
       // console.log(response.data);
-      dispatch(login({ roles, email, "accessToken": response.data.accessToken }));
-      window.localStorage.setItem('authtoken', response.data.accessToken);
+      dispatch(login({ roles, email, "accessToken": response.accessToken }));
+      window.localStorage.setItem('authtoken', response.accessToken);
       console.log("accessToken is ", response.data.accessToken);
     } catch (error) {
       setToastMessage("Invalid credentials!");

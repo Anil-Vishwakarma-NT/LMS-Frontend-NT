@@ -38,18 +38,18 @@ export async function fetchCourseProgress(userId, courseId) {
 export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
-    console.log("Enrolled coursed fetched " , enrollments);
+    console.log("Enrolled coursed fetched ", enrollments);
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
       console.log("details fetched for course", courseDetails);
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
-        
+
       );
       console.log("Completion percentage fetched", completionPercentage);
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
-
+      const date = new Date().toISOString().split("T")[0];
       return {
         ...courseDetails,
         assignedById: enrollment.assignedById,
@@ -61,7 +61,7 @@ export async function getUserEnrolledCourseDetails(userId) {
             ? "Completed"
             : roundedCompletion > 0
               ? "In Progress"
-              : "Not Started",
+              : (date < enrollment.deadline ? "Not Started" : "Defaulter"),
       };
     });
 

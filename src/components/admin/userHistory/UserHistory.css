@@ -1,47 +1,151 @@
-.main-content {
+/* ===================== Root Container ===================== */
+.user-history-section {
+    padding: 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ===================== Page Header ===================== */
+.user-history-header {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: 160px;
+    margin-top: 70px;
+    color: #333;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+
+}
+
+/* ===================== DashCard Wrapper ===================== */
+.user-history-stats {
     display: flex;
-    justify-content: space-evenly;
     flex-wrap: wrap;
-    /* Ensure it wraps at all screen sizes */
-    gap: 20px;
-    /* Optional: spacing between cards */
-    margin-bottom: 40px;
-    /* Push the next section down */
+    gap: 16px;
+    margin-bottom: 24px;
+    margin-top: 24px;
+    justify-content: center;
 }
 
-.user-history-table {
-    font-family: Josefin Sans;
-    font-size: 1.25rem;
+/* === Individual Card Styling === */
+.user-history-stats .ant-card {
+    border: 2px solid #ccc;
+    /* light gray border */
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(9, 8, 8, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    transition: box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 200px;
+    /* max card width */
+    height: 100px;
+    box-sizing: border-box;
+}
+
+.user-history-stats .ant-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-history-stats p:first-child {
+    font-weight: 700;
+    /* bold */
+    font-size: 1.2rem;
+    /* larger */
+    margin: 0;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.user-history-stats p:last-child {
     font-weight: 400;
-    margin-bottom: 7px;
-    margin-top: 7px;
-    padding-top: 7px;
+    font-size: 1rem;
+    margin: 0;
+    text-align: center;
 }
 
-.no-data-found {
-    position: relative;
+/* ===================== Table Wrapper ===================== */
+.user-history-table {
+    overflow-x: auto;
+    max-width: calc(100% - 50px);
+    margin-left: 30px;
+    /* space from sidebar */
+    box-sizing: border-box;
 }
 
-.dash-card {
-    position: relative;
-    /* instead of absolute */
+.user-history-table .ant-table {
+    border-collapse: collapse;
     width: 100%;
 }
 
-@media (max-width: 1300px) {
-    .main-content {
-        flex-wrap: wrap;
+/* ===================== Borders ===================== */
+.user-history-table .ant-table-cell {
+    border-bottom: 1px solid #e0e0e0;
+    /* Row border */
+    border-right: 1px solid #e0e0e0;
+    /* Column border */
+    padding: 10px;
+}
+
+/* Remove right border for last column */
+.user-history-table .ant-table-thead>tr>th:last-child,
+.user-history-table .ant-table-tbody>tr>td:last-child {
+    border-right: none;
+}
+
+/* Header styling */
+.user-history-table .ant-table-thead>tr>th {
+    background-color: #fafafa;
+    font-weight: bold;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* ===================== Row Hover Effect ===================== */
+.user-history-table .ant-table-tbody>tr:hover>td {
+    background-color: #f5f5f5;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* ===================== No Data Found ===================== */
+.no-data-found {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* ===================== Responsive Adjustments ===================== */
+@media (max-width: 768px) {
+    .user-history-header {
+        font-size: 1.4rem;
     }
 
-    .dash-tables {
+    .user-history-stats {
         flex-direction: column;
+        align-items: center;
     }
 
-    .user-dash-table {
-        width: 100%;
+    .user-history-stats .ant-card {
+        max-width: 100%;
+        height: auto;
+        padding: 12px;
     }
 
-    .welcome-admin {
-        padding-top: 0;
+    .user-history-stats p:first-child {
+        font-size: 1.1rem;
+    }
+
+    .user-history-stats p:last-child {
+        font-size: 0.9rem;
+    }
+
+    .user-history-table .ant-table-cell {
+        font-size: 0.85rem;
+        padding: 8px;
     }
 }
