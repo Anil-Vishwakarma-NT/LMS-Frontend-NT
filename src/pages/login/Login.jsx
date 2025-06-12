@@ -129,12 +129,13 @@ u/bvWV47VOzzM+ObAgMBAAE=
       const encodedPassword = encryptor.encrypt(password);
       const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
-      const { roles, sub: email } = parseJwt(response.data.accessToken);
-      console.log({ roles, email, "accessToken": response.data.accessToken });
-      // console.log(response.data);
-      dispatch(login({ roles, email, "accessToken": response.data.accessToken }));
-      window.localStorage.setItem('authtoken', response.data.accessToken);
-      console.log("accessToken is ", response.data.accessToken);
+      console.log(response);
+      const { roles, sub: email } = parseJwt(response.accessToken);
+      console.log({ roles, email, "accessToken": response.accessToken });
+
+      dispatch(login({ roles, email, "accessToken": response.accessToken }));
+      window.localStorage.setItem('authtoken', response.accessToken);
+      console.log("accessToken is ", response.accessToken);
     } catch (error) {
       setToastMessage("Invalid credentials!");
       setToastType("error");

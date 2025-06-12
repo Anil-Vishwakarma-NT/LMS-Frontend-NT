@@ -5,7 +5,7 @@ export async function fetchUserEnrolledCourses(userId) {
     const response = await axios.get(
       `http://localhost:8081/api/enrollment/user/${userId}/enrolled-courses`
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     throw new Error(
       error?.response?.data?.message || "Failed to fetch enrolled courses."
@@ -18,7 +18,7 @@ export async function fetchCourseDetails(courseId) {
     const response = await axios.get(
       `http://localhost:8080/api/course/${courseId}`
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     throw new Error("Failed to fetch course details.");
   }
@@ -45,11 +45,12 @@ export async function getUserEnrolledCourseDetails(userId) {
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
-
       );
       console.log("Completion percentage fetched", completionPercentage);
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
+      console.log("ROUNDED COMPLETION PERC", roundedCompletion)
       const date = new Date().toISOString().split("T")[0];
+      console.log("DATE DEADLINE", enrollment.deadline.toISOString().split("T")[0])
       return {
         ...courseDetails,
         assignedById: enrollment.assignedById,
@@ -61,12 +62,13 @@ export async function getUserEnrolledCourseDetails(userId) {
             ? "Completed"
             : roundedCompletion > 0
               ? "In Progress"
-              : (date < enrollment.deadline ? "Not Started" : "Defaulter"),
+              : (date < enrollment.deadline.toISOString().split("T")[0] ? "Not Started" : "Defaulter"),
       };
     });
 
     return await Promise.all(courseDetailsPromises);
   } catch (error) {
+    alert("error getting course details");
     throw new Error("Failed to retrieve user enrolled courses.");
   }
 }
@@ -76,7 +78,7 @@ export async function fetchContentProgress(userId, courseId, contentId) {
     const response = await axios.get(
       `http://localhost:8080/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
     );
-    return response.data; // Returns content completion percentage
+    return response.data.data; // Returns content completion percentage
   } catch (error) {
     return 0; // Default to 0% if no entry exists
   }

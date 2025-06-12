@@ -20,7 +20,7 @@ export async function userStats(userId, token) {
                 },
             }
         )
-        console.log("userStats response", response);
+        console.log("userStats response", response.data.data);
 
         return response.data;
     } catch (error) {
@@ -109,7 +109,7 @@ export async function userLogin(data) {
 
         const response = await app.post('/api/auth/login', data);
         console.log("userLogin response", response.data);
-        return response.data;
+        return response.data.data;
     } catch (error) {
         throw new Error(error?.response?.data?.message);
     }
