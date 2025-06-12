@@ -5,7 +5,7 @@ export async function fetchUserEnrolledCourses(userId) {
     const response = await axios.get(
       `http://localhost:8081/api/enrollment/user/${userId}/enrolled-courses`
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     throw new Error(
       error?.response?.data?.message || "Failed to fetch enrolled courses."
@@ -18,7 +18,7 @@ export async function fetchCourseDetails(courseId) {
     const response = await axios.get(
       `http://localhost:8080/api/course/${courseId}`
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     throw new Error("Failed to fetch course details.");
   }
@@ -29,7 +29,7 @@ export async function fetchCourseProgress(userId, courseId) {
     const response = await axios.get(
       `http://localhost:8080/api/user-progress?userId=${userId}&courseId=${courseId}`
     );
-    return response.data; // Returns completion percentage
+    return response.data.data; // Returns completion percentage
   } catch (error) {
     return 0; // Default to 0% if no entry exists
   }
@@ -76,7 +76,7 @@ export async function fetchContentProgress(userId, courseId, contentId) {
     const response = await axios.get(
       `http://localhost:8080/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
     );
-    return response.data; // Returns content completion percentage
+    return response.data.data; // Returns content completion percentage
   } catch (error) {
     return 0; // Default to 0% if no entry exists
   }
