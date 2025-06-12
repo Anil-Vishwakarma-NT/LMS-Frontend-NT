@@ -20,7 +20,7 @@ export async function userStats(userId, token) {
                 },
             }
         )
-        console.log("userStats response", response);
+        console.log("userStats response", response.data.data);
 
         return response.data;
     } catch (error) {

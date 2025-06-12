@@ -29,7 +29,7 @@ export async function fetchCourseProgress(userId, courseId) {
     const response = await axios.get(
       `http://localhost:8080/api/user-progress?userId=${userId}&courseId=${courseId}`
     );
-    return response.data.data; // Returns completion percentage
+    return response.data; // Returns completion percentage
   } catch (error) {
     return 0; // Default to 0% if no entry exists
   }
@@ -45,11 +45,12 @@ export async function getUserEnrolledCourseDetails(userId) {
       const completionPercentage = await fetchCourseProgress(
         userId,
         enrollment.courseId
-
       );
       console.log("Completion percentage fetched", completionPercentage);
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
+      console.log("ROUNDED COMPLETION PERC", roundedCompletion)
       const date = new Date().toISOString().split("T")[0];
+      console.log("DATE DEADLINE", enrollment.deadline.toISOString().split("T")[0])
       return {
         ...courseDetails,
         assignedById: enrollment.assignedById,
@@ -61,12 +62,13 @@ export async function getUserEnrolledCourseDetails(userId) {
             ? "Completed"
             : roundedCompletion > 0
               ? "In Progress"
-              : (date < enrollment.deadline ? "Not Started" : "Defaulter"),
+              : (date < enrollment.deadline.toISOString().split("T")[0] ? "Not Started" : "Defaulter"),
       };
     });
 
     return await Promise.all(courseDetailsPromises);
   } catch (error) {
+    alert("error getting course details");
     throw new Error("Failed to retrieve user enrolled courses.");
   }
 }

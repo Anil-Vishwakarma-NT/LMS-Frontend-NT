@@ -50,16 +50,22 @@ const UserHistory = ({ setLoading }) => {
       console.log("userHistory ", userName);
       setLoading(true);
       try {
-        const [statsData, courses] = await Promise.all([
-          userStats(id, auth.accessToken),
+        const statsData = await userStats(id, auth.accessToken)
+
+        console.log("userHIstory", statsData.data);
+        setDashStatsData(statsData.data);
+        const courses = await Promise.all([
           getUserEnrolledCourseDetails(id),
         ]);
-        setDashStatsData(statsData);
+        console.log("COURSES HISTORY" , courses)
         setCourseList(courses);
         setFilteredCourses(courses);
         setCompleted(courses.filter(course => course.status === "Completed").length);
+        console.log("COMPLETED" , completed);
         setInprogress(courses.filter(course => course.status === "In Progress").length);
+         console.log("Inprogress" , inprogress);
         setDefaulters(courses.filter(course => course.status === "Defaulter").length);
+         console.log("defaulter" , defaulters);
         setNotStarted(courses.filter(course => course.status === "Not Started").length);
         console.log(defaulters)
       } catch (error) {
