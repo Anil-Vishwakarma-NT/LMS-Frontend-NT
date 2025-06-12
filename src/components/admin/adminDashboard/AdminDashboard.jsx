@@ -61,22 +61,22 @@ const AdminDashboard = () => {
   // Fetch count data
   const fetchUserCount = async () => {
     const response = await getTotalUsers();
-    setUserCount(response.message);
+    setUserCount(response);
   };
 
   const fetchCourseCount = async () => {
     const response = await getTotalCourses();
-    setCourseCount(response.message);
+    setCourseCount(response);
   };
 
   const fetchBundleCount = async () => {
     const response = await getTotalBundles();
-    setBundleCount(response.message);
+    setBundleCount(response);
   };
 
   const fetchGroupCount = async () => {
     const response = await getTotalGroups();
-    setGroupCount(response.message);
+    setGroupCount(response);
   };
 
   const fetchEnrollmentCount = async () => {
