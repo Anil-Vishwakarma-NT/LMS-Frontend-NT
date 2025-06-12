@@ -10,8 +10,7 @@ import {
   validateEmailOrMobile,
 } from "../../utility/validation";
 import Toast from "../../components/shared/toast/Toast";
-// import NodeRSA from 'node-rsa';
-
+import JSEncrypt from "jsencrypt";
 
 const Login = () => {
 
@@ -29,24 +28,24 @@ const Login = () => {
   const [toastType, setToastType] = useState("");
   const [userId, setUserId] = useState(null);
   const [emp, setEmp] = useState(null);
-  function parseJwt(token) {
-    const base64Url = token.split('.')[1]; // Get payload part
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 
-const publicKey = `MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
+  const publicKey = `-----BEGIN PUBLIC KEY-----
+MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
 W9/SyLNzJgBujCmOe49QnJNKD79eM/VUFHAGPLO5f1Krh9J1PoOZAEeimzdOnkFf
 zn6y8H7z4vwjIHAkzvW/uJBcV7PJRgPIr7awpn7J4TsU0zxCBb3CNgkwLrM5KmZG
-u/bvWV47VOzzM+ObAgMBAAE=`
+u/bvWV47VOzzM+ObAgMBAAE=
+-----END PUBLIC KEY-----`
 
 
-
+  function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
         .map(c => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
         .join('')
     );
-
     return JSON.parse(jsonPayload);
   }
 
@@ -60,26 +59,25 @@ u/bvWV47VOzzM+ObAgMBAAE=`
           "Content-Type": "application/json"
         }
       });
-
       const userData = await response.json(); // Read and parse JSON in one step
-      console.log("✅ Parsed JSON response:", userData);
+      console.log("Parsed JSON response:", userData);
       return userData;
     } catch (error) {
-      console.error("❌ Error fetching user ID:", error);
+      console.error("Error fetching user ID:", error);
       return null;
     }
   };
 
   useEffect(() => {
     if (auth.email) {
-      console.log("📩 Fetching userId for email:", auth.email);
+      console.log("Fetching userId for email:", auth.email);
       fetchUserId(auth.email).then((user) => {
         if (user && user.userId) {
-          console.log("✅ User fetched:", user);
+          console.log("User fetched:", user);
           setUserId(user.userId);
           setEmp(user.firstName + user.lastName);
         } else {
-          console.warn("⚠️ No valid user returned or userId is missing:", user);
+          console.warn("No valid user returned or userId is missing:", user);
         }
       });
     }
@@ -125,9 +123,10 @@ u/bvWV47VOzzM+ObAgMBAAE=`
 
 
     try {
-        
-      const encodedPassword = btoa(password);
-
+      const encryptor = new JSEncrypt();
+      encryptor.setPublicKey(publicKey);
+      // const encodedPassword = btoa(password);
+      const encodedPassword = encryptor.encrypt(password);
       const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
       const { roles, sub: email } = parseJwt(response.data.accessToken);
