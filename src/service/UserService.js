@@ -88,7 +88,7 @@ export async function createUser(userData, token) {
 
 export async function updateUser(userData, id) {
     try {
-        const response = await app.put(`/admin/update-user/${id}`, userData);
+        const response = await app.patch(`/admin/update-user/${id}`, userData);
         return response.data;
     } catch (error) {
         throw new Error(error?.response?.data?.message);
