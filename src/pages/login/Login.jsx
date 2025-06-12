@@ -33,7 +33,7 @@ const Login = () => {
     const base64Url = token.split('.')[1]; // Get payload part
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 
-const publicKey = `MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
+    const publicKey = `MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
 W9/SyLNzJgBujCmOe49QnJNKD79eM/VUFHAGPLO5f1Krh9J1PoOZAEeimzdOnkFf
 zn6y8H7z4vwjIHAkzvW/uJBcV7PJRgPIr7awpn7J4TsU0zxCBb3CNgkwLrM5KmZG
 u/bvWV47VOzzM+ObAgMBAAE=`
@@ -125,17 +125,18 @@ u/bvWV47VOzzM+ObAgMBAAE=`
 
 
     try {
-        
+
       const encodedPassword = btoa(password);
 
       const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
-      const { roles, sub: email } = parseJwt(response.data.accessToken);
-      console.log({ roles, email, "accessToken": response.data.accessToken });
-      // console.log(response.data);
-      dispatch(login({ roles, email, "accessToken": response.data.accessToken }));
-      window.localStorage.setItem('authtoken', response.data.accessToken);
-      console.log("accessToken is ", response.data.accessToken);
+      console.log(response);
+      const { roles, sub: email } = parseJwt(response.accessToken);
+      console.log({ roles, email, "accessToken": response.accessToken });
+
+      dispatch(login({ roles, email, "accessToken": response.accessToken }));
+      window.localStorage.setItem('authtoken', response.accessToken);
+      console.log("accessToken is ", response.accessToken);
     } catch (error) {
       setToastMessage("Invalid credentials!");
       setToastType("error");
