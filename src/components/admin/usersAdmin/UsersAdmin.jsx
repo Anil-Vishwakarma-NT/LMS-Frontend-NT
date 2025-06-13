@@ -35,8 +35,8 @@ const UsersAdmin = ({ setLoading }) => {
   async function getUserLists() {
     const activeUsers = await fetchAllActiveUsers(auth.accessToken);
     const inactiveUsers = await fetchAllInactiveUsers(auth.accessToken);
-    setUserList(activeUsers);
-    setInactiveUserList(inactiveUsers);
+    setUserList(activeUsers.data);
+    setInactiveUserList(inactiveUsers.data);
   }
   useEffect(() => {
     getUserLists();
