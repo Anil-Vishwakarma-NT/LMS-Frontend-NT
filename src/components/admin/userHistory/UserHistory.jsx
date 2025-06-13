@@ -52,8 +52,8 @@ const UserHistory = ({ setLoading }) => {
       try {
         const statsData = await userStats(id, auth.accessToken)
 
-        console.log("userHIstory", statsData);
-        setDashStatsData(statsData);
+        console.log("userHIstory", statsData.data);
+        setDashStatsData(statsData.data);
         const courses = await Promise.all([
           getUserEnrolledCourseDetails(id),
         ]);
