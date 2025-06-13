@@ -54,20 +54,19 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await Promise.all([
-          getUserEnrolledCourseDetails(id),
-        ]);
+        const courses = await  getUserEnrolledCourseDetails(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
+        console.log(Array.isArray(courses))
         setCompleted(courses.filter(course => course.status === "Completed").length);
         console.log("COMPLETED", completed);
         setInprogress(courses.filter(course => course.status === "In Progress").length);
         console.log("Inprogress", inprogress);
         setDefaulters(courses.filter(course => course.status === "Defaulter").length);
-        console.log("defaulter", defaulters);
+        console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
         setNotStarted(courses.filter(course => course.status === "Not Started").length);
-        console.log(defaulters)
+        console.log("NotStarted", notStarted)
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
@@ -115,20 +114,22 @@ const UserHistory = ({ setLoading }) => {
     {
       title: 'Description',
       dataIndex: 'description',
+      key: 'description'
     },
     {
       title: 'Assigned By',
       dataIndex: 'assignedById',
+      key: 'assignedById',
     },
     {
       title: 'Enrollment Date',
       dataIndex: 'enrollmentDate',
-      render: (date) => new Date(date).toLocaleDateString('en-GB'),
+      // render: (date) => new Date(date).toLocaleDateString('en-GB'),
     },
     {
       title: 'Deadline',
       dataIndex: 'deadline',
-      render: (date) => new Date(date).toLocaleDateString('en-GB'),
+      // render: (date) => new Date(date).toLocaleDateString('en-GB'),
     },
     {
       title: 'Completion %',
@@ -204,7 +205,7 @@ const UserHistory = ({ setLoading }) => {
     {
       id: 5,
       title: 'Not Started',
-      number: inprogress,
+      number: notStarted,
       color: '#fa8c16',
       icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
@@ -239,16 +240,9 @@ const UserHistory = ({ setLoading }) => {
           <Table
             dataSource={filteredCourses}
             columns={columns}
-            pagination={{
-              current: pageNumber + 1,
-              pageSize,
-              total: totalPages * pageSize,
-              onChange: (page) => setPageNumber(page - 1),
-              showSizeChanger: false,
-            }}
-            scroll={{ x: '100%' }}
+            scroll={{ x: '100%', y:'100%' }}
             locale={{ emptyText: 'No courses found for this user.' }}
-            rowKey={(record) => record.id}
+            rowKey={(record) => record.courseId}
           />
         ) : (
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

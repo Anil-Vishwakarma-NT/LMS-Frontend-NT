@@ -50,19 +50,20 @@ export async function getUserEnrolledCourseDetails(userId) {
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
       console.log("ROUNDED COMPLETION PERC", roundedCompletion)
       const date = new Date().toISOString().split("T")[0];
-      console.log("DATE DEADLINE", enrollment.deadline.toISOString().split("T")[0])
+      console.log("DATE", date);
+      console.log("DATE DEADLINE", enrollment.deadline.split("T")[0])
       return {
         ...courseDetails,
         assignedById: enrollment.assignedById,
-        enrollmentDate: enrollment.enrollmentDate,
-        deadline: enrollment.deadline,
+        enrollmentDate: enrollment.enrollmentDate.split("T")[0],
+        deadline: enrollment.deadline.split("T")[0],
         roundedCompletion,
         status:
           roundedCompletion === 100
             ? "Completed"
             : roundedCompletion > 0
               ? "In Progress"
-              : (date < enrollment.deadline.toISOString().split("T")[0] ? "Not Started" : "Defaulter"),
+              : (date < enrollment.deadline.split("T")[0] ? "Not Started" : "Defaulter"),
       };
     });
 
