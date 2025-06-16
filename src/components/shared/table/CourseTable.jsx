@@ -79,14 +79,36 @@
 
 
 
+import QuizModal from "./QuizModal";
+import React, { useState } from "react";
 
-import React from "react";
-import { Table, Tooltip, Space, Button } from "antd";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+// import React from "react";
+import { Table, Tooltip, Space, Button , message } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
   const navigate = useNavigate();
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+
+  const handleAddQuizClick = (course) => {
+    setSelectedCourse(course);
+    setQuizModalOpen(true);
+  };
+
+  const handleQuizSubmit = async (quizData) => {
+    try {
+      console.log("Quiz Submitted:", quizData);
+      // Replace this with actual API call
+      // await addQuizAPI(quizData);
+      message.success("Quiz added successfully!");
+    } catch (err) {
+      message.error("Failed to add quiz");
+    } finally {
+      setQuizModalOpen(false);
+    }
+  };
 
   const columns = [
     {
@@ -160,6 +182,14 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
               onClick={() => navigate(`/course-content/${record.courseId}`)}
             />
           </Tooltip>
+          <Tooltip title="Add Quiz">
+            <Button
+              type="primary"
+              onClick={() => handleAddQuizClick(record)}
+            >
+              Add Quiz
+            </Button>
+          </Tooltip>
         </Space>
       ),
     },
@@ -177,6 +207,14 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
         bordered
         pagination={{ pageSize: 10 }}
       />
+      {selectedCourse && (
+        <QuizModal
+          open={quizModalOpen}
+          onClose={() => setQuizModalOpen(false)}
+          onSubmit={handleQuizSubmit}
+          course={selectedCourse}
+        />
+      )}
     </div>
   );
 };
