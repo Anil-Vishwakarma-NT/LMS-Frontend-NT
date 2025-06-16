@@ -5,6 +5,14 @@ const USER_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhos
 
 const COURSE_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 
+
+const getAuthHeaders = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
+  }
+});
+
+
 class EnrollmentService {
   /**
    * Fetch enrollment statistics
@@ -20,6 +28,7 @@ class EnrollmentService {
   async fetchStats() {
     try {
       const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/stats`);
+      console.log("response from enrollment stats", response.data)
       return response.data;
     } catch (error) {
       console.error('Error fetching enrollment statistics:', error);
@@ -37,7 +46,8 @@ class EnrollmentService {
       const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/user-course`, {
         params: filters
       });
-      return response.data;
+      console.log("response fetchUserCourses", response.data.data)
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching user course enrollments:', error);
       throw error;
@@ -60,6 +70,7 @@ class EnrollmentService {
       const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/user-bundle`, {
         params: filters
       });
+      console.log("response fetchUserBundles", response.data.data)
       return response.data;
     } catch (error) {
       console.error('Error fetching user bundle enrollments:', error);
@@ -97,8 +108,8 @@ class EnrollmentService {
       const response = await axios.get(`${USER_API_BASE_URL}/api/enrollment/user-enrollments`, {
         params: filters
       });
-      // console.log("response fetched for active users", response.data)
-      return response.data;
+      console.log("response fetched for active users", response.data.data)
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching user enrollments:', error);
       throw error;
@@ -130,7 +141,7 @@ class EnrollmentService {
 
       const response = await axios.post(
         `${USER_API_BASE_URL}/api/enrollment/enroll`,
-        formattedData
+        formattedData,
       );
       return response.data;
     } catch (error) {
@@ -186,15 +197,15 @@ class EnrollmentService {
  * - message: Optional message
  */
   async fetchActiveEmployees() {
-    try {
-      const response = await axios.get(`${USER_API_BASE_URL}/admin/active-employees`);
-      console.log("response fetched for active users", response.data.data)
-      return response.data.data
-    } catch (error) {
-      console.error('Error fetching active employees:', error);
-      throw error;
-    }
+  try {
+      console.log('API URL:', `${USER_API_BASE_URL}/admin/active-employees`);
+      const response = await axios.get(`${USER_API_BASE_URL}/admin/active-employees`, getAuthHeaders());
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching active employees:', error);
+    throw error;
   }
+}
 
   /**
    * Fetch all groups
@@ -205,7 +216,7 @@ class EnrollmentService {
    */
   async fetchAllGroups() {
     try {
-      const response = await axios.get(`${USER_API_BASE_URL}/group/all-groups`);
+      const response = await axios.get(`${USER_API_BASE_URL}/group/all-groups`, getAuthHeaders());
       return response.data.data;
     } catch (error) {
       console.error('Error fetching all groups:', error);
@@ -227,7 +238,7 @@ class EnrollmentService {
    */
   async fetchAllCourses() {
     try {
-      const response = await axios.get(`${COURSE_API_BASE_URL}/course`); 
+      const response = await axios.get(`${COURSE_API_BASE_URL}/course`, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error('Error fetching courses:', error);
@@ -246,7 +257,7 @@ class EnrollmentService {
    */
   async fetchAllBundles() {
     try {
-      const response = await axios.get(`${COURSE_API_BASE_URL}/bundles`);
+      const response = await axios.get(`${COURSE_API_BASE_URL}/bundles`, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error('Error fetching bundles:', error);

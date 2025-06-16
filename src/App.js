@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 import "./App.css";
 import AdminDashboard from "./components/admin/adminDashboard/AdminDashboard";
@@ -50,10 +51,21 @@ function App() {
 
   const getUser = async (token) => {
     try {
-      const data = await getUserByToken(token);
+      const decoded = jwtDecode(token); 
+      const { email, roles, exp } = decoded;
 
-      dispatch(login(data));
-      window.localStorage.setItem("authtoken", data.token);
+      // Check if token is expired
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (exp < currentTime) {
+          console.warn("Token expired!");
+          localStorage.removeItem("authtoken");
+          navigate("/");
+          return;
+        }
+
+      dispatch(login({ email, roles, accessToken: token }));
+
+      window.localStorage.setItem("authtoken", token);
     } catch (error) {
       navigate("/");
     }

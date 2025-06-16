@@ -80,9 +80,13 @@ const AdminDashboard = () => {
   };
 
   const fetchEnrollmentCount = async () => {
-    const response = await getTotalEnrollment();
+  const response = await getTotalEnrollment();
+  if (response && response.totalEnrollments !== undefined) {
     setEnrollmentCount(response.totalEnrollments);
-  };
+  } else {
+    setEnrollmentCount(0); // fallback if response is empty or invalid
+  }
+};
 
   // Fetch recent data
   const fetchRecentUser = async () => {
