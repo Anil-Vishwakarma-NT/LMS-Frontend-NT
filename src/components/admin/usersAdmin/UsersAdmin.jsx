@@ -95,7 +95,7 @@ const UsersAdmin = ({ setLoading }) => {
       dataIndex: "srNo",
       title: "Sr. No.",
       key: "srNo",
-      width: 50
+      width: 70
     },
     {
       dataIndex: "employeeId",

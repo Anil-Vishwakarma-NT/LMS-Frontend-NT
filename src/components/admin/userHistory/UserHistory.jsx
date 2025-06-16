@@ -54,7 +54,7 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await  getUserEnrolledCourseDetails(id);
+        const courses = await getUserEnrolledCourseDetails(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
@@ -240,7 +240,14 @@ const UserHistory = ({ setLoading }) => {
           <Table
             dataSource={filteredCourses}
             columns={columns}
-            scroll={{ x: '100%', y:'100%' }}
+            pagination={{
+              current: pageNumber + 1,
+              pageSize,
+              total: totalPages * pageSize,
+              onChange: (page) => setPageNumber(page - 1),
+              showSizeChanger: false,
+            }}
+            scroll={{ x: '100%', y: '100%' }}
             locale={{ emptyText: 'No courses found for this user.' }}
             rowKey={(record) => record.courseId}
           />
