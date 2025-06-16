@@ -108,20 +108,23 @@ const EnrollmentDashboard = () => {
       
       // Fetch all data in parallel based on updated API structure
       const [
-        statsResponse,
+        // statsResponse,
+        
         userCoursesResponse,
        
-        userEnrollmentsResponse
+        userEnrollmentsResponse,
+        //userBundlesResponse
+
       ] = await Promise.all([
-        EnrollmentService.fetchStats(),
+        // EnrollmentService.fetchStats(),
         EnrollmentService.fetchUserCourses(filters),
-       
-        EnrollmentService.fetchUserEnrollments(filters)
+        EnrollmentService.fetchUserEnrollments(filters),
+        EnrollmentService.fetchUserBundles(filters)
       ]);
+
+      const statsResponse = []; // Hardcoaded declare the value as null as above it is commented out
+      const userBundlesResponse = [];
       
-      // Process user enrollments to format for users & groups views
-      // Process user enrollments to format for users & groups views
-      const users = userEnrollmentsResponse || [];
       const groups = []; // Currently not implementing groups view correctly
       
       // Process courses to ensure they have unique keys
@@ -130,16 +133,17 @@ const EnrollmentDashboard = () => {
         key: `course-${course.courseId || Math.random().toString(36).substring(2, 11)}`
       }));
       
+      
       // Process bundles to ensure they have unique keys
-      // const processedBundles = (userBundlesResponse || []).map(bundle => ({
-      //   ...bundle,
-      //   key: `bundle-${bundle.bundleId || Math.random().toString(36).substring(2, 11)}`
-      // }));
+      const processedBundles = (userBundlesResponse || []).map(bundle => ({
+        ...bundle,
+        key: `bundle-${bundle.bundleId || Math.random().toString(36).substring(2, 11)}`
+      }));
       
       setDashboardData({
         courses: processedCourses,
-        // bundles: processedBundles,
-        users: users.map(user => ({
+        bundles: processedBundles,
+        users: (userEnrollmentsResponse || []).map(user => ({
           key: `user-${user.userId || Math.random().toString(36).substring(2, 11)}`,
           entityId: user.userId,
           entityName: user.userName,
