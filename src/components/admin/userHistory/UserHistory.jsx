@@ -54,9 +54,7 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await Promise.all([
-          getUserEnrolledCourseDetails(id),
-        ]);
+        const courses =  getUserEnrolledCourseDetails(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);

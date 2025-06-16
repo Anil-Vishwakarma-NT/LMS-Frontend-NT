@@ -62,7 +62,7 @@ export async function fetchCourseById(courseId) {
 export async function fetchCourseContentByCourseId(courseId) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/course-content/courseid/${courseId}`
+      `http://localhost:8080/api/course-content/course/${courseId}`
     );
     return response.data.data; // Return the course content data
   } catch (error) {
