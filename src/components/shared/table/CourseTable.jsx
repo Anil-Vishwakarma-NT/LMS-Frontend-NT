@@ -98,17 +98,15 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
   };
 
   const handleQuizSubmit = async (quizData) => {
-    try {
-      console.log("Quiz Submitted:", quizData);
-      // Replace this with actual API call
-      // await addQuizAPI(quizData);
-      message.success("Quiz added successfully!");
-    } catch (err) {
-      message.error("Failed to add quiz");
-    } finally {
-      setQuizModalOpen(false);
-    }
-  };
+  try {
+    const response = 200
+    // const response = await addQuizAPI(quizData); // Replace with actual API
+    return { status: response };
+  } catch (err) {
+    message.error("Failed to add quiz");
+    return null;
+  }
+};
 
   const columns = [
     {
@@ -188,6 +186,13 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
               onClick={() => handleAddQuizClick(record)}
             >
               Add Quiz
+            </Button>
+          </Tooltip>
+          <Tooltip title="Go to Quiz List">
+            <Button
+              onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
+            >
+              Quiz List
             </Button>
           </Tooltip>
         </Space>
