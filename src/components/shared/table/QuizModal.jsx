@@ -14,17 +14,17 @@ import {
 const { Option } = Select;
 const { Title } = Typography;
 
-const QuizModal = ({ open, onClose, course, onSubmit }) => {
+const QuizModal = ({ open, onClose, course, onSubmit, initialValues  }) => {
   const [form] = Form.useForm();
   const [answerType, setAnswerType] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
-      form.resetFields();
-      setAnswerType(null);
+      form.setFieldsValue(initialValues);
+    setAnswerType(initialValues.answerType || null);
     }
-  }, [open, form]);
+  }, [open, form, initialValues]);
 
   const handleAnswerTypeChange = (value) => {
     setAnswerType(value);
