@@ -18,11 +18,17 @@ const QuizModal = ({ open, onClose, course, onSubmit, initialValues  }) => {
   const [form] = Form.useForm();
   const [answerType, setAnswerType] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-
+  console.log("answerType",answerType)
+  console.log("initialValues",initialValues)
   useEffect(() => {
     if (open) {
+      if (initialValues) {
       form.setFieldsValue(initialValues);
-    setAnswerType(initialValues.answerType || null);
+      setAnswerType(initialValues.answerType || null);
+    } else {
+      form.resetFields();
+      setAnswerType(null);
+    }
     }
   }, [open, form, initialValues]);
 
