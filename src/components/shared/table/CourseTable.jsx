@@ -1,214 +1,166 @@
-// import React from "react";
-// import edit from "../../../assets/edit.png";
-// import deleteLogo from "../../../assets/delete.png";
-// import { useNavigate } from "react-router-dom";
-// import Tooltip from "../tooltip/Tooltip";
-// import { MdVisibility } from "react-icons/md";
-
-// const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="table-container">
-//       <div className="table-parent">
-//         <table className="books-table">
-//           <thead>
-//             <tr>
-//               <th>Course ID</th>
-//               <th>Title</th>
-//               <th>Description</th>
-//               <th>Level</th>
-//               <th>Owner ID</th>
-//               <th>Is Active</th>
-//               <th>Created At</th>
-//               <th>Updated At</th>
-//               <th>Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {entries?.map((item, i) => (
-//               <tr key={i}>
-//                 <td>{item.courseId}</td>
-//                 <td>{item.title}</td>
-//                 <td>{item.description}</td>
-//                 <td>{item.level}</td>
-//                 <td>{item.ownerId}</td>
-//                 <td>{item.isActive ? "Yes" : "No"}</td>
-//                 <td>
-//                   {item.createdAt
-//                     ? new Date(item.createdAt.split(".")[0]).toLocaleString()
-//                     : "N/A"}
-//                 </td>
-//                 <td>{new Date(item.updatedAt).toLocaleString()}</td>
-//                 <td>
-//                   <div className="modifications">
-//                     <Tooltip tooltipText="Edit">
-//                       <img
-//                         src={edit}
-//                         alt="edit"
-//                         className="edit-logo"
-//                         onClick={() => onEditClick(item)}
-//                       />
-//                     </Tooltip>
-//                     <Tooltip tooltipText="Delete">
-//                       <img
-//                         src={deleteLogo}
-//                         alt="delete"
-//                         className="edit-logo"
-//                         onClick={() => onDeleteClick(item)}
-//                       />
-//                     </Tooltip>
-//                     <Tooltip tooltipText="View">
-//                       <MdVisibility
-//                         className="view-icon"
-//                         onClick={() => navigate(`/course-content/${item.courseId}`)}
-//                       />
-//                     </Tooltip>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CourseTable;
-
-
-
-import QuizModal from "./QuizModal";
-import React, { useState } from "react";
-
-// import React from "react";
-import { Table, Tooltip, Space, Button , message } from "antd";
-import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined} from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Tooltip, Space, Button, message } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FileAddOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import QuizModal from "./QuizModal";
 
-const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
+const CourseTable = ({ onEditClick, onDeleteClick }) => {
   const navigate = useNavigate();
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [isMetadataOnly, setIsMetadataOnly] = useState(false);
+  const [quizToEdit, setQuizToEdit] = useState(null);
+  const [latestQuizId, setLatestQuizId] = useState(null);
 
-  const handleAddQuizClick = (course) => {
-    setSelectedCourse(course);
-    setQuizModalOpen(true);
-  };
-
-  const handleQuizSubmit = async (quizData) => {
-  try {
-    const response = 200
-    // const response = await addQuizAPI(quizData); // Replace with actual API
-    return { status: response };
-  } catch (err) {
-    message.error("Failed to add quiz");
-    return null;
-  }
+  const handleAddQuizClick = (course, metadataOnly = false) => {
+  setSelectedCourse(course);
+  setIsMetadataOnly(metadataOnly);
+  setQuizModalOpen(true);
 };
 
+  const handleQuizSubmit = async (quizMetadata) => {
+    try {
+      const payload = {
+        ...quizMetadata,
+        parentId: selectedCourse.courseId,
+        createdBy: 1,
+        parentType: "course"
+      };
+      console.log("payload", payload)
+      const response = await axios.post("http://localhost:8080/api/quizzes", payload);
+      console.log("response1", response)
+      // const response = { success: true, quizId: "mock-quiz-123" };
+      const result = response?.data?.data;
+      const messageText = response?.data?.message;
+
+      if (result?.quizId) {
+        const quizId = result.quizId;
+        message.success(messageText || "Quiz created successfully.");
+        setQuizModalOpen(false);
+        fetchCourses();
+        navigate(`/course-content/${selectedCourse.courseId}/quizzes/${quizId}/questions`);
+    } else {
+      throw new Error("Invalid response format");
+    }
+  } catch (err) {
+      console.error("Quiz creation failed", err);
+      message.error("Failed to create quiz");
+  }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/course");
+      const coursesWithQuizStatus = await Promise.all(
+        response.data.data.map(async (course) => {
+          try {
+            await axios.get(`/api/quizzes/metadata/${course.courseId}`);
+            return { ...course, quizCreated: true };
+          } catch (err) {
+            return { ...course, quizCreated: false };
+          }
+        })
+      );
+      setCourses(coursesWithQuizStatus);
+    } catch (err) {
+      message.error("Failed to load courses");
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
   const columns = [
-    {
-      title: "Course ID",
-      dataIndex: "courseId",
-      key: "courseId",
-    },
-    {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Level",
-      dataIndex: "level",
-      key: "level",
-    },
-    {
-      title: "Owner ID",
-      dataIndex: "ownerId",
-      key: "ownerId",
-    },
+    { title: "Course ID", dataIndex: "courseId" },
+    { title: "Title", dataIndex: "title" },
+    { title: "Description", dataIndex: "description" },
+    { title: "Level", dataIndex: "level" },
+    { title: "Owner ID", dataIndex: "ownerId" },
     {
       title: "Is Active",
       dataIndex: "isActive",
-      key: "isActive",
       render: (active) => (active ? "Yes" : "No"),
     },
     {
       title: "Created At",
       dataIndex: "createdAt",
-      key: "createdAt",
       render: (createdAt) =>
-        createdAt ? new Date(createdAt.split(".")[0]).toLocaleString() : "N/A",
+        createdAt ? new Date(createdAt).toLocaleString() : "N/A",
     },
     {
       title: "Updated At",
       dataIndex: "updatedAt",
-      key: "updatedAt",
       render: (updatedAt) => new Date(updatedAt).toLocaleString(),
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <Tooltip title="Edit">
+      width: 283,
+      render: (_, record) => {
+        const quizExists = record.quizCreated;
+        return (
+          <Space wrap>
+            <Tooltip title="Edit">
+              <Button icon={<EditOutlined />} onClick={() => onEditClick(record)} />
+            </Tooltip>
+            <Tooltip title="Delete">
+              <Button icon={<DeleteOutlined />} danger onClick={() => onDeleteClick(record)} />
+            </Tooltip>
+            <Tooltip title="View Course">
+              <Button icon={<EyeOutlined />} onClick={() => navigate(`/course-content/${record.courseId}`)} />
+            </Tooltip>
+
+            {/* Create or Modify Quiz */}
+            <Tooltip title={quizExists ? "Modify Quiz Metadata" : "Create Quiz Metadata"}>
+              <Button
+                icon={<FileAddOutlined />}
+                type="primary"
+                onClick={() => handleAddQuizClick(record, true)}
+              >
+                {quizExists ? "Modify Quiz" : "Create Quiz"}
+              </Button>
+            </Tooltip>
+
+            {/* Quiz Listing */}
+            {quizExists ? (
+          <Tooltip title="Quiz List">
             <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => onEditClick(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              type="text"
-              icon={<DeleteOutlined />}
-              danger
-              onClick={() => onDeleteClick(record)}
-            />
-          </Tooltip>
-          <Tooltip title="View">
-            <Button
-              type="text"
-              icon={<EyeOutlined />}
-              onClick={() => navigate(`/course-content/${record.courseId}`)}
-            />
-          </Tooltip>
-          <Tooltip title="Add Quiz">
-            <Button
-              type="primary"
-              onClick={() => handleAddQuizClick(record)}
-            >
-              Add Quiz
-            </Button>
-          </Tooltip>
-          <Tooltip title="Go to Quiz List">
-            <Button
-              onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
+              icon={<UnorderedListOutlined />}
+              onClick={() =>
+                navigate(`/course-content/${record.courseId}/quizzes/${record.quizId}/questions`)
+              }
             >
               Quiz List
             </Button>
           </Tooltip>
-        </Space>
-      ),
+        ) : (
+          <Tooltip title="No quiz created">
+            <Button icon={<UnorderedListOutlined />} disabled>
+              Quiz List
+            </Button>
+          </Tooltip>
+        )}
+          </Space>
+        );
+      },
     },
   ];
 
   return (
-    <div style={{ padding: "16px",
-      marginLeft:"35px",
-      marginRight:"25px",
-     }}>
+    <div style={{ padding: "16px", marginLeft: "35px", marginRight: "25px" }}>
       <Table
         columns={columns}
-        dataSource={entries}
-        rowKey={(record) => record.courseId}
+        dataSource={courses}
+        rowKey="courseId"
         bordered
         pagination={{ pageSize: 10 }}
       />
@@ -218,6 +170,8 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
           onClose={() => setQuizModalOpen(false)}
           onSubmit={handleQuizSubmit}
           course={selectedCourse}
+          metadataOnly={isMetadataOnly}
+          initialValues={quizToEdit}
         />
       )}
     </div>

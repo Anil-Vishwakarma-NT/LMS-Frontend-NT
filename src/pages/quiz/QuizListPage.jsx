@@ -1,93 +1,293 @@
+// import React, { useEffect, useState } from "react";
+// import { Table, Button, message, Tooltip, Space } from "antd";
+// import { useParams, useNavigate } from "react-router-dom";
+// // import { Table, Button, message, Tooltip, Space } from "antd";
+// import { PlusOutlined, ArrowLeftOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+// import axios from "axios";
+// import QuizQuestionModal from "./QuizQuestionModal"; // ✅ Make sure path is correct
+// import ViewQuestionModal from "./ViewQuestionModal"; //
+// import EditDummyQuestionModal from "./QuizQuestionEditPage";
+
+// const QuizList = () => {
+//   const { courseId } = useParams();
+//   const navigate = useNavigate();
+//   const [quizQuestions, setQuizQuestions] = useState([]);
+//   const [modalOpen, setModalOpen] = useState(false); // ✅ For modal visibility
+//   const [viewModalOpen, setViewModalOpen] = useState(false);
+//   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  
+//   const [editModalOpen, setEditModalOpen] = useState(false);
+//   const [editingQuestionId, setEditingQuestionId] = useState(null);
+//   const [localData, setLocalData] = useState([]);
+
+//   // const fetchQuizQuestions = async () => {
+//   //   try {
+//   //     const response = 200;
+//   //     // const response = await axios.get(`/api/quizzes/questions/${courseId}`);
+//   //     setQuizQuestions(response.data.data || []);
+//   //   } catch (error) {
+//   //     message.error("Failed to load quiz questions");
+//   //   }
+//   // };
+//   const fetchQuizQuestions = async () => {
+//   try {
+//     const mockData = [
+//       {
+//         questionId: "q1",
+//         questionText: "What is the capital of France?",
+//         answerType: "SINGLE_SELECT",
+//         options: ["Paris", "Rome", "Madrid", "Berlin"],
+//         correctAnswer: ["Paris"],
+//       },
+//       {
+//         questionId: "q2",
+//         questionText: "List all primary colors.",
+//         answerType: "MULTI_SELECT",
+//         options: ["Red", "Green", "Blue", "Yellow"],
+//         correctAnswer: ["Red", "Blue", "Yellow"],
+//       },
+//       {
+//         questionId: "q3",
+//         questionText: "Explain the concept of polymorphism in OOP.",
+//         answerType: "TEXT",
+//         correctAnswer: ["Polymorphism allows objects to take many forms."],
+//       },
+//     ];
+
+//     setQuizQuestions(mockData);
+//   } catch (error) {
+//     message.error("Failed to load quiz questions");
+//   }
+// };
+
+//   useEffect(() => {
+//     fetchQuizQuestions();
+//   }, [courseId]);
+
+//   const handleDeleteQuestion = async (questionId) => {
+//     try {
+//       await axios.delete(`/api/quizzes/questions/${questionId}`);
+//       message.success("Question deleted");
+//       fetchQuizQuestions();
+//     } catch (error) {
+//       message.error("Failed to delete question");
+//     }
+//   };
+
+//   const columns = [
+//     {
+//       title: "Question",
+//       dataIndex: "questionText",
+//       key: "questionText",
+//     },
+//     {
+//       title: "Answer Type",
+//       dataIndex: "answerType",
+//       key: "answerType",
+//     },
+//     {
+//       title: "Actions",
+//       key: "actions",
+//       render: (_, record) => (
+//         <>
+//           <Space wrap>
+//         {/* View Question */}
+//         <Tooltip title="View Question">
+//         <Button
+//           icon={<EyeOutlined />}
+//           onClick={() => {
+//             setSelectedQuestion(record);
+//             setViewModalOpen(true);
+//           }}
+//         />
+//       </Tooltip>
+
+//         {/* Edit Question */}
+//         {/* <Tooltip title="Edit Question">
+//           <Button
+//             icon={<EditOutlined />}
+//             onClick={() =>
+//               navigate(
+//                 `/course-content/${courseId}/quizzes/edit-question/${record.questionId}`
+//               )
+//             }
+//           />
+//         </Tooltip> */}
+
+//         <Tooltip title="Edit Question">
+//   <Button
+//     icon={<EditOutlined />}
+//     onClick={() => {
+//       setEditingQuestionId(record.questionId);
+//       setEditModalOpen(true);
+//     }}
+//   />
+// </Tooltip>
+
+//         {/* Delete Question */}
+//         <Tooltip title="Delete Question">
+//           <Button
+//             icon={<DeleteOutlined />}
+//             danger
+//             onClick={() => handleDeleteQuestion(record.questionId)}
+//           />
+//         </Tooltip>
+//       </Space>
+//         </>
+//       ),
+//     },
+//   ];
+
+//   return (
+//     <div style={{ padding: "24px", marginTop: "75px" }}>
+//       <div
+//         style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}
+//       >
+//         <Button
+//           icon={<ArrowLeftOutlined />}
+//           onClick={() => navigate("/books")}
+//         >
+//           Back to Courses
+//         </Button>
+
+//         <Button
+//           type="primary"
+//           icon={<PlusOutlined />}
+//           onClick={() => setModalOpen(true)}
+//         >
+//           Add Quiz Question
+//         </Button>
+//       </div>
+
+//       <h2>Quiz List for Course ID: {courseId}</h2>
+
+//       <Table
+//         dataSource={quizQuestions}
+//         columns={columns}
+//         rowKey="questionId"
+//         pagination={false}
+//         locale={{ emptyText: "No data" }}
+//       />
+
+//       {/* ✅ Modal for Adding Question */}
+//       <QuizQuestionModal
+//         open={modalOpen}
+//         onClose={() => setModalOpen(false)} 
+//         onSuccess={() => {
+//           setModalOpen(false);
+//           fetchQuizQuestions();
+//         }}
+//         courseId={courseId}
+//       />
+//       <ViewQuestionModal
+//         visible={viewModalOpen}
+//         onClose={() => {
+//           setViewModalOpen(false);
+//           setSelectedQuestion(null);
+//         }}
+//         question={selectedQuestion}
+//     />
+
+//     <EditDummyQuestionModal
+//   open={editModalOpen}
+//   questionId={editingQuestionId}
+//   onClose={() => setEditModalOpen(false)}
+//   onUpdate={(updatedData) => setLocalData(updatedData)}
+// />
+//     </div>
+//   );
+// };
+
+// export default QuizList;
+
+
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Table, Button, message, Modal, Tooltip, Space } from "antd";
+import { useParams, useNavigate } from "react-router-dom";
 import {
-  Table,
-  Space,
-  Button,
-  Tooltip,
-  message,
-  Modal,
-} from "antd";
-import {
+  PlusOutlined,
+  ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import QuizModal from "../../components/shared/table/QuizModal";
+import axios from "axios";
+import QuizQuestionModal from "./QuizQuestionModal";
+import ViewQuestionModal from "./ViewQuestionModal";
+import EditQuestionModal from "./QuizQuestionEditPage";
 
-
-// MOCK: Replace with real API
-const getQuizQuestions = async (courseId) => {
-  return [
-    {
-      id: 1,
-      courseId,
-      question: "What is React?",
-      answerType: "mcq_single",
-      options: ["Library", "Framework", "Tool", "IDE"],
-      correctOption: "option1",
-    },
-    {
-      id: 2,
-      courseId,
-      question: "State is used to store data in components?",
-      answerType: "text",
-      textAnswer: "Yes",
-    },
-  ];
-};
-
-const QuizListPage = () => {
-  const { courseId } = useParams();
-  const [questions, setQuestions] = useState([]);
+const QuizList = () => {
+  const { courseId, quizId} = useParams();
+  const navigate = useNavigate();
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [quizToEdit, setQuizToEdit] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getQuizQuestions(courseId);
-        setQuestions(data);
-      } catch (err) {
-        message.error("Failed to load quiz questions");
-      }
-    };
+  const fetchQuizQuestions = async () => {
+    console.log("courseId", courseId)
+    try {
+      // const mockData = [
+      //   {
+      //     questionId: "q1",
+      //     questionText: "What is the capital of France?",
+      //     answerType: "SINGLE_SELECT",
+      //     options: ["Paris", "Rome", "Madrid", "Berlin"],
+      //     correctAnswer: ["Paris"],
+      //   },
+      //   {
+      //     questionId: "q2",
+      //     questionText: "List all primary colors.",
+      //     answerType: "MULTI_SELECT",
+      //     options: ["Red", "Green", "Blue", "Yellow"],
+      //     correctAnswer: ["Red", "Blue", "Yellow"],
+      //   },
+      //   {
+      //     questionId: "q3",
+      //     questionText: "Explain the concept of polymorphism in OOP.",
+      //     answerType: "TEXT",
+      //     correctAnswer: ["Polymorphism allows objects to take many forms."],
+      //   },
+      // ];
+      const response = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${courseId}`);
+      console("here")
+      console.log("response11111111", response)
+      setQuizQuestions(response.data?.data || []);
+    } catch (error) {
+      message.error("Failed to load quiz questions");
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+    fetchQuizQuestions();
   }, [courseId]);
 
-  const handleView = (quiz) => {
-    setSelectedQuiz(quiz);
-    setViewModalOpen(true);
+  const handleDeleteQuestion = async (questionId) => {
+    try {
+      const filtered = quizQuestions.filter((q) => q.questionId !== questionId);
+      setQuizQuestions(filtered);
+      message.success("Question deleted (mock)");
+    } catch (error) {
+      message.error("Failed to delete question");
+    }
   };
 
-  const handleEdit = (quiz) => {
-    setQuizToEdit(quiz);
-    setEditModalOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    Modal.confirm({
-      title: "Confirm Delete",
-      content: "Are you sure you want to delete this quiz?",
-      okText: "Yes",
-      cancelText: "No",
-      onOk: () => {
-        message.success(`Deleted quiz with ID: ${id}`);
-        setQuestions((prev) => prev.filter((q) => q.id !== id));
-        // TODO: Replace with actual DELETE API
-      },
-    });
+  const handleSaveEditedQuestion = (updated) => {
+    const updatedList = quizQuestions.map((q) =>
+      q.questionId === updated.questionId ? updated : q
+    );
+    setQuizQuestions(updatedList);
+    setEditModalOpen(false);
+    message.success("Question updated successfully");
   };
 
   const columns = [
     {
       title: "Question",
-      dataIndex: "question",
-      key: "question",
+      dataIndex: "questionText",
+      key: "questionText",
     },
     {
       title: "Answer Type",
@@ -99,17 +299,35 @@ const QuizListPage = () => {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Tooltip title="View">
-            <Button icon={<EyeOutlined />} onClick={() => handleView(record)} />
-          </Tooltip>
-          <Tooltip title="Edit">
-            <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          </Tooltip>
-          <Tooltip title="Delete">
+          {/* View Question */}
+          <Tooltip title="View Question">
             <Button
-              icon={<DeleteOutlined />}
+              icon={<EyeOutlined />}
+              onClick={() => {
+                setSelectedQuestion(record);
+                setViewModalOpen(true);
+              }}
+            />
+          </Tooltip>
+
+          {/* Edit Question */}
+          <Tooltip title="Edit Question">
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => {
+                setQuizToEdit(record); 
+                setSelectedQuestion(record);
+                setEditModalOpen(true);
+              }}
+            />
+          </Tooltip>
+
+          {/* Delete */}
+          <Tooltip title="Delete Question">
+            <Button
               danger
-              onClick={() => handleDelete(record.id)}
+              icon={<DeleteOutlined />}
+              onClick={() => handleDeleteQuestion(record.questionId)}
             />
           </Tooltip>
         </Space>
@@ -118,84 +336,61 @@ const QuizListPage = () => {
   ];
 
   return (
-    <div style={{ padding: 100 }}>
-      <h2>Quiz List for Course ID: {courseId}</h2>
-      <div style={{ marginTop: "18px" }}>
-        <Table
-          dataSource={questions}
-          columns={columns}
-          rowKey="id"
-          bordered
-          pagination={{ pageSize: 5 }}
-        />
+    <div style={{ padding: "24px", marginTop: "75px" }}>
+      <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/admin/courses")}>Back to Courses</Button>
+
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+          Add Quiz Question
+        </Button>
       </div>
 
+      <h2>Quiz List for Course ID: {courseId}</h2>
+
+      <Table
+        dataSource={quizQuestions}
+        columns={columns}
+        rowKey="questionId"
+        pagination={false}
+        locale={{ emptyText: "No data" }}
+      />
+
+      {/* Add Modal */}
+      <QuizQuestionModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={(newQuestion) => {
+          setQuizQuestions([...quizQuestions, newQuestion]);
+          setModalOpen(false);
+        }}
+        courseId={courseId}
+        quizId={quizId}
+      />
+
       {/* View Modal */}
-      {selectedQuiz && (
-        <Modal
-          open={viewModalOpen}
-          title="Quiz Details"
-          onCancel={() => setViewModalOpen(false)}
-          footer={[
-            <Button key="close" onClick={() => setViewModalOpen(false)}>
-              Close
-            </Button>,
-          ]}
-        >
-          <p><strong>Question:</strong> {selectedQuiz.question}</p>
-          <p><strong>Answer Type:</strong> {selectedQuiz.answerType}</p>
+      <ViewQuestionModal
+        open={viewModalOpen}
+        question={selectedQuestion}
+        onClose={() => setViewModalOpen(false)}
+      />
 
-          {selectedQuiz.answerType === "text" && (
-            <p><strong>Answer:</strong> {selectedQuiz.textAnswer}</p>
-          )}
-
-          {(selectedQuiz.answerType === "mcq_single" || selectedQuiz.answerType === "mcq_multiple") && (
-            <>
-              <p><strong>Options:</strong></p>
-              <ul>
-                {selectedQuiz.options?.map((opt, index) => (
-                  <li key={index}>{opt}</li>
-                ))}
-              </ul>
-              <p><strong>
-                {selectedQuiz.answerType === "mcq_single"
-                  ? "Correct Option:"
-                  : "Correct Options:"}
-              </strong> {selectedQuiz.correctOption || selectedQuiz.correctOptions?.join(", ")}</p>
-            </>
-          )}
-        </Modal>
-      )}
-
-      {/* Edit Modal using QuizModal */}
-      {quizToEdit && (
-        <QuizModal
-          open={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setQuizToEdit(null);
-          }}
-          course={{ courseId: quizToEdit.courseId, title: "Edit Quiz" }}
-          onSubmit={async (updatedQuiz) => {
-            try {
-              // TODO: Replace with PUT API call
-              message.success("Quiz updated successfully");
-              setQuestions((prev) =>
-                prev.map((q) =>
-                  q.id === quizToEdit.id ? { ...q, ...updatedQuiz } : q
-                )
-              );
-              setEditModalOpen(false);
-              setQuizToEdit(null);
-            } catch (error) {
-              message.error("Failed to update quiz");
-            }
-          }}
-          initialValues={quizToEdit}
-        />
-      )}
+      {/* Edit Modal */}
+      <EditQuestionModal
+      open={editModalOpen}
+      questionId={selectedQuestion?.questionId}
+      onClose={() => {
+        setEditModalOpen(false);
+        setQuizToEdit(null);
+      }}
+      onUpdate={(updatedList) => {
+        setQuizQuestions(updatedList);
+        setSelectedQuestion(null);
+      }}
+      initialValues={quizToEdit}
+    />
     </div>
   );
 };
 
-export default QuizListPage;
+export default QuizList;
+

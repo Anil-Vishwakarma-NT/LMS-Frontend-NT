@@ -27,6 +27,7 @@ import CourseContentAdmin from "./components/admin/booksAdmin/CourseContentAdmin
 import MyCourses from "./components/user/myCourses/MyCourses";
 import CourseContentUser from "./components/user/myCourses/CourseContentUser";
 import QuizListPage from "./pages/quiz/QuizListPage";
+import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -178,7 +179,11 @@ function App() {
             </AdminRoutes>
           }
         ></Route>
-        <Route path="/course-content/:courseId/quizzes" element={<QuizListPage />} />
+        <Route path="/course-content/:courseId/quizzes/:quizId/questions" element={<QuizListPage />} />
+        <Route
+          path="/course-content/:courseId/quizzes/edit-question/:questionId"
+          element={<QuizQuestionEditPage />}
+        />
       </Routes>
     </>
   );
