@@ -56,11 +56,8 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   // Determine correctAnswer
   let correctAnswer;
   if (answerType === "TEXT") {
-    if (!values.textAnswer?.trim()) {
-      return message.error("Please enter the correct answer.");
-    }
-    correctAnswer = [values.textAnswer.trim()]; // ✅ wrap in array
-  } else {
+  correctAnswer = [values.textAnswer.trim()];
+} else {
     if (options.length < 2) {
       return message.error("Add at least 2 options.");
     }
@@ -150,108 +147,119 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
     }
 
     if (step === 3) {
-      return (
+  return (
+    <>
+      {/* TEXT TYPE */}
+      {answerType === "TEXT" && (
+        <Form.Item
+          label="Correct Answer"
+          name="textAnswer"
+          rules={[{ required: true, message: "Please enter the correct answer" }]}
+        >
+          <Input placeholder="Enter correct answer" />
+        </Form.Item>
+      )}
+
+      {/* SELECT TYPES */}
+      {(answerType === "SINGLE_SELECT" || answerType === "MULTI_SELECT") && (
         <>
-          {answerType === "TEXT" && (
-            <Form.Item
-              label="Correct Answer"
-              name="textAnswer"
-              rules={[{ required: true, message: "Please enter correct answer" }]}
+          <Form.Item label="Options" required>
+            {options.map((opt, idx) => (
+              <Space key={idx} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                <Input
+                  value={opt}
+                  onChange={(e) =>
+                    setOptions([
+                      ...options.slice(0, idx),
+                      e.target.value,
+                      ...options.slice(idx + 1),
+                    ])
+                  }
+                  placeholder={`Option ${idx + 1}`}
+                  style={{ width: 300 }}
+                />
+                <MinusCircleOutlined
+                  onClick={() => setOptions(options.filter((_, i) => i !== idx))}
+                  style={{ color: "#ff4d4f", cursor: "pointer" }}
+                />
+              </Space>
+            ))}
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => setOptions([...options, ""])}
+              type="dashed"
             >
-              <Input placeholder="Enter correct answer" />
-            </Form.Item>
-          )}
-
-          {(answerType === "SINGLE_SELECT" || answerType === "MULTI_SELECT") && (
-            <>
-              <label>Options</label>
-              {options.map((opt, idx) => (
-                <Space key={idx} style={{ marginBottom: 8 }}>
-                  <Input
-                    value={opt}
-                    onChange={(e) =>
-                      setOptions([
-                        ...options.slice(0, idx),
-                        e.target.value,
-                        ...options.slice(idx + 1),
-                      ])
-                    }
-                    placeholder={`Option ${idx + 1}`}
-                  />
-                  <MinusCircleOutlined
-                    onClick={() => setOptions(options.filter((_, i) => i !== idx))}
-                  />
-                </Space>
-              ))}
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() => setOptions([...options, ""])}
-                style={{ margin: "12px 0" }}
-              >
-                Add Option
-              </Button>
-
-              <Form.Item label="Correct Answer(s)">
-                {answerType === "SINGLE_SELECT" ? (
-                  <Radio.Group
-                    value={correctAnswers[0] || ""}
-                    onChange={(e) => setCorrectAnswers([e.target.value])}
-                  >
-                    {options.map((opt, idx) => (
-                      <Radio key={idx} value={opt}>
-                        {opt}
-                      </Radio>
-                    ))}
-                  </Radio.Group>
-                ) : (
-                  <Checkbox.Group
-                    value={correctAnswers}
-                    onChange={setCorrectAnswers}
-                  >
-                    {options.map((opt, idx) => (
-                      <Checkbox key={idx} value={opt}>
-                        {opt}
-                      </Checkbox>
-                    ))}
-                  </Checkbox.Group>
-                )}
-              </Form.Item>
-            </>
-          )}
-
-          <Form.Item
-            label="Points"
-            name="points"
-            rules={[{ required: true, message: "Enter point value" }]}
-          >
-            <Input type="number" min={0.1} step={0.1} />
-          </Form.Item>
-
-          <Form.Item label="Explanation" name="explanation">
-            <Input.TextArea rows={2} placeholder="Optional explanation for the answer" />
-          </Form.Item>
-
-          <Form.Item label="Required Question" name="required" valuePropName="checked">
-            <Checkbox />
-          </Form.Item>
-
-          <Form.Item
-            label="Position in Quiz"
-            name="position"
-            rules={[{ required: true, message: "Enter position" }]}
-          >
-            <Input type="number" min={1} />
-          </Form.Item>
-
-          <Space>
-            <Button onClick={() => setStep(2)}>Back</Button>
-            <Button type="primary" onClick={handleSubmit}>
-              Submit
+              Add Option
             </Button>
-          </Space>
+          </Form.Item>
+
+          <Form.Item label="Correct Answer(s)" required>
+            {answerType === "SINGLE_SELECT" ? (
+              <Radio.Group
+                value={correctAnswers[0] || ""}
+                onChange={(e) => setCorrectAnswers([e.target.value])}
+              >
+                <Space direction="vertical">
+                  {options.map((opt, idx) => (
+                    <Radio key={idx} value={opt}>
+                      {opt}
+                    </Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
+            ) : (
+              <Checkbox.Group value={correctAnswers} onChange={setCorrectAnswers}>
+                <Space direction="vertical">
+                  {options.map((opt, idx) => (
+                    <Checkbox key={idx} value={opt}>
+                      {opt}
+                    </Checkbox>
+                  ))}
+                </Space>
+              </Checkbox.Group>
+            )}
+          </Form.Item>
         </>
-      );
-    }
+      )}
+
+      <Form.Item
+        label="Points"
+        name="points"
+        rules={[{ required: true, message: "Enter point value" }]}
+      >
+        <Input type="number" min={0.1} step={0.1} placeholder="e.g. 5.0" style={{ width: 200 }} />
+      </Form.Item>
+
+      <Form.Item label="Explanation" name="explanation">
+        <Input.TextArea rows={2} placeholder="Optional explanation for the answer" />
+      </Form.Item>
+
+      <Form.Item
+        label="Required Question"
+        name="required"
+        valuePropName="checked"
+      >
+        <Checkbox>Check if question must be answered</Checkbox>
+      </Form.Item>
+
+      <Form.Item
+        label="Position in Quiz"
+        name="position"
+        rules={[{ required: true, message: "Enter position" }]}
+      >
+        <Input type="number" min={1} placeholder="e.g. 1" style={{ width: 200 }} />
+      </Form.Item>
+
+      <Form.Item>
+        <Space>
+          <Button onClick={() => setStep(2)}>Back</Button>
+          <Button type="primary" onClick={handleSubmit}>Submit</Button>
+        </Space>
+      </Form.Item>
+    </>
+  );
+}
+
   };
 
   return (
