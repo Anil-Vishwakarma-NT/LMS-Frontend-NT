@@ -18,11 +18,11 @@ const CourseContent = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
-  const [contentIds, setContentIds] = useState([]); // Store content IDs
+  const [contentIds, setContentIds] = useState([]); 
 
 
   const auth = useSelector((state) => state.auth);
-  const userId = auth?.userId;
+  const userId = auth?.userId || Number(localStorage.getItem("userId"));
   console.log(userId);
 
   // Load Course Name

@@ -59,10 +59,10 @@ export async function fetchCourseDetails(courseId) {
   }
 }
 
-export async function fetchCourseProgress(userId, courseId) {
+export async function getCourseProgressWithMeta(userId, courseId) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/user-progress?userId=${userId}&courseId=${courseId}`
+      `http://localhost:8080/api/user-progress/meta?userId=${userId}&courseId=${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -79,10 +79,13 @@ export async function getUserEnrolledCourseDetails(userId) {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
       console.log("Details fetched for course", courseDetails);
 
-      const completionPercentage = await fetchCourseProgress(
+      const progressMeta = await getCourseProgressWithMeta(
         userId,
         enrollment.courseId
       );
+      const completionPercentage = progressMeta.courseCompletionPercentage;
+      const firstCompletedAt = progressMeta.firstCompletedAt;
+
       console.log("Completion percentage fetched", completionPercentage);
 
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
@@ -96,12 +99,49 @@ export async function getUserEnrolledCourseDetails(userId) {
       console.log("📅 Deadline:", deadlineISO || "None");
 
       let status = "Not Started";
-      if (roundedCompletion === 100) {
-        status = "Completed";
+      let adherence = "N/A";
+
+      if (roundedCompletion >= 95.0) {
+        if (firstCompletedAt) {
+          const completedISO = new Date(firstCompletedAt)
+            .toISOString()
+            .split("T")[0];
+
+          if (!deadlineISO) {
+            status = "Completed";
+            adherence = "No Deadline";
+          } else if (completedISO <= deadlineISO) {
+            status = "Completed";
+            adherence = "On Time";
+          } else {
+            status = "Completed";
+            adherence = "Late";
+          }
+        } else {
+          // Should rarely hit this if `firstCompletedAt` is maintained well
+          status = "Completed";
+          adherence = deadlineISO ? "Late" : "No Deadline";
+        }
       } else if (roundedCompletion > 0) {
-        status = "In Progress";
-      } else if (deadlineISO && todayISO > deadlineISO) {
-        status = "Defaulter";
+        status =
+          deadlineISO && todayISO > deadlineISO
+            ? "Completion Failed"
+            : "In Progress";
+        adherence = deadlineISO
+          ? todayISO <= deadlineISO
+            ? "Ongoing On Time"
+            : "Ongoing Late"
+          : "No Deadline";
+      } else {
+        status =
+          deadlineISO && todayISO > deadlineISO
+            ? "Completion Failed"
+            : "Not Started";
+        adherence = deadlineISO
+          ? todayISO <= deadlineISO
+            ? "On Time (Yet to Start)"
+            : "Late (Yet to Start)"
+          : "No Deadline";
       }
 
       let assignedByName = "Unknown";
@@ -117,6 +157,7 @@ export async function getUserEnrolledCourseDetails(userId) {
         deadline: enrollment.deadline,
         roundedCompletion,
         status,
+        adherence,
       };
     });
 

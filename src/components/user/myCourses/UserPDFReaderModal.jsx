@@ -20,8 +20,9 @@ const UserPDFReaderModal = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [remainingTime, setRemainingTime] = useState(blockTime);
   const [timerActive, setTimerActive] = useState(true);
-  const userId = useSelector((state) => state.auth.userId);
-
+  const storedUserId = localStorage.getItem("userId");
+  const userId = useSelector((state) => state.auth.userId) || storedUserId;
+  
   let activeRenderTask = null;
 
   // Reset timer and page on open

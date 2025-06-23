@@ -38,18 +38,25 @@ const MyCourses = () => {
   };
 
   useEffect(() => {
-    if (email) {
+    const savedUserId = localStorage.getItem("userId");
+  
+    if (savedUserId) {
+      setUserId(Number(savedUserId)); // Restore from localStorage
+      dispatch(setUserIdAction(Number(savedUserId)));
+    } else if (email) {
       fetchUserId(email).then((user) => {
         if (user && user.userId) {
           console.log("Fetched User ID:", user.userId);
           setUserId(user.userId);
           dispatch(setUserIdAction(user.userId));
+          localStorage.setItem("userId", user.userId); // ✅ Save to localStorage
         } else {
           console.warn("No valid user returned from API.");
         }
       });
     }
   }, [email]);
+  
 
   useEffect(() => {
     const fetchCourses = async () => {

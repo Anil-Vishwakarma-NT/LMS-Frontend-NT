@@ -52,6 +52,11 @@ const UserCourseTable = ({ entries, showViewAction }) => {
       dataIndex: "status",
       key: "status",
     },
+    {
+      title: "Adherence",
+      dataIndex: "adherence",
+      key: "adherence",
+    },
   ];
 
   // Conditionally push Action column
