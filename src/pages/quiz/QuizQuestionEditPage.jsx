@@ -1,163 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   Form,
-//   Input,
-//   Select,
-//   Button,
-//   Space,
-//   Checkbox,
-//   Radio,
-//   message,
-//   Spin,
-// } from "antd";
-// import { useParams, useNavigate } from "react-router-dom";
-// import axios from "axios";
-
-// const { Option } = Select;
-
-// const QuizQuestionEditPage = () => {
-//   const { courseId, questionId } = useParams();
-//   const [form] = Form.useForm();
-//   const [loading, setLoading] = useState(true);
-//   const [answerType, setAnswerType] = useState("TEXT");
-//   const [options, setOptions] = useState([]);
-//   const navigate = useNavigate();
-
-//   // Fetch question by ID
-//   useEffect(() => {
-//     const fetchQuestion = async () => {
-//       try {
-//         const { data } = await axios.get(`/api/quizzes/questions/${questionId}`);
-//         const question = data.data;
-
-//         setAnswerType(question.answerType);
-//         setOptions(question.options || []);
-//         form.setFieldsValue({
-//           questionText: question.questionText,
-//           answerType: question.answerType,
-//           options: question.options || [],
-//           correctAnswer: question.correctAnswer || [],
-//         });
-
-//         setLoading(false);
-//       } catch (err) {
-//         message.error("Failed to load question");
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchQuestion();
-//   }, [questionId, form]);
-
-//   const handleSubmit = async (values) => {
-//     try {
-//       const payload = {
-//         ...values,
-//         questionId,
-//         courseId,
-//         answerType,
-//       };
-
-//       await axios.put(`/api/quizzes/questions/${questionId}`, payload);
-//       message.success("Question updated successfully");
-//       navigate(`/course-content/${courseId}/quizzes`);
-//     } catch (err) {
-//       message.error("Failed to update question");
-//     }
-//   };
-
-//   return (
-//     <div style={{ maxWidth: 700, margin: "auto", paddingTop: 40 }}>
-//       <h2>Edit Quiz Question</h2>
-
-//       {loading ? (
-//         <Spin size="large" />
-//       ) : (
-//         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-//           <Form.Item
-//             label="Question Text"
-//             name="questionText"
-//             rules={[{ required: true, message: "Please enter a question" }]}
-//           >
-//             <Input.TextArea rows={3} placeholder="Enter your question" />
-//           </Form.Item>
-
-//           <Form.Item label="Answer Type" name="answerType">
-//             <Select disabled>
-//               <Option value="TEXT">Text</Option>
-//               <Option value="SINGLE_SELECT">Single Select</Option>
-//               <Option value="MULTI_SELECT">Multi Select</Option>
-//             </Select>
-//           </Form.Item>
-
-//           {(answerType === "SINGLE_SELECT" || answerType === "MULTI_SELECT") && (
-//             <>
-//               <Form.Item
-//                 label="Options"
-//                 name="options"
-//                 rules={[{ required: true, message: "Please enter options" }]}
-//               >
-//                 <Checkbox.Group
-//                   options={options}
-//                   disabled
-//                   style={{ display: "block" }}
-//                 />
-//               </Form.Item>
-
-//               <Form.Item
-//                 label="Correct Answer(s)"
-//                 name="correctAnswer"
-//                 rules={[{ required: true, message: "Please select correct answer(s)" }]}
-//               >
-//                 {answerType === "SINGLE_SELECT" ? (
-//                   <Radio.Group>
-//                     {options.map((opt, idx) => (
-//                       <Radio key={idx} value={opt}>
-//                         {opt}
-//                       </Radio>
-//                     ))}
-//                   </Radio.Group>
-//                 ) : (
-//                   <Checkbox.Group>
-//                     {options.map((opt, idx) => (
-//                       <Checkbox key={idx} value={opt}>
-//                         {opt}
-//                       </Checkbox>
-//                     ))}
-//                   </Checkbox.Group>
-//                 )}
-//               </Form.Item>
-//             </>
-//           )}
-
-//           {answerType === "TEXT" && (
-//             <Form.Item
-//               label="Correct Answer"
-//               name="correctAnswer"
-//               rules={[{ required: true, message: "Please enter the correct answer" }]}
-//             >
-//               <Input placeholder="Correct answer" />
-//             </Form.Item>
-//           )}
-
-//           <Form.Item>
-//             <Space>
-//               <Button onClick={() => navigate(`/course-content/${courseId}/quizzes`)}>
-//                 Cancel
-//               </Button>
-//               <Button type="primary" htmlType="submit">
-//                 Save Changes
-//               </Button>
-//             </Space>
-//           </Form.Item>
-//         </Form>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default QuizQuestionEditPage;
-
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -170,62 +10,85 @@ import {
   Modal,
   message,
 } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
-const dummyData = [
-  {
-    questionId: "q1",
-    questionText: "What is the capital of France?",
-    answerType: "SINGLE_SELECT",
-    options: ["Paris", "Rome", "Madrid", "Berlin"],
-    correctAnswer: ["Paris"],
-  },
-  {
-    questionId: "q2",
-    questionText: "List all primary colors.",
-    answerType: "MULTI_SELECT",
-    options: ["Red", "Green", "Blue", "Yellow"],
-    correctAnswer: ["Red", "Blue", "Yellow"],
-  },
-  {
-    questionId: "q3",
-    questionText: "Explain the concept of polymorphism in OOP.",
-    answerType: "TEXT",
-    correctAnswer: ["Polymorphism allows objects to take many forms."],
-  },
-];
-
-const EditDummyQuestionModal = ({ open, onClose, questionId, onUpdate }) => {
+const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) => {
   const [form] = Form.useForm();
-  const [question, setQuestion] = useState(null);
   const [currentAnswerType, setCurrentAnswerType] = useState(null);
 
   // Dynamically watch options
   const options = Form.useWatch("options", form) || [];
 
   useEffect(() => {
-    const found = dummyData.find((q) => q.questionId === questionId);
-    if (found) {
-      setQuestion(found);
-      setCurrentAnswerType(found.answerType);
-      form.setFieldsValue({
-        questionText: found.questionText,
-        answerType: found.answerType,
-        options: found.options || [],
-        correctAnswer: found.correctAnswer,
-      });
-    }
-  }, [questionId, form]);
+    const fetchQuestion = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/quiz-questions/${questionId}`);
+        const data = res.data?.data;
 
-  const handleSubmit = (values) => {
-    const updated = dummyData.map((q) =>
-      q.questionId === questionId ? { ...q, ...values } : q
-    );
-    message.success("Question updated in dummy data");
-    onUpdate(updated);
+        if (data) {
+          setCurrentAnswerType(data.questionType);
+          form.setFieldsValue({
+            questionText: data.questionText,
+            answerType: data.questionType,
+            options: data.options || [],
+            correctAnswer: data.correctAnswer || [],
+            points: data.points,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch question:", error);
+        message.error("Could not load question data");
+      }
+    };
+
+    if (questionId && open) {
+      fetchQuestion();
+    }
+  }, [questionId, form, open]);
+
+const handleSubmit = async (values) => {
+  try {
+    // Determine correctAnswer structure based on type
+    let correctAnswer = null;
+
+    if (values.answerType === "TEXT") {
+      correctAnswer = JSON.stringify([values.correctAnswer]); // wrap in array and stringify
+    } else if (values.answerType === "SINGLE_SELECT") {
+      correctAnswer = JSON.stringify([values.correctAnswer]); // wrap in array and stringify
+    } else if (values.answerType === "MULTI_SELECT") {
+      correctAnswer = JSON.stringify(values.correctAnswer); // already array
+    }
+
+    const payload = {
+      questionText: values.questionText,
+      questionType:
+        values.answerType === "TEXT"
+          ? "SHORT_ANSWER"
+          : values.answerType === "SINGLE_SELECT"
+          ? "MCQ_SINGLE"
+          : "MCQ_MULTIPLE",
+      options:
+        ["SINGLE_SELECT", "MULTI_SELECT"].includes(values.answerType) && values.options
+          ? JSON.stringify(values.options)
+          : null,
+      correctAnswer,
+      position: values.position,
+      points: values.points
+    };
+
+    await axios.put(`http://localhost:8080/api/quiz-questions/${questionId}`, payload);
+
+    message.success("Question updated successfully");
+    if (onUpdate) onUpdate(); // Trigger parent refresh
     onClose();
-  };
+  } catch (err) {
+    console.error("Failed to update question:", err);
+    message.error("Failed to update question");
+  }
+};
+
 
   return (
     <Modal
@@ -234,6 +97,7 @@ const EditDummyQuestionModal = ({ open, onClose, questionId, onUpdate }) => {
       onCancel={onClose}
       onOk={() => form.submit()}
       okText="Update"
+      destroyOnClose
     >
       <Form layout="vertical" form={form} onFinish={handleSubmit}>
         <Form.Item
@@ -328,10 +192,23 @@ const EditDummyQuestionModal = ({ open, onClose, questionId, onUpdate }) => {
             <Input />
           </Form.Item>
         )}
+        <Form.Item
+        label="Points"
+        name="points"
+        rules={[{ required: true, message: "Please enter the points" }]}
+        >
+        <Input type="number" min={0} step={1} />
+        </Form.Item>
+        <Form.Item
+            label="Position"
+            name="position"
+            rules={[{ required: true, message: "Please enter the question position" }]}
+            >
+            <Input type="number" min={1} />
+        </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export default EditDummyQuestionModal;
-
+export default EditQuizQuestionModal;

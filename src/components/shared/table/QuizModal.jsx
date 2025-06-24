@@ -66,7 +66,7 @@ const QuizModal = ({ open, onClose, onSubmit, course }) => {
     <Switch />
   </Form.Item>
 
-  <Form.Item label="Show Results After Submission" name="showResultsAfterSubmission" valuePropName="checked">
+  <Form.Item label="Show Results After Submission" name="showResults" valuePropName="checked">
     <Switch />
   </Form.Item>
 

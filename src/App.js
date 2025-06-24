@@ -179,7 +179,7 @@ function App() {
             </AdminRoutes>
           }
         ></Route>
-        <Route path="/course-content/:courseId/quizzes/:quizId/questions" element={<QuizListPage />} />
+        <Route path="/course-content/:courseId/quizzes" element={<QuizListPage />} />
         <Route
           path="/course-content/:courseId/quizzes/edit-question/:questionId"
           element={<QuizQuestionEditPage />}

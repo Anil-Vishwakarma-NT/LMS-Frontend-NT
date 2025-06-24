@@ -57,23 +57,38 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
   };
 
   const fetchCourses = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/api/course");
-      const coursesWithQuizStatus = await Promise.all(
-        response.data.data.map(async (course) => {
-          try {
-            await axios.get(`/api/quizzes/metadata/${course.courseId}`);
-            return { ...course, quizCreated: true };
-          } catch (err) {
-            return { ...course, quizCreated: false };
+  try {
+    const response = await axios.get("http://localhost:8080/api/course");
+
+    const coursesWithQuizStatus = await Promise.all(
+      response.data.data.map(async (course) => {
+        try {
+          const quizResponse = await axios.get(`http://localhost:8080/api/quizzes/course/${course.courseId}`);
+          const quizzes = quizResponse?.data?.data || [];
+
+          if (quizzes.length > 0) {
+            // If you have multiple quizzes, pick the latest or the first one
+            const latestQuiz = quizzes[0]; 
+            return {
+              ...course,
+              quizCreated: true,
+              quizId: latestQuiz.quizId,
+            };
+          } else {
+            return { ...course, quizCreated: false, quizId: null };
           }
-        })
-      );
-      setCourses(coursesWithQuizStatus);
-    } catch (err) {
-      message.error("Failed to load courses");
-    }
-  };
+        } catch (err) {
+          return { ...course, quizCreated: false, quizId: null };
+        }
+      })
+    );
+
+    setCourses(coursesWithQuizStatus);
+  } catch (err) {
+    message.error("Failed to load courses");
+  }
+};
+
 
   useEffect(() => {
     fetchCourses();
@@ -120,7 +135,7 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
             </Tooltip>
 
             {/* Create or Modify Quiz */}
-            <Tooltip title={quizExists ? "Modify Quiz Metadata" : "Create Quiz Metadata"}>
+            {/* <Tooltip title={quizExists ? "Modify Quiz Metadata" : "Create Quiz Metadata"}>
               <Button
                 icon={<FileAddOutlined />}
                 type="primary"
@@ -128,27 +143,39 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
               >
                 {quizExists ? "Modify Quiz" : "Create Quiz"}
               </Button>
-            </Tooltip>
+            </Tooltip> */}
 
             {/* Quiz Listing */}
-            {quizExists ? (
-          <Tooltip title="Quiz List">
-            <Button
-              icon={<UnorderedListOutlined />}
-              onClick={() =>
-                navigate(`/course-content/${record.courseId}/quizzes/${record.quizId}/questions`)
-              }
-            >
-              Quiz List
-            </Button>
+            {/* {quizExists ? (
+            <Tooltip title="Quiz List">
+              <Button
+                icon={<UnorderedListOutlined />}
+                onClick={() =>
+                  navigate(`/course-content/${record.courseId}/quizzes/${record.quizId}/questions`)
+                }
+              >
+                Quiz List
+              </Button>
           </Tooltip>
         ) : (
-          <Tooltip title="No quiz created">
-            <Button icon={<UnorderedListOutlined />} disabled>
-              Quiz List
-            </Button>
-          </Tooltip>
-        )}
+            <Tooltip title="No quiz created">
+              <Button icon={<UnorderedListOutlined />} disabled>
+                Quiz List
+              </Button>
+            </Tooltip>
+          )} */}
+
+          <Tooltip title="Manage Quiz">
+        <Button
+          type="primary"
+          icon={<UnorderedListOutlined />}
+          onClick={() =>
+            navigate(`/course-content/${record.courseId}/quizzes`)
+          }
+        >
+          Manage Quiz
+        </Button>
+      </Tooltip>
           </Space>
         );
       },
