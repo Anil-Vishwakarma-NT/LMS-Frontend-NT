@@ -242,14 +242,6 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
         <Checkbox>Check if question must be answered</Checkbox>
       </Form.Item>
 
-      <Form.Item
-        label="Position in Quiz"
-        name="position"
-        rules={[{ required: true, message: "Enter position" }]}
-      >
-        <Input type="number" min={1} placeholder="e.g. 1" style={{ width: 200 }} />
-      </Form.Item>
-
       <Form.Item>
         <Space>
           <Button onClick={() => setStep(2)}>Back</Button>
@@ -273,7 +265,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
         setOptions([]);
         setCorrectAnswers([]);
         form.resetFields();
-        onCancel();
+        if (onCancel) onCancel();
       }}
     >
       <Form layout="vertical" form={form}>

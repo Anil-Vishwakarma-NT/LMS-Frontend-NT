@@ -17,8 +17,6 @@ const { Option } = Select;
 const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) => {
   const [form] = Form.useForm();
   const [currentAnswerType, setCurrentAnswerType] = useState(null);
-
-  // Dynamically watch options
   const options = Form.useWatch("options", form) || [];
 
   useEffect(() => {
@@ -28,13 +26,28 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
         const data = res.data?.data;
 
         if (data) {
-          setCurrentAnswerType(data.questionType);
+          const parsedOptions = data.options ? JSON.parse(data.options) : [];
+          const parsedCorrect = data.correctAnswer ? JSON.parse(data.correctAnswer) : [];
+
+          const mappedAnswerType =
+            data.questionType === "SHORT_ANSWER"
+              ? "TEXT"
+              : data.questionType === "MCQ_SINGLE"
+              ? "SINGLE_SELECT"
+              : "MULTI_SELECT";
+
+          setCurrentAnswerType(mappedAnswerType);
+
           form.setFieldsValue({
             questionText: data.questionText,
-            answerType: data.questionType,
-            options: data.options || [],
-            correctAnswer: data.correctAnswer || [],
+            answerType: mappedAnswerType,
+            options: parsedOptions,
+            correctAnswer:
+              mappedAnswerType === "SINGLE_SELECT" || mappedAnswerType === "TEXT"
+                ? parsedCorrect[0] || ""
+                : parsedCorrect,
             points: data.points,
+            position: data.position
           });
         }
       } catch (error) {
@@ -48,47 +61,43 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
     }
   }, [questionId, form, open]);
 
-const handleSubmit = async (values) => {
-  try {
-    // Determine correctAnswer structure based on type
-    let correctAnswer = null;
+  const handleSubmit = async (values) => {
+    try {
+      let correctAnswer;
 
-    if (values.answerType === "TEXT") {
-      correctAnswer = JSON.stringify([values.correctAnswer]); // wrap in array and stringify
-    } else if (values.answerType === "SINGLE_SELECT") {
-      correctAnswer = JSON.stringify([values.correctAnswer]); // wrap in array and stringify
-    } else if (values.answerType === "MULTI_SELECT") {
-      correctAnswer = JSON.stringify(values.correctAnswer); // already array
+      if (values.answerType === "TEXT" || values.answerType === "SINGLE_SELECT") {
+        correctAnswer = JSON.stringify([values.correctAnswer]);
+      } else {
+        correctAnswer = JSON.stringify(values.correctAnswer);
+      }
+
+      const payload = {
+        questionText: values.questionText,
+        questionType:
+          values.answerType === "TEXT"
+            ? "SHORT_ANSWER"
+            : values.answerType === "SINGLE_SELECT"
+            ? "MCQ_SINGLE"
+            : "MCQ_MULTIPLE",
+        options:
+          ["SINGLE_SELECT", "MULTI_SELECT"].includes(values.answerType) && values.options
+            ? JSON.stringify(values.options)
+            : null,
+        correctAnswer,
+        points: values.points,
+        position: values.position
+      };
+
+      await axios.put(`http://localhost:8080/api/quiz-questions/${questionId}`, payload);
+
+      message.success("Question updated successfully");
+      if (onUpdate) onUpdate();
+      onClose();
+    } catch (err) {
+      console.error("Failed to update question:", err);
+      message.error("Failed to update question");
     }
-
-    const payload = {
-      questionText: values.questionText,
-      questionType:
-        values.answerType === "TEXT"
-          ? "SHORT_ANSWER"
-          : values.answerType === "SINGLE_SELECT"
-          ? "MCQ_SINGLE"
-          : "MCQ_MULTIPLE",
-      options:
-        ["SINGLE_SELECT", "MULTI_SELECT"].includes(values.answerType) && values.options
-          ? JSON.stringify(values.options)
-          : null,
-      correctAnswer,
-      position: values.position,
-      points: values.points
-    };
-
-    await axios.put(`http://localhost:8080/api/quiz-questions/${questionId}`, payload);
-
-    message.success("Question updated successfully");
-    if (onUpdate) onUpdate(); // Trigger parent refresh
-    onClose();
-  } catch (err) {
-    console.error("Failed to update question:", err);
-    message.error("Failed to update question");
-  }
-};
-
+  };
 
   return (
     <Modal
@@ -114,7 +123,7 @@ const handleSubmit = async (values) => {
               setCurrentAnswerType(value);
               form.setFieldsValue({
                 options: [],
-                correctAnswer: [],
+                correctAnswer: value === "MULTI_SELECT" ? [] : ""
               });
             }}
           >
@@ -124,7 +133,6 @@ const handleSubmit = async (values) => {
           </Select>
         </Form.Item>
 
-        {/* MCQ Options & Correct Answer */}
         {["SINGLE_SELECT", "MULTI_SELECT"].includes(currentAnswerType) && (
           <>
             <Form.List name="options">
@@ -182,7 +190,6 @@ const handleSubmit = async (values) => {
           </>
         )}
 
-        {/* Text Answer */}
         {currentAnswerType === "TEXT" && (
           <Form.Item
             label="Correct Answer"
@@ -192,19 +199,21 @@ const handleSubmit = async (values) => {
             <Input />
           </Form.Item>
         )}
+
         <Form.Item
-        label="Points"
-        name="points"
-        rules={[{ required: true, message: "Please enter the points" }]}
+          label="Points"
+          name="points"
+          rules={[{ required: true, message: "Please enter the points" }]}
         >
-        <Input type="number" min={0} step={1} />
+          <Input type="number" min={0} step={1} />
         </Form.Item>
+
         <Form.Item
-            label="Position"
-            name="position"
-            rules={[{ required: true, message: "Please enter the question position" }]}
-            >
-            <Input type="number" min={1} />
+          label="Position"
+          name="position"
+          rules={[{ required: true, message: "Please enter the question position" }]}
+        >
+          <Input type="number" min={1} />
         </Form.Item>
       </Form>
     </Modal>

@@ -420,7 +420,7 @@ const QuizListPage = () => {
 
           <QuizQuestionModal
             open={modalOpen}
-            onClose={() => setModalOpen(false)}
+            onCancel={() => setModalOpen(false)}
             onSuccess={() => {
               fetchQuestions(quiz.quizId);
               setModalOpen(false);
