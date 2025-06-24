@@ -1,0 +1,114 @@
+// export const getTotalCourses = async () => {
+
+//     try {
+//         const response = await appCourse.get('/api/course/count')
+//         return response.data.data
+//     } catc h (error) {
+//         throw new Error(error?.response?.data?.message);
+//     }
+// }
+import { app } from "./serviceLMS";
+
+export const getAllGroups = async () => {
+
+    try {
+        const response = await app.get('/group/groups')
+        console.log("GROUP DETAILS", response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Error fetching groups");
+        throw new Error(error?.response?.data?.message);
+    }
+
+};
+
+
+export const addGroup = async (group) => {
+    try {
+        const response = await app.post('/group/create-group', group);
+        return response.data;
+    }
+    catch (error) {
+        alert("Error adding group");
+        throw new Error(error?.response?.data?.message);
+    }
+
+};
+
+
+export const updateGroup = async (group) => {
+    try {
+
+        // const response = await app.put(group);
+        // return response;
+    }
+    catch (error) {
+        alert("Error while updating group");
+        throw new Error(error?.response?.data?.message);
+    }
+};
+
+
+export const deleteGroup = async (groupId) => {
+    try {
+        const response = await app.delete(`/group/remove/${groupId}`);
+    }
+    catch (error) {
+        alert("Error while deleting group");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+export const getUsersInGroup = async (groupId) => {
+    try {
+        const response = await app.get(`/group/group-emps/${groupId}`)
+        console.log("Users in a group ", response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch users");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+
+export const deleteSingleUser = async (user) => {
+    try {
+        console.log(user);
+        const response = await app.delete("/group/remove-user", { data: user });
+        alert("USer deleted");
+
+    }
+    catch (error) {
+        alert("Couldn't fetch users");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+
+
+export const addUser = async (user) => {
+    try {
+        console.log(user);
+        const response = await app.post("/group/add-user", user);
+        alert("USer added");
+    }
+    catch (error) {
+        alert("Couldn't fetch users");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+
+export const getCourseDetails = async (groupId) => {
+    try {
+        console.log("GroupIdin getcoursedetails api", groupId);
+        const response = await app.get(`/group/group-courses/${groupId}`);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch courses");
+        throw new Error(error?.response?.data?.message);
+    }
+}

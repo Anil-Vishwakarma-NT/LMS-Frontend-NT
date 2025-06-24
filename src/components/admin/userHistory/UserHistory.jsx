@@ -138,10 +138,11 @@ const UserHistory = ({ setLoading }) => {
         <Progress
           percent={progress}
           size="small"
+          type="circle"
           strokeColor={
             progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
           }
-        />
+         wrap/>
       ),
     },
     {

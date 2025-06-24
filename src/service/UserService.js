@@ -38,14 +38,14 @@ export async function deleteUsers(id) {
     }
 }
 
-export async function fetchAllActiveUsers(token) {
+export async function fetchAllActiveUsers() {
     try {
-        console.log("token");
-        console.log(token);
+        // console.log("token");
+        // console.log(token);
         const response = await app.get('/admin/active-employees', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
+            // headers: {
+            //     Authorization: `Bearer ${token}`,
+            // }
         });
         return response.data
     } catch (error) {

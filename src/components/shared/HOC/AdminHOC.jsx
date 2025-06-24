@@ -15,6 +15,7 @@ const AdminHOC = (Component) => function HOC() {
     { path: '/admin', label: 'Dashboard', img: sideDash },
     { path: '/categories', label: 'Categories', img: sideCategory },
     { path: '/books', label: 'Courses', img: sideBook },
+    { path: '/group', label: 'Groups', img: sideIssuance },
     { path: '/users', label: 'Users', img: sideUsers },
     { path: '/enroll', label: 'Enrollments', img: sideIssuance }
   ];
