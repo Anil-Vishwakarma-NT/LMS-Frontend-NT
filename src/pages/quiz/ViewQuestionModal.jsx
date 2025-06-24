@@ -17,7 +17,7 @@ const ViewQuestionModal = ({ open, onClose, question }) => {
           {question.questionText}
         </Descriptions.Item>
         <Descriptions.Item label="Answer Type">
-          <Tag color="blue">{question.answerType}</Tag>
+          <Tag color="blue">{question.questionType}</Tag>
         </Descriptions.Item>
         {question.options && (
           <Descriptions.Item label="Options">

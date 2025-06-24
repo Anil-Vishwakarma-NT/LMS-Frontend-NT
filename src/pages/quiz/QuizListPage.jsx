@@ -228,6 +228,7 @@ const QuizList = () => {
 
   const fetchQuizQuestions = async () => {
     console.log("courseId", courseId)
+    console.log("quizId", quizId)
     try {
       // const mockData = [
       //   {
@@ -251,8 +252,9 @@ const QuizList = () => {
       //     correctAnswer: ["Polymorphism allows objects to take many forms."],
       //   },
       // ];
-      const response = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${courseId}`);
-      console("here")
+      // const response = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${courseId}`);
+      const response = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${quizId}`);
+      console.log("here")
       console.log("response11111111", response)
       setQuizQuestions(response.data?.data || []);
     } catch (error) {
@@ -291,8 +293,8 @@ const QuizList = () => {
     },
     {
       title: "Answer Type",
-      dataIndex: "answerType",
-      key: "answerType",
+      dataIndex: "questionType",
+      key: "questionType",
     },
     {
       title: "Actions",
@@ -338,7 +340,7 @@ const QuizList = () => {
   return (
     <div style={{ padding: "24px", marginTop: "75px" }}>
       <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/admin/courses")}>Back to Courses</Button>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/books")}>Back to Courses</Button>
 
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
           Add Quiz Question
@@ -359,10 +361,10 @@ const QuizList = () => {
       <QuizQuestionModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSuccess={(newQuestion) => {
-          setQuizQuestions([...quizQuestions, newQuestion]);
-          setModalOpen(false);
-        }}
+        onSuccess={() => {
+        fetchQuizQuestions();
+        setModalOpen(false);
+      }}
         courseId={courseId}
         quizId={quizId}
       />

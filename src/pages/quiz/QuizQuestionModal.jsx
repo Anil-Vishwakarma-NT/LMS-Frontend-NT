@@ -44,7 +44,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
     "points",
     "explanation",
     "required",
-    "position"
+    // "position"
   ];
 
   if (answerType === "TEXT") {
@@ -71,21 +71,21 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   }
 
   const payload = {
-    quizId,
-    questionText: values.questionText,
-    questionType:
-      answerType === "TEXT"
-        ? "SHORT_ANSWER"
-        : answerType === "SINGLE_SELECT"
-        ? "SINGLE_CHOICE"
-        : "MULTIPLE_CHOICE",
-    options: answerType === "TEXT" ? null : options, // ❗ null for TEXT type
-    correctAnswer, // ✅ always List<String>
-    points: parseFloat(values.points),
-    explanation: values.explanation || "",
-    required: !!values.required,
-    position: parseInt(values.position),
-  };
+  quizId,
+  questionText: values.questionText,
+  questionType:
+    answerType === "TEXT"
+      ? "SHORT_ANSWER"
+      : answerType === "SINGLE_SELECT"
+      ? "MCQ_SINGLE"
+      : "MCQ_MULTIPLE",
+  options: answerType === "TEXT" ? null : JSON.stringify(options),
+  correctAnswer: JSON.stringify(correctAnswer),
+  points: parseFloat(values.points),
+  explanation: values.explanation || "",
+  required: !!values.required,
+//   position: parseInt(values.position),
+};
 
   console.log("📤 Final Payload:", payload);
 
