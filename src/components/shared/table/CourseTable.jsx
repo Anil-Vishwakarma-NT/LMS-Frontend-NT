@@ -1,92 +1,58 @@
+import QuizModal from "./QuizModal";
+import React, { useState } from "react";
+
 // import React from "react";
-// import edit from "../../../assets/edit.png";
-// import deleteLogo from "../../../assets/delete.png";
-// import { useNavigate } from "react-router-dom";
-// import Tooltip from "../tooltip/Tooltip";
-// import { MdVisibility } from "react-icons/md";
-
-// const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="table-container">
-//       <div className="table-parent">
-//         <table className="books-table">
-//           <thead>
-//             <tr>
-//               <th>Course ID</th>
-//               <th>Title</th>
-//               <th>Description</th>
-//               <th>Level</th>
-//               <th>Owner ID</th>
-//               <th>Is Active</th>
-//               <th>Created At</th>
-//               <th>Updated At</th>
-//               <th>Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {entries?.map((item, i) => (
-//               <tr key={i}>
-//                 <td>{item.courseId}</td>
-//                 <td>{item.title}</td>
-//                 <td>{item.description}</td>
-//                 <td>{item.level}</td>
-//                 <td>{item.ownerId}</td>
-//                 <td>{item.isActive ? "Yes" : "No"}</td>
-//                 <td>
-//                   {item.createdAt
-//                     ? new Date(item.createdAt.split(".")[0]).toLocaleString()
-//                     : "N/A"}
-//                 </td>
-//                 <td>{new Date(item.updatedAt).toLocaleString()}</td>
-//                 <td>
-//                   <div className="modifications">
-//                     <Tooltip tooltipText="Edit">
-//                       <img
-//                         src={edit}
-//                         alt="edit"
-//                         className="edit-logo"
-//                         onClick={() => onEditClick(item)}
-//                       />
-//                     </Tooltip>
-//                     <Tooltip tooltipText="Delete">
-//                       <img
-//                         src={deleteLogo}
-//                         alt="delete"
-//                         className="edit-logo"
-//                         onClick={() => onDeleteClick(item)}
-//                       />
-//                     </Tooltip>
-//                     <Tooltip tooltipText="View">
-//                       <MdVisibility
-//                         className="view-icon"
-//                         onClick={() => navigate(`/course-content/${item.courseId}`)}
-//                       />
-//                     </Tooltip>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CourseTable;
-
-
-
-
-import React from "react";
-import { Table, Tooltip, Space, Button } from "antd";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { Table, Tooltip, Space, Button , message } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined, FilePdfOutlined, PlusOutlined} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { previewCourseReportPdf, downloadCourseReportPdf} from "../../../service/BookService";
+import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
 
 const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
   const navigate = useNavigate();
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportBlobUrl, setReportBlobUrl] = useState("");
+  const [reportingCourseId, setReportingCourseId] = useState(null);
+
+
+  const handlePreviewReport = async (courseId) => {
+    try {
+      const blob = await previewCourseReportPdf(courseId);
+      const blobUrl = URL.createObjectURL(blob);
+      setReportBlobUrl(blobUrl);
+      setIsReportModalOpen(true);
+    } catch (error) {
+      console.error("Failed to load report PDF:", error.message);
+    }
+  };
+
+  const handleDownload = (courseId) => {
+    if (!courseId) {
+      message.warning("No course selected for download");
+      return;
+    }
+    downloadCourseReportPdf(courseId);
+  };
+
+  const handleAddQuizClick = (course) => {
+    setSelectedCourse(course);
+    setQuizModalOpen(true);
+  };   
+
+  const handleQuizSubmit = async (quizData) => {
+    try {
+      console.log("Quiz Submitted:", quizData);
+      // Replace this with actual API call
+      // await addQuizAPI(quizData);
+      message.success("Quiz added successfully!");
+    } catch (err) {
+      message.error("Failed to add quiz");
+    } finally {
+      setQuizModalOpen(false);
+    }
+  };
 
   const columns = [
     {
@@ -125,13 +91,13 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
       dataIndex: "createdAt",
       key: "createdAt",
       render: (createdAt) =>
-        createdAt ? new Date(createdAt.split(".")[0]).toLocaleString() : "N/A",
+        createdAt ? new Date(createdAt.split(".")[0]).toLocaleDateString() : "N/A",
     },
     {
       title: "Updated At",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      render: (updatedAt) => new Date(updatedAt).toLocaleString(),
+      render: (updatedAt) => new Date(updatedAt).toLocaleDateString(),
     },
     {
       title: "Actions",
@@ -160,6 +126,24 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
               onClick={() => navigate(`/course-content/${record.courseId}`)}
             />
           </Tooltip>
+            <Tooltip title="Preview Report">
+              <Button
+                icon={<FilePdfOutlined />}
+                onClick={() => {
+                  setReportingCourseId(record.courseId);
+                  handlePreviewReport(record.courseId);
+                }}
+                type="text"
+              />
+          </Tooltip>
+          <Tooltip title="Add Quiz">
+            <Button
+              type="primary"
+              onClick={() => handleAddQuizClick(record)}
+            >
+              Add Quiz
+            </Button>
+          </Tooltip>
         </Space>
       ),
     },
@@ -175,8 +159,28 @@ const CourseTable = ({ onEditClick, fields, entries, type, onDeleteClick }) => {
         dataSource={entries}
         rowKey={(record) => record.courseId}
         bordered
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 10 }}     
       />
+      <PDFReaderModal
+        isOpen={isReportModalOpen}
+        pdfUrl={reportBlobUrl}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          URL.revokeObjectURL(reportBlobUrl);
+          setSelectedCourse(null);
+        }}
+        blockTime={0}
+        showDownload={true}
+        onDownload={() => handleDownload(reportingCourseId)}
+      />
+      {selectedCourse && (
+        <QuizModal
+          open={quizModalOpen}
+          onClose={() => setQuizModalOpen(false)}
+          onSubmit={handleQuizSubmit}
+          course={selectedCourse}
+        />
+      )}
     </div>
   );
 };
