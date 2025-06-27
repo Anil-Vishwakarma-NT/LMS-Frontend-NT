@@ -50,9 +50,11 @@ export async function fetchUserNameById(userId) {
 
 export async function fetchCourseDetails(courseId) {
   try {
+    console.log("FetchCourseDetails fetching ......")
     const response = await axios.get(
       `http://localhost:8080/api/course/${courseId}`
     );
+    console.log("FetchCourseDetails", response.data.data)
     return response.data.data;
   } catch (error) {
     throw new Error("Failed to fetch course details.");
@@ -89,24 +91,7 @@ export async function getUserEnrolledCourseDetails(userId) {
       console.log("Completion percentage fetched", completionPercentage);
 
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
-<<<<<<< HEAD
-      console.log("ROUNDED COMPLETION PERC", roundedCompletion)
-      const date = new Date().toISOString().split("T")[0];
-      console.log("DATE", date);
-      console.log("DATE DEADLINE", enrollment.deadline.split("T")[0])
-      return {
-        ...courseDetails,
-        assignedById: enrollment.assignedById,
-        enrollmentDate: enrollment.enrollmentDate.split("T")[0],
-        deadline: enrollment.deadline.split("T")[0],
-        roundedCompletion,
-        status:
-          roundedCompletion === 100
-            ? "Completed"
-            : roundedCompletion > 0
-              ? "In Progress"
-              : (date < enrollment.deadline.split("T")[0] ? "Not Started" : "Defaulter"),
-=======
+
       console.log("ROUNDED COMPLETION PERC", roundedCompletion);
 
       const todayISO = new Date().toISOString().split("T")[0];
@@ -176,7 +161,7 @@ export async function getUserEnrolledCourseDetails(userId) {
         roundedCompletion,
         status,
         adherence,
->>>>>>> 25127422651de110e2cc32c2eefd8e130a962cf0
+
       };
     });
 

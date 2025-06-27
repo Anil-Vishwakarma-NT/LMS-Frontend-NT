@@ -39,7 +39,7 @@ export async function deleteUsers(id) {
   }
 }
 
-<<<<<<< HEAD
+
 export async function fetchAllActiveUsers() {
     try {
         // console.log("token");
@@ -53,22 +53,7 @@ export async function fetchAllActiveUsers() {
     } catch (error) {
         throw new Error(error?.response?.data?.message);
     }
-=======
-export async function fetchAllActiveUsers(token) {
-  try {
-    console.log("token");
-    console.log(token);
-    const response = await app.get("/admin/active-employees", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error?.response?.data?.message);
   }
->>>>>>> 25127422651de110e2cc32c2eefd8e130a962cf0
-}
 
 export async function fetchAllInactiveUsers(token) {
   try {

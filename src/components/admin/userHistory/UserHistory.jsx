@@ -124,12 +124,12 @@ const UserHistory = ({ setLoading }) => {
     {
       title: 'Enrollment Date',
       dataIndex: 'enrollmentDate',
-      // render: (date) => new Date(date).toLocaleDateString('en-GB'),
+      render: (date) => new Date(date).toLocaleDateString('en-GB'),
     },
     {
       title: 'Deadline',
       dataIndex: 'deadline',
-      // render: (date) => new Date(date).toLocaleDateString('en-GB'),
+      render: (date) => new Date(date).toLocaleDateString('en-GB'),
     },
     {
       title: 'Completion %',
@@ -142,7 +142,7 @@ const UserHistory = ({ setLoading }) => {
           strokeColor={
             progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
           }
-         wrap/>
+          wrap />
       ),
     },
     {
@@ -212,6 +212,8 @@ const UserHistory = ({ setLoading }) => {
     },
   ];
 
+
+
   return (
     <div className="user-history-section">
       <Title level={1} className="user-history-header" style={{ marginBottom: 16 }}>
@@ -219,13 +221,7 @@ const UserHistory = ({ setLoading }) => {
       </Title>
       <div className="user-history-stats">
         {dashData.map((data) => (
-          <Card
-            key={data.id}
-            style={{
-              width: 220,
-              height: 130,
-              border: '1px solid #e0e0e0',
-            }}>
+          <Card key={data.id} className="user-history-card">
             <Statistic
               title={<Text strong>{data.title}</Text>}
               value={data.number}
@@ -235,6 +231,7 @@ const UserHistory = ({ setLoading }) => {
           </Card>
         ))}
       </div>
+
 
       <div className="user-history-table">
         {filteredCourses.length > 0 ? (
