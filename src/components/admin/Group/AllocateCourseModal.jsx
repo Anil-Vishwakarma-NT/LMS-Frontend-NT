@@ -1,4 +1,4 @@
-import { addUser, updateGroup } from "../../../service/GroupService";
+import { addUser, updateGroup, getUserCoursesInGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { Modal, Form, Input, Select, Button, Checkbox, Col, DatePicker } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
@@ -26,6 +26,9 @@ const AllocateCourseModal = (
     {
         isModalOpen,
         groupId,
+        userId,
+        getUsers,
+        getCourses,
         handleCloseModal,
         setToastMessage,
         setToastType,
@@ -35,97 +38,66 @@ const AllocateCourseModal = (
 ) => {
     const [form] = Form.useForm();
     const [searchCourse, setSearchCourse] = useState('');
+    const [courses, setCourses] = useState([]);
+
 
     const filteredCourses = courses?.filter(user =>
-        user.name.toLowerCase().includes(searchCourse.toLowerCase())
+        user.title.toLowerCase().includes(searchCourse.toLowerCase())
         // user.email.toLowerCase().includes(searchValue.toLowerCase())
     );
 
 
     async function getCourseList() {
-        const activeUsers = await fetchAllActiveUsers();
-        const users = activeUsers.data.map((user, index) => ({
-            value: user.userId,
-            label: `${user.firstName} ${user.lastName}`,
+
+        const payload = {
+            groupId: Number(groupId),
+            userId: userId,
+        }
+        console.log("Payload", payload);
+        const activeUsers = await getUserCoursesInGroup(payload);
+        const users = activeUsers.map((user, index) => ({
+            courseId: user.courseId,
+            title: user.title,
+            level: user.courseLevel,
         }));
-        setUserList(users);
+        setCourses(users);
         console.log(users);
     }
 
-    // async function getExistingUsersList() {
-    //     const response = await getUsersInGroup(id);
-    //     if (!Array.isArray(response)) {
-    //         console.error("Expected an array but got:", response);
-    //         setUserList([]);
-    //         return;
-    //     }
-    //     const users = response.map((user, index) => ({
-    //         id: user.userId,
-    //         srno: index + 1,
-    //         name: `${user.firstName} ${user.lastName}`,
-    //     }));
-
-    //     setExistingUsers(users);
-    // }
 
     useEffect(() => {
         form.setFieldsValue({
             groupId: groupId,
-            employees: [],
+            employees: [userId],
             courses: [],
-
         });
 
-        getUserList();
+        getCourseList();
 
     }, [isModalOpen]);
-
-    // ✅ New useEffect for filtering users
-    useEffect(() => {
-        if (userList.length > 0 && existingUsers.length > 0) {
-            const usr = userList.filter(
-                user => !existingUsers.some(existing => existing.id === user.value)
-            );
-            setNotAddedUSers(usr);
-        } else if (userList.length > 0) {
-            // If no existing users, assume all are not added
-            setNotAddedUSers(userList);
-        }
-
-        console.log("Group Id", form.getFieldValue("groupId"))// this will set userList
-    }, [userList, existingUsers]);
-
-
-
-
 
     const handleAdd = async () => {
         try {
             const values = await form.validateFields();
-            values.groupId = Number(values.groupId);
-            values.deadline = values.deadline ? values.deadline.format('YYYY-MM-DDThh:mm:ss') : null;
-            values.assignedAt = values.assignedAt ? values.assignedAt.format('YYYY-MM-DDThh:mm:ss') : null;
 
-            // if (!values.groupName) {
-            //     form.setFields("Group name required");
-            //     return;
-            // }
-            // const formData = new FormData();
-            // formData.append("groupId", groupId);
-            // formData.append("employees", form.getFieldValue("employees"));
+            // Ensure proper structure
+            const payload = {
+                groupId: Number(values.groupId),
+                employees: [userId], // ✅ Backend expects this
+                courses: values.courses,
+                deadline: values.deadline,
+                assignedAt: values.assignedAt,
+            };
+
             setLoading(true);
-            console.log("Values", values);
-            console.log("Group Id", form.getFieldValue("groupId"))// this will set userList // Is this an array or valid object?
-            // console.log("form values", formData);
-            // for (let [key, value] of formData.entries()) {
-            //     console.log(`${key}: ${value}`);
-            // }
+            console.log("Sending Payload", payload);
 
-            const data = await addUser(values);
+            const data = await addUser(payload);
+            getUsers();
+            getCourses();
             setToastMessage(data?.message);
             setToastType("success");
             setShowToast(true);
-            getUsers();
             handleCloseModal();
 
         } catch (error) {
@@ -137,35 +109,9 @@ const AllocateCourseModal = (
         }
     };
 
-    // const handleEdit = async () => {
-    //     try {
-
-    //         const values = await form.validateFields();
-    //         if (!values.groupName) {
-    //             form.setFields("Group name required");
-    //             return;
-    //         }
-
-    //         setLoading(true);
-    //         const data = updateGroup(values);
-    //         setToastMessage(data?.message);
-    //         setToastType("success");
-    //         setShowToast(true);
-    //         getGroups();
-    //         handleCloseModal();
-    //     } catch (error) {
-    //         setToastMessage(error?.message || "Error occurred while adding group");
-    //         setToastType("error");
-    //         setShowToast(true);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
-
     return (
         <Modal
-            title={`Add new User`}
+            title={`Allocate course to user`}
             visible={isModalOpen}
             onCancel={handleCloseModal}
             footer={
@@ -188,71 +134,19 @@ const AllocateCourseModal = (
                     <Input type="hidden" />
                 </Form.Item>
 
-
-                <Form.Item label="Employees">
-                    <Input.Search
-                        placeholder="Search by name or email..."
-                        enterButton
-                        allowClear
-                        style={{ width: '100%', marginBottom: 16 }}
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
-                    <Form.Item
-                        name="employees"
-                        noStyle
-                        rules={[{ required: true, message: 'Please select at least one employee' }]}
-                    >
-                        <Checkbox.Group style={{ width: '100%' }}>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    maxHeight: '350px',
-                                    overflowY: 'auto',
-                                    paddingRight: '55px',
-                                    gap: '10px',
-                                }}
-                            >
-                                {filteredUsers?.map((user) => (
-                                    <Checkbox
-                                        key={user.value}
-                                        value={user.value}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '6px 8px',
-                                            borderRadius: '4px',
-                                            transition: 'background 0.5s',
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.label}</span>
-                                        </div>
-                                    </Checkbox>
-                                ))}
-                                {filteredUsers?.length === 0 && (
-                                    <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                )}
-                            </div>
-                        </Checkbox.Group>
-                    </Form.Item>
-                </Form.Item>
-
-
                 <Form.Item label="Courses">
                     <Input.Search
                         placeholder="Search by course name..."
                         enterButton
                         allowClear
                         style={{ width: '100%', marginBottom: 16 }}
-                        value={searchValue}
+                        value={searchCourse}
                         onChange={(e) => setSearchCourse(e.target.value)}
                     />
                     <Form.Item
                         name="courses"
                         noStyle
-                        rules={[{ required: true, message: 'Please select at least one employee' }]}
+                        rules={[{ required: true, message: 'Please select at least one Course' }]}
                     >
                         <Checkbox.Group style={{ width: '100%' }}>
                             <div
@@ -267,8 +161,8 @@ const AllocateCourseModal = (
                             >
                                 {filteredCourses?.map((user) => (
                                     <Checkbox
-                                        key={user.id}
-                                        value={user.id}
+                                        key={user.courseId}
+                                        value={user.courseId}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -278,11 +172,11 @@ const AllocateCourseModal = (
                                         }}
                                     >
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.name}</span>
+                                            <span style={{ fontWeight: 500 }}>{user.title}</span>
                                         </div>
                                     </Checkbox>
                                 ))}
-                                {filteredUsers?.length === 0 && (
+                                {filteredCourses?.length === 0 && (
                                     <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
                                 )}
                             </div>
@@ -309,4 +203,4 @@ const AllocateCourseModal = (
         </Modal>
     );
 };
-export default AddNewUserModal;
+export default AllocateCourseModal;

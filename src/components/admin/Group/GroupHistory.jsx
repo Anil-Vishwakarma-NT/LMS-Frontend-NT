@@ -1,6 +1,6 @@
 import { Layout, Typography, Divider } from 'antd';
 import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined } from "@ant-design/icons";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,8 @@ import ConfirmDeletePopup from '../../shared/confirmDeletePopup/ConfirmDeletePop
 import { deleteSingleUser } from '../../../service/GroupService';
 import Toast from '../../shared/toast/Toast';
 import AddNewUserModal from './AddNewUSerModal';
+import EditGroupNameModal from './EditGroupNameModal';
+import AllocateCourseModal from './AllocateCourseModal';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -17,7 +19,8 @@ const GroupHistory = ({ setLoading }) => {
 
     const { id } = useParams();
     const location = useLocation();
-    const userName = location.state?.name || 'N/A';
+    const [groupName, setGroupName] = useState(location.state?.name || 'N/A');
+
     const navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [deleteUser, setDeleteUser] = useState([]);
@@ -28,8 +31,10 @@ const GroupHistory = ({ setLoading }) => {
     const [courseList, setCourseList] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filteredList, setFilteredList] = useState([]);
-
+    const [EditPopOpen, setEditPopOpen] = useState(false)
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+    const [allocatecourseModalOpen, setAllocateCourseModalOpen] = useState(false);
+    const [userId, setUserId] = useState(null);
 
     async function getUsers() {
         const response = await getUsersInGroup(id);
@@ -84,6 +89,15 @@ const GroupHistory = ({ setLoading }) => {
         setIsModalOpen(false);
     };
 
+    const handleCloseEdit = () => {
+        setEditPopOpen(false);
+
+    };
+
+    const handleCloseAllocationModal = () => {
+        setAllocateCourseModalOpen(false);
+    }
+
     const handleAddNew = () => {
         setIsModalOpen(prev => !prev);
     };
@@ -92,10 +106,18 @@ const GroupHistory = ({ setLoading }) => {
         setShowCourse(prev => !prev);
     }
 
+    const handleAllocateCourse = (userId) => {
+        setUserId(userId);
+        setAllocateCourseModalOpen(true);
+    }
+
     const handleOpenConfirmDeletePopup = (user) => {
         setIsConfirmPopupOpen(true);
         setDeleteUser(user);
     };
+    const handleEditGroup = () => {
+        setEditPopOpen(prev => !prev);
+    }
 
 
 
@@ -208,18 +230,13 @@ const GroupHistory = ({ setLoading }) => {
                                 handleViewUserClick(record?.id, record?.name)
                             }
                         />
-                        <Tooltip title="Allocate course">
+                        {!showCourse && <Tooltip title="Allocate course">
                             <Button
                                 icon={<FileAddOutlined />}
-                                onClick={() =>
-                                    // handleViewUserClick(record?.id, record?.name)
-                                    alert("add new course clicked !!!")
-
-                                }
-                            // tooltip={<div>Allocate course</div>}
-
+                                onClick={() => handleAllocateCourse(record.id)}
                             />
                         </Tooltip>
+                        }
                     </Space>
                 </>
             )
@@ -232,12 +249,12 @@ const GroupHistory = ({ setLoading }) => {
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
                         {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
-                        <Title level={2} style={{ margin: 0 }}>{userName}  Details</Title>
+                        <Title level={2} style={{ margin: 0 }}>{groupName}   Details</Title>
                         {/* </div>
                     <div> */}
                         <Button style={{ marginLeft: 30 }}
                             icon={<EditOutlined />}
-                        // onClick={handleAddNew}
+                            onClick={handleEditGroup}
                         >
 
                         </Button>
@@ -252,7 +269,7 @@ const GroupHistory = ({ setLoading }) => {
                             Add new User
                         </Button>}
                         <Button style={{ marginLeft: 30 }}
-                            icon={<FolderOpenOutlined />}
+                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
                             onClick={handleViewCourse}
                         >
                             {!showCourse ? "View Course" : "View Users"}
@@ -291,6 +308,30 @@ const GroupHistory = ({ setLoading }) => {
                 isOpen={isConfirmPopupOpen}
                 onClose={() => setIsConfirmPopupOpen(false)}
                 onConfirm={handleDeleteUser}
+            />
+            <EditGroupNameModal
+                isModalOpen={EditPopOpen}
+                handleCloseModal={handleCloseEdit}
+                setToastMessage={setToastMessage}
+                setToastType={setToastType}
+                setShowToast={setShowToast}
+                setLoading={setLoading}
+                groupName={groupName}
+                groupId={id}
+                setGroupName={setGroupName}
+
+            />
+            <AllocateCourseModal
+                isModalOpen={allocatecourseModalOpen}
+                groupId={id}
+                userId={userId}
+                getUsers={getUsers}
+                getCourses={getCourses}
+                handleCloseModal={handleCloseAllocationModal}
+                setToastMessage={setToastMessage}
+                setToastType={setToastType}
+                setShowToast={setShowToast}
+                setLoading={setLoading}
             />
         </div>
     );

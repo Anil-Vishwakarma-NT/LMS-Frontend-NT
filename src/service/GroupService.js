@@ -7,6 +7,7 @@
 //         throw new Error(error?.response?.data?.message);
 //     }
 // }
+import { Group } from "antd/es/radio";
 import { app } from "./serviceLMS";
 
 export const getAllGroups = async () => {
@@ -40,8 +41,9 @@ export const addGroup = async (group) => {
 export const updateGroup = async (group) => {
     try {
 
-        // const response = await app.put(group);
-        // return response;
+        const response = await app.put("/group/update-group", group);
+        // alert(group.groupId + group.groupName)
+        return response;
     }
     catch (error) {
         alert("Error while updating group");
@@ -105,6 +107,19 @@ export const getCourseDetails = async (groupId) => {
     try {
         console.log("GroupIdin getcoursedetails api", groupId);
         const response = await app.get(`/group/group-courses/${groupId}`);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch courses");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+export const getUserCoursesInGroup = async (group) => {
+    try {
+        console.log("Group getcoursedetails api", group);
+        const response = await app.post('/group/user-courses', group);
+        console.log("Courses details ", response.data.data);
         return response.data.data;
     }
     catch (error) {

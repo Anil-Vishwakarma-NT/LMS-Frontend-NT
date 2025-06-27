@@ -1,6 +1,6 @@
 import { addGroup, updateGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Col } from "antd";
+import { Modal, Form, Input, Select, Button, Checkbox, Row, Col } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 
 import { useEffect, useState } from 'react';
@@ -51,6 +51,13 @@ const GroupModal = (
         console.log(users);
     }
 
+    const handleSelectAll = () => {
+        const allFilteredUserIds = filteredUsers.map(user => user.value);
+        form.setFieldsValue({ employees: allFilteredUserIds });
+    };
+    const handleReset = () => {
+        form.setFieldsValue({ employees: [] });
+    }
 
     useEffect(() => {
         form.setFieldsValue({
@@ -118,15 +125,24 @@ const GroupModal = (
             visible={isModalOpen}
             onCancel={handleCloseModal}
             footer={
-                <Button
-                    key="submit"
-                    type="primary"
-                    onClick={handleAdd}
-                >
-                    Add Group
-                </Button>
+                <span>
+                    <Button
+                        key="reset"
+                        style={{ marginRight: 8 }}
+                        onClick={handleReset}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        key="submit"
+                        type="primary"
+                        onClick={handleAdd}
+                    >
+                        Add Group
+                    </Button>
 
 
+                </span>
 
             }
             bodyStyle={{ height: 500 }}
@@ -142,15 +158,22 @@ const GroupModal = (
                 </Form.Item>
 
 
-                <Form.Item label="Employees">
-                    <Input.Search
-                        placeholder="Search by name or email..."
-                        enterButton
-                        allowClear
-                        style={{ width: '100%', marginBottom: 16 }}
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
+                <Form.Item label="Employees" >
+                    <Row gutter={8} style={{ marginBottom: 16 }}>
+                        <Col flex="80px">
+                            <Button onClick={handleSelectAll}>Add All</Button>
+                        </Col>
+                        <Col flex="auto">
+                            <Input.Search
+                                placeholder="Search by name or email..."
+                                enterButton
+                                allowClear
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                        </Col>
+                    </Row>
+
                     <Form.Item
                         name="employees"
                         noStyle

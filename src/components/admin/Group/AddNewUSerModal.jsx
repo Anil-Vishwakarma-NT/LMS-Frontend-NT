@@ -1,6 +1,6 @@
 import { addUser, updateGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Col, DatePicker } from "antd";
+import { Modal, Form, Input, Select, Button, Checkbox, Col, Row, DatePicker } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 
 import { useEffect, useState } from 'react';
@@ -64,21 +64,21 @@ const AddNewUserModal = (
         console.log(users);
     }
 
-    // async function getExistingUsersList() {
-    //     const response = await getUsersInGroup(id);
-    //     if (!Array.isArray(response)) {
-    //         console.error("Expected an array but got:", response);
-    //         setUserList([]);
-    //         return;
-    //     }
-    //     const users = response.map((user, index) => ({
-    //         id: user.userId,
-    //         srno: index + 1,
-    //         name: `${user.firstName} ${user.lastName}`,
-    //     }));
+    const handleSelectAllEmployees = () => {
+        const allFilteredUserIds = filteredUsers.map(user => user.value);
+        form.setFieldsValue({ employees: allFilteredUserIds });
+    };
+    const handleSelectAllCourses = () => {
+        const allFilteredCoursesIds = filteredCourses.map(user => user.value);
+        form.setFieldsValue({ courses: allFilteredCoursesIds });
+    };
+    const handleResetEmployees = () => {
+        form.setFieldsValue({ employees: [] });
+    }
+    const handleResetCourses = () => {
+        form.setFieldsValue({ courses: [] });
+    }
 
-    //     setExistingUsers(users);
-    // }
 
     useEffect(() => {
         form.setFieldsValue({
@@ -149,31 +149,6 @@ const AddNewUserModal = (
         }
     };
 
-    // const handleEdit = async () => {
-    //     try {
-
-    //         const values = await form.validateFields();
-    //         if (!values.groupName) {
-    //             form.setFields("Group name required");
-    //             return;
-    //         }
-
-    //         setLoading(true);
-    //         const data = updateGroup(values);
-    //         setToastMessage(data?.message);
-    //         setToastType("success");
-    //         setShowToast(true);
-    //         getGroups();
-    //         handleCloseModal();
-    //     } catch (error) {
-    //         setToastMessage(error?.message || "Error occurred while adding group");
-    //         setToastType("error");
-    //         setShowToast(true);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
 
     return (
         <Modal
@@ -181,14 +156,31 @@ const AddNewUserModal = (
             visible={isModalOpen}
             onCancel={handleCloseModal}
             footer={
-                <Button
-                    key="submit"
-                    type="primary"
-                    onClick={handleAdd}
-                >
-                    Add user
-                </Button>
+                <span>
+                    <Button
+                        key="reset"
+                        style={{ marginRight: 8 }}
+                        onClick={handleResetEmployees}
+                    >
+                        Reset Employees
+                    </Button>
+                    <Button
+                        key="reset"
+                        style={{ marginRight: 8 }}
+                        onClick={handleResetCourses}
+                    >
+                        Reset Courses
+                    </Button>
+                    <Button
+                        key="submit"
+                        type="primary"
+                        onClick={handleAdd}
+                    >
+                        Add Group
+                    </Button>
 
+
+                </span>
 
 
             }
@@ -202,6 +194,20 @@ const AddNewUserModal = (
 
 
                 <Form.Item label="Employees">
+                    <Row gutter={8} style={{ marginBottom: 16 }}>
+                        <Col flex="80px">
+                            <Button onClick={handleSelectAllEmployees}>Add All Employees</Button>
+                        </Col>
+                        <Col flex="auto">
+                            <Input.Search
+                                placeholder="Search by name or email..."
+                                enterButton
+                                allowClear
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                        </Col>
+                    </Row>
                     <Input.Search
                         placeholder="Search by name or email..."
                         enterButton
@@ -253,18 +259,25 @@ const AddNewUserModal = (
 
 
                 <Form.Item label="Courses">
-                    <Input.Search
-                        placeholder="Search by course name..."
-                        enterButton
-                        allowClear
-                        style={{ width: '100%', marginBottom: 16 }}
-                        value={searchValue}
-                        onChange={(e) => setSearchCourse(e.target.value)}
-                    />
+                    <Row gutter={8} style={{ marginBottom: 16 }}>
+                        <Col flex="80px">
+                            <Button onClick={handleSelectAllCourses}>Add All Courses</Button>
+                        </Col>
+                        <Col flex="auto">
+                            <Input.Search
+                                placeholder="Search by course name..."
+                                enterButton
+                                allowClear
+                                style={{ width: '100%', marginBottom: 16 }}
+                                value={searchValue}
+                                onChange={(e) => setSearchCourse(e.target.value)}
+                            />
+                        </Col>
+                    </Row>
                     <Form.Item
                         name="courses"
                         noStyle
-                        rules={[{ required: true, message: 'Please select at least one employee' }]}
+                    // rules={[{ required: true, message: 'Please select at least one employee' }]}
                     >
                         <Checkbox.Group style={{ width: '100%' }}>
                             <div
