@@ -3,162 +3,342 @@ import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import UserHOC from "../../shared/HOC/UserHOC";
 import './UserDashboard.css';
-import Table from '../../shared/table/Table';
-import Paginate from '../../shared/pagination/Paginate';
-import DashCard from "../../shared/dashCard/DashCard";
-import book from "../../../assets/bookshelf.png";
-import users from "../../../assets/group.png";
-import inHouse from "../../../assets/reading.png";
-import category from "../../../assets/category.png";
-import UserCourseTable from "../../shared/table/UserCourseTable";
-
+import { Table, Tag, Progress, Col, Row, Card, Empty, Statistic, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+  SyncOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 import { userStats } from "../../../service/UserService";
 import { userHistory } from '../../../service/IssuanceService';
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
+import DonutChart from './DonutChart';
+// import { setBrushSettings } from 'recharts/types/state/brushSlice';
 
-const UserDashboard = () => {
-  const auth = useSelector(state => state.auth);
+
+const { Text, Title } = Typography;
+
+
+const UserDashboard = ({ setLoading }) => {
+
+
+  const location = useLocation();
+  const [id, setId] = useState(null);
+  const [userName, setUserName] = useState("N/A");
+  const auth = useSelector((state) => state.auth)
 
   const [userHistoryData, setUserHistoryData] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
-  const [id, setId] = useState(null);
-  const [name, setName] = useState(null);
+  const [pageSize, setPageSize] = useState(() => (window.innerHeight >= 1024 ? 11 : 10));
   const [totalPages, setTotalPages] = useState(0);
-
-  const [dashStatsData, setDashStatsData] = useState({
-    enrollments: 0,
-    groups: 0,
-  });
-
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [dashStatsData, setDashStatsData] = useState({ enrollments: 0, groups: 0 });
+  const [completed, setCompleted] = useState(0);
+  const [inprogress, setInprogress] = useState(0);
+  const [defaulters, setDefaulters] = useState(0);
+  const [notStarted, setNotStarted] = useState(0);
+  const [completionFailed, setCompletionFailed] = useState(0);
 
-  const pageSizeByHeight = () => {
-    const height = window.innerHeight;
-    return height >= 1024 ? 11 : 10;
+
+
+
+  const fetchUserId = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const userData = await response.json();
+      console.log("Parsed JSON response:", userData);
+      return userData;
+    } catch (error) {
+      console.error("Error fetching user ID:", error);
+      return null;
+    }
   };
 
-  const [pageSize, setPageSize] = useState(pageSizeByHeight());
-
-  const handleResize = () => {
-    setPageSize(pageSizeByHeight());
-  };
 
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const handleResize = () => {
+      setPageSize(window.innerHeight >= 1024 ? 11 : 10);
+    };
+    console.log("Email for user", auth)
+    const data = fetchUserId(auth.email)
+    console.log("User data ", data)
+    setId(data.userId);
+    setUserName(data.firstName + data.lastName);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch userId and set it
   useEffect(() => {
-    const fetchUserId = async (email) => {
+    const loadData = async () => {
+      console.log("userId", id)
+      console.log("userHistory ", userName);
+      setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
-            "Content-Type": "application/json"
-          }
-        });
-        const userData = await response.json();
-        console.log("✅ Parsed JSON response:", userData);
-        setName(userData.firstName + " " + userData.lastName);
-        setId(userData.userId);
+        const statsData = await userStats(id, auth.accessToken)
+
+        console.log("userHIstory", statsData.data);
+        setDashStatsData(statsData.data);
+        const courses = await getUserEnrolledCourseDetails(id);
+        console.log("COURSES HISTORY", courses)
+        setCourseList(courses);
+        setFilteredCourses(courses);
+        console.log(Array.isArray(courses))
+        setCompleted(courses.filter(course => course.status === "Completed").length);
+        console.log("COMPLETED", completed);
+        setInprogress(courses.filter(course => course.status === "In Progress").length);
+        console.log("Inprogress", inprogress);
+        setDefaulters(courses.filter(course => course.status === "Defaulter").length);
+        console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
+        setNotStarted(courses.filter(course => course.status === "Not Started").length);
+        console.log("NotStarted", notStarted)
+        setCompletionFailed(courses.filter(course => course.status === "Completion Failed").length);
       } catch (error) {
-        console.error("❌ Error fetching user ID:", error);
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (auth.email) {
-      fetchUserId(auth.email);
-    }
-  }, [auth.email]);
+    loadData();
+  }, [id, auth.accessToken, setLoading]);
 
-  // Fetch stats and courses after ID is set
   useEffect(() => {
-    if (!id) return;
-
-    const loadStatsAndCourses = async () => {
+    const loadUserHistory = async () => {
+      setLoading(true);
       try {
-        console.log("Fetching user stats and courses for ID:", id);
-
-        const [statsData, coursesData] = await Promise.all([
-          userStats(id, auth.accessToken),
-          getUserEnrolledCourseDetails(id)
-        ]);
-
-        setDashStatsData(statsData);
-        setCourseList(coursesData);
-        setFilteredCourses(coursesData);
-
-        console.log("📊 User stats:", statsData);
-        console.log("📘 Enrolled courses:", coursesData);
+        const data = await userHistory(id);
+        setUserHistoryData(data?.content || []);
+        setTotalPages(data?.totalPages || 0);
       } catch (error) {
-        console.error("❌ Error fetching stats/courses:", error);
+        console.error('Error loading user history:', error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    loadStatsAndCourses();
-  }, [id, auth.accessToken]);
-
-  // Load user history
-  const loadUserHistory = async () => {
-    if (!id) return;
-    try {
-      const data = await userHistory(id);
-      setUserHistoryData(data?.content || []);
-      setTotalPages(data?.totalPages || 0);
-    } catch (error) {
-      console.error("❌ Error loading user history:", error);
-    }
-  };
-
-  useEffect(() => {
     loadUserHistory();
-  }, [id, pageNumber, pageSize]);
+  }, [id, pageNumber, pageSize, setLoading]);
 
-  const data = [
-    { id: 1, title: "Total Enrollments", number: dashStatsData?.enrollments, logo: users },
-    { id: 2, title: "Total Groups", number: dashStatsData?.groups, logo: book },
-    // Uncomment and customize these if needed:
-    // { id: 3, title: "Total Completed Courses", number: 6, logo: category },
-    // { id: 4, title: "Incomplete Courses", number: 3, logo: inHouse },
-    // { id: 5, title: "Defaulters", number: 1, logo: inHouse }
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'Level',
+      dataIndex: 'level',
+      key: 'level',
+      render: (level) => {
+        const levelColor = {
+          beginner: 'green',
+          intermediate: 'blue',
+          professional: 'purple',
+        }[level?.toLowerCase()] || 'gray';
+        return <Tag color={levelColor}>{level || 'Not Defined'}</Tag>;
+      },
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description'
+    },
+    {
+      title: 'Assigned By',
+      dataIndex: 'assignedById',
+      key: 'assignedById',
+    },
+    {
+      title: 'Enrollment Date',
+      dataIndex: 'enrollmentDate',
+      render: (date) => new Date(date).toLocaleDateString('en-GB'),
+    },
+    {
+      title: 'Deadline',
+      dataIndex: 'deadline',
+      render: (date) => new Date(date).toLocaleDateString('en-GB'),
+    },
+    {
+      title: 'Completion %',
+      dataIndex: 'roundedCompletion',
+      render: (progress) => (
+        <Progress
+          percent={progress}
+          size="small"
+          // type="circle"
+          strokeColor={
+            progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
+          }
+          wrap />
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      filters: [
+        { text: 'Completed', value: 'Completed' },
+        { text: 'In Progress', value: 'In Progress' },
+        { text: 'Not Started', value: 'Not Started' },
+        { text: 'Defaulter', value: 'Defaulter' },
+      ],
+      onFilter: (value, record) => record.status === value,
+      render: (status) => {
+        const color = {
+          completed: 'green',
+          'in progress': 'orange',
+          'not started': 'purple',
+          'defaulter': 'red'
+        }[status?.toLowerCase()] || 'gray';
+        return <span style={{ color }}>{status}</span>;
+      },
+    },
   ];
 
+  const dashData = [
+    {
+      id: 1,
+      title: 'Total Enrollments',
+      number: dashStatsData.enrollments,
+      color: '#13c2c2',
+      icon: <SolutionOutlined style={{ color: '#13c2c2' }} />,
+    },
+    {
+      id: 2,
+      title: 'Total Groups',
+      number: dashStatsData.groups,
+      color: '#fa8c16',
+      icon: <TeamOutlined style={{ color: '#fa8c16' }} />,
+    },
+    // {
+    //   id: 3,
+    //   title: 'Total Completed Courses',
+    //   number: completed,
+    //   color: '#52c41a',
+    //   icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+    // },
+    // {
+    //   id: 4,
+    //   title: 'Incomplete Courses',
+    //   number: inprogress,
+    //   color: '#faad14',
+    //   icon: <SyncOutlined style={{ color: '#faad14' }} />,
+    // },
+    // {
+    //   id: 5,
+    //   title: 'Defaulters',
+    //   number: defaulters,
+    //   color: '#f5222d',
+    //   icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
+    // },
+    // {
+    //   id: 5,
+    //   title: 'Not Started',
+    //   number: notStarted,
+    //   color: '#fa8c16',
+    //   icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
+    // },
+  ];
+
+
+  const piedata = [
+    {
+      id: 3,
+      title: 'Total Completed Courses',
+      number: 5,
+      // color: '#52c41a',
+      // icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+    },
+    {
+      id: 4,
+      title: 'Incomplete Courses',
+      number: 3,
+      // color: '#faad14',
+      // icon: <SyncOutlined style={{ color: '#faad14' }} />,
+    },
+    {
+      id: 5,
+      title: 'Defaulters',
+      number: 2,
+      // color: '#f5222d',
+      // icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
+    },
+    {
+      id: 5,
+      title: 'Not Started',
+      number: 1,
+      // color: '#fa8c16',
+      // icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
+    },
+    {
+      id: 6,
+      title: 'Completion Failed',
+      number: completionFailed,
+      // color: '#fa8c16',
+      // icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
+    },
+  ]
+
+
   return (
-    <div className="admin-section">
-      <h2 className="admin-page-header" style={{ marginTop: '10px' }}>
-        Welcome {name}
-      </h2>
+    <div className="user-history-section">
+      <Title level={1} className="user-history-header" style={{ marginBottom: 16 }}>
+        {userName} Details
+      </Title>
 
-      <div className="admin-page-mid" />
-      <div className="main-content">
-        {data.map((item) => (
-          <DashCard key={item.id} data={item} />
+      {/* Stats Cards + Donut Chart */}
+      <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 32, marginLeft: 50 }}>
+        {dashData.map((data) => (
+          <Col key={data.id} xs={24} sm={12} md={8} lg={6} xl={4}>
+            <Card className="user-history-card" bordered>
+              <Statistic
+                title={<Text strong>{data.title}</Text>}
+                value={data.number}
+                valueStyle={{ color: data.color }}
+                prefix={data.icon}
+              />
+            </Card>
+          </Col>
         ))}
-      </div>
 
-      <div className='user-history-table'>
+        {/* Donut Chart occupies full width or half depending on screen */}
+        <Col xs={24} md={12} lg={8}>
+          <Card title="Course Status Overview" bordered>
+            <DonutChart data={piedata} />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Table */}
+      <div className="user-history-table">
         {filteredCourses.length > 0 ? (
-          <UserCourseTable entries={filteredCourses} showViewAction={false} />
+          <Table
+            dataSource={filteredCourses}
+            columns={columns}
+            pagination={{
+              current: pageNumber + 1,
+              pageSize,
+              total: totalPages * pageSize,
+              onChange: (page) => setPageNumber(page - 1),
+              showSizeChanger: false,
+            }}
+            scroll={{ x: '100%', y: '100%' }}
+            locale={{ emptyText: 'No courses found for this user.' }}
+            rowKey={(record) => record.courseId}
+          />
         ) : (
-          <div className="no-data-found">No enrolled courses found.</div>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
-
-        <div className="paginate">
-          {userHistoryData && userHistoryData.length > 0 ? (
-            <Paginate
-              currentPage={pageNumber}
-              totalPages={totalPages}
-              onPageChange={setPageNumber}
-            />
-          ) : (
-            <div></div>
-          )}
-        </div>
       </div>
     </div>
+
   );
 };
 
