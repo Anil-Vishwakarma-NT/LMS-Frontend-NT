@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { Table, Tooltip, Space, Button, message } from "antd";
 import {
@@ -10,11 +11,23 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import QuizModal from "./QuizModal";
+=======
+import QuizModal from "./QuizModal";
+import React, { useState } from "react";
+
+// import React from "react";
+import { Table, Tooltip, Space, Button , message } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined, FilePdfOutlined, PlusOutlined} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { previewCourseReportPdf, downloadCourseReportPdf} from "../../../service/BookService";
+import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
+>>>>>>> dev
 
 const CourseTable = ({ onEditClick, onDeleteClick }) => {
   const navigate = useNavigate();
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+<<<<<<< HEAD
   const [courses, setCourses] = useState([]);
   const [isMetadataOnly, setIsMetadataOnly] = useState(false);
   const [quizToEdit, setQuizToEdit] = useState(null);
@@ -25,6 +38,36 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
   setIsMetadataOnly(metadataOnly);
   setQuizModalOpen(true);
 };
+=======
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportBlobUrl, setReportBlobUrl] = useState("");
+  const [reportingCourseId, setReportingCourseId] = useState(null);
+
+
+  const handlePreviewReport = async (courseId) => {
+    try {
+      const blob = await previewCourseReportPdf(courseId);
+      const blobUrl = URL.createObjectURL(blob);
+      setReportBlobUrl(blobUrl);
+      setIsReportModalOpen(true);
+    } catch (error) {
+      console.error("Failed to load report PDF:", error.message);
+    }
+  };
+
+  const handleDownload = (courseId) => {
+    if (!courseId) {
+      message.warning("No course selected for download");
+      return;
+    }
+    downloadCourseReportPdf(courseId);
+  };
+
+  const handleAddQuizClick = (course) => {
+    setSelectedCourse(course);
+    setQuizModalOpen(true);
+  };   
+>>>>>>> dev
 
   const handleQuizSubmit = async (quizMetadata) => {
     try {
@@ -109,12 +152,21 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
       title: "Created At",
       dataIndex: "createdAt",
       render: (createdAt) =>
+<<<<<<< HEAD
         createdAt ? new Date(createdAt).toLocaleString() : "N/A",
+=======
+        createdAt ? new Date(createdAt.split(".")[0]).toLocaleDateString() : "N/A",
+>>>>>>> dev
     },
     {
       title: "Updated At",
       dataIndex: "updatedAt",
+<<<<<<< HEAD
       render: (updatedAt) => new Date(updatedAt).toLocaleString(),
+=======
+      key: "updatedAt",
+      render: (updatedAt) => new Date(updatedAt).toLocaleDateString(),
+>>>>>>> dev
     },
     {
       title: "Actions",
@@ -157,6 +209,7 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
                 Quiz List
               </Button>
           </Tooltip>
+<<<<<<< HEAD
         ) : (
             <Tooltip title="No quiz created">
               <Button icon={<UnorderedListOutlined />} disabled>
@@ -179,6 +232,43 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
           </Space>
         );
       },
+=======
+          <Tooltip title="Delete">
+            <Button
+              type="text"
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => onDeleteClick(record)}
+            />
+          </Tooltip>
+          <Tooltip title="View">
+            <Button
+              type="text"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/course-content/${record.courseId}`)}
+            />
+          </Tooltip>
+            <Tooltip title="Preview Report">
+              <Button
+                icon={<FilePdfOutlined />}
+                onClick={() => {
+                  setReportingCourseId(record.courseId);
+                  handlePreviewReport(record.courseId);
+                }}
+                type="text"
+              />
+          </Tooltip>
+          <Tooltip title="Add Quiz">
+            <Button
+              type="primary"
+              onClick={() => handleAddQuizClick(record)}
+            >
+              Add Quiz
+            </Button>
+          </Tooltip>
+        </Space>
+      ),
+>>>>>>> dev
     },
   ];
 
@@ -189,7 +279,19 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
         dataSource={courses}
         rowKey="courseId"
         bordered
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 10 }}     
+      />
+      <PDFReaderModal
+        isOpen={isReportModalOpen}
+        pdfUrl={reportBlobUrl}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          URL.revokeObjectURL(reportBlobUrl);
+          setSelectedCourse(null);
+        }}
+        blockTime={0}
+        showDownload={true}
+        onDownload={() => handleDownload(reportingCourseId)}
       />
       {selectedCourse && (
         <QuizModal
