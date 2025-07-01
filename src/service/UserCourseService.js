@@ -49,10 +49,12 @@ export async function fetchUserNameById(userId) {
 }
 
 export async function fetchCourseDetails(courseId) {
+  console.log("courseID", courseId)
   try {
     const response = await axios.get(
       `http://localhost:8080/api/course/${courseId}`
     );
+    console.log("response of fetchCourseDetails", response)
     return response.data.data;
   } catch (error) {
     throw new Error("Failed to fetch course details.");
