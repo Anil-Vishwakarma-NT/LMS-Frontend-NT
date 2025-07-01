@@ -5,14 +5,17 @@ import {
   fetchAllActiveUsers,
   deleteUsers,
   fetchAllInactiveUsers,
+  previewUserReportPdf,
+  downloadUserReportPdf
 } from "../../../service/UserService";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Empty, Button, Tag, Space } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined } from "@ant-design/icons";
+import { Table, Empty, Button, Tag, Space, message, Tooltip } from "antd";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FilePdfOutlined} from "@ant-design/icons";
 import UsersModal from "./UsersModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import "./UsersAdmin.css"; // Importing CSS
+import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
 
 const UsersAdmin = ({ setLoading }) => {
 
@@ -28,6 +31,9 @@ const UsersAdmin = ({ setLoading }) => {
   const [toastType, setToastType] = useState(null);
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportBlobUrl, setReportBlobUrl] = useState("");
+  const [reportingCourseId, setReportingCourseId] = useState(null);
 
   const auth = useSelector((state) => state.auth);
 
@@ -41,6 +47,26 @@ const UsersAdmin = ({ setLoading }) => {
   useEffect(() => {
     getUserLists();
   }, []);
+
+  const handlePreviewReport = async (courseId) => {
+    try {
+      const blob = await previewUserReportPdf(courseId);
+      const blobUrl = URL.createObjectURL(blob);
+      setReportBlobUrl(blobUrl);
+      setIsReportModalOpen(true);
+    } catch (error) {
+      console.error("Failed to load report PDF:", error.message);
+    }
+  };
+
+  const handleDownload = (courseId) => {
+    if (!courseId) {
+      message.warning("No user selected for download");
+      return;
+    }
+    downloadUserReportPdf(courseId);
+  };
+
 
   const handleAddNew = () => {
     setSelectedUser(null); // reset selected user for new entry
@@ -152,22 +178,38 @@ const UsersAdmin = ({ setLoading }) => {
         render: (text, record) => (
           <>
             <Space >
-              <Button
-                icon={<EditOutlined />}
-                style={{ marginRight: 8 }}
-                onClick={() => handleEditUser(record)}
-              />
-              <Button
-                icon={<DeleteOutlined />}
-                style={{ marginRight: 8 }}
-                onClick={() => handleOpenConfirmDeletePopup(record)}
-              />
-              <Button
-                icon={<ExportOutlined />}
-                onClick={() =>
-                  handleViewUserClick(record?.id, record?.firstName + "  " + record?.lastName)
-                }
-              />
+              <Tooltip title="Edit">
+                <Button
+                  icon={<EditOutlined />}
+                  style={{ marginRight: 8 }}
+                  onClick={() => handleEditUser(record)}
+                />
+              </Tooltip>
+              <Tooltip title="Delete">
+                <Button
+                  icon={<DeleteOutlined />}
+                  style={{ marginRight: 8 }}
+                  onClick={() => handleOpenConfirmDeletePopup(record)}
+                />
+              </Tooltip>
+              <Tooltip title="View">
+                <Button
+                  icon={<ExportOutlined />}
+                  onClick={() =>
+                    handleViewUserClick(record?.id, record?.firstName + "  " + record?.lastName)
+                  }
+                />
+              </Tooltip>
+              <Tooltip title="Preview Report">
+                <Button
+                  icon={<FilePdfOutlined />}
+                  onClick={() => {
+                    setReportingCourseId(record?.id);
+                    handlePreviewReport(record?.id);
+                  }}
+                />
+              </Tooltip>
+
             </Space>
           </>
         )
@@ -226,6 +268,18 @@ const UsersAdmin = ({ setLoading }) => {
           )}
         </div>
 
+        <PDFReaderModal
+          isOpen={isReportModalOpen}
+          pdfUrl={reportBlobUrl}
+          onClose={() => {
+            setIsReportModalOpen(false);
+            URL.revokeObjectURL(reportBlobUrl);
+            setSelectedUser(null);
+          }}
+          blockTime={0}
+          showDownload={true}
+          onDownload={() => handleDownload(reportingCourseId)}
+        />
 
         <UsersModal
           title={selectedUser ? "Edit Employee Details" : "Add New Employee"}

@@ -3,13 +3,48 @@ import axios from "axios";
 export async function fetchUserEnrolledCourses(userId) {
   try {
     const response = await axios.get(
-      `http://localhost:8081/api/enrollment/user/${userId}/enrolled-courses`
+      `http://localhost:8081/api/enrollment/userCourses/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
     return response.data.data;
   } catch (error) {
     throw new Error(
       error?.response?.data?.message || "Failed to fetch enrolled courses."
     );
+  }
+}
+
+export async function fetchUserNameById(userId) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8081/api/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = response.data;
+
+    if (data.status === "SUCCESS" && data.data) {
+      return `${data.data.firstName} ${data.data.lastName}`;
+    }
+
+    console.warn("No user found for ID:", userId);
+    return null;
+  } catch (error) {
+    console.error(
+      "Error fetching user name:",
+      error.response?.data || error.message
+    );
+    return null;
   }
 }
 
@@ -24,51 +59,111 @@ export async function fetchCourseDetails(courseId) {
   }
 }
 
-export async function fetchCourseProgress(userId, courseId) {
+export async function getCourseProgressWithMeta(userId, courseId) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/user-progress?userId=${userId}&courseId=${courseId}`
+      `http://localhost:8080/api/user-progress/meta?userId=${userId}&courseId=${courseId}`
     );
-    return response.data; // Returns completion percentage
+    return response.data;
   } catch (error) {
-    return 0; // Default to 0% if no entry exists
+    return 0;
   }
 }
 
 export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
-    console.log("Enrolled coursed fetched ", enrollments);
+    console.log("Enrolled courses fetched ", enrollments);
+
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
-      console.log("details fetched for course", courseDetails);
-      const completionPercentage = await fetchCourseProgress(
+      console.log("Details fetched for course", courseDetails);
+
+      const progressMeta = await getCourseProgressWithMeta(
         userId,
         enrollment.courseId
       );
+      const completionPercentage = progressMeta.courseCompletionPercentage;
+      const firstCompletedAt = progressMeta.firstCompletedAt;
+
       console.log("Completion percentage fetched", completionPercentage);
+
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
-      console.log("ROUNDED COMPLETION PERC", roundedCompletion)
-      const date = new Date().toISOString().split("T")[0];
-      console.log("DATE DEADLINE", enrollment.deadline.toISOString().split("T")[0])
+      console.log("ROUNDED COMPLETION PERC", roundedCompletion);
+
+      const todayISO = new Date().toISOString().split("T")[0];
+      const deadlineISO = enrollment.deadline
+        ? new Date(enrollment.deadline).toISOString().split("T")[0]
+        : null;
+
+      console.log("📅 Deadline:", deadlineISO || "None");
+
+      let status = "Not Started";
+      let adherence = "N/A";
+
+      if (roundedCompletion >= 95.0) {
+        if (firstCompletedAt) {
+          const completedISO = new Date(firstCompletedAt)
+            .toISOString()
+            .split("T")[0];
+
+          if (!deadlineISO) {
+            status = "Completed";
+            adherence = "No Deadline";
+          } else if (completedISO <= deadlineISO) {
+            status = "Completed";
+            adherence = "On Time";
+          } else {
+            status = "Completed";
+            adherence = "Late";
+          }
+        } else {
+          // Should rarely hit this if `firstCompletedAt` is maintained well
+          status = "Completed";
+          adherence = deadlineISO ? "Late" : "No Deadline";
+        }
+      } else if (roundedCompletion > 0) {
+        status =
+          deadlineISO && todayISO > deadlineISO
+            ? "Completion Failed"
+            : "In Progress";
+        adherence = deadlineISO
+          ? todayISO <= deadlineISO
+            ? "Ongoing On Time"
+            : "Ongoing Late"
+          : "No Deadline";
+      } else {
+        status =
+          deadlineISO && todayISO > deadlineISO
+            ? "Completion Failed"
+            : "Not Started";
+        adherence = deadlineISO
+          ? todayISO <= deadlineISO
+            ? "On Time (Yet to Start)"
+            : "Late (Yet to Start)"
+          : "No Deadline";
+      }
+
+      let assignedByName = "Unknown";
+      if (enrollment.assignedById) {
+        const name = await fetchUserNameById(enrollment.assignedById);
+        assignedByName = name || "Unknown";
+      }
+
       return {
         ...courseDetails,
-        assignedById: enrollment.assignedById,
+        assignedById: assignedByName,
         enrollmentDate: enrollment.enrollmentDate,
         deadline: enrollment.deadline,
         roundedCompletion,
-        status:
-          roundedCompletion === 100
-            ? "Completed"
-            : roundedCompletion > 0
-              ? "In Progress"
-              : (date < enrollment.deadline.toISOString().split("T")[0] ? "Not Started" : "Defaulter"),
+        status,
+        adherence,
       };
     });
 
     return await Promise.all(courseDetailsPromises);
   } catch (error) {
-    alert("error getting course details");
+    alert("Error getting course details");
     throw new Error("Failed to retrieve user enrolled courses.");
   }
 }
@@ -78,9 +173,10 @@ export async function fetchContentProgress(userId, courseId, contentId) {
     const response = await axios.get(
       `http://localhost:8080/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
     );
-    return response.data.data; // Returns content completion percentage
+    console.log(response.data);
+    return response.data;
   } catch (error) {
-    return 0; // Default to 0% if no entry exists
+    return 0;
   }
 }
 
@@ -102,14 +198,6 @@ export async function updateContentProgress(
       existingCompletionPercentage,
       newCompletionPercentage
     );
-
-    // console.log(
-    //   newCompletionPercentage,
-    //   existingCompletionPercentage,
-    //   finalCompletionPercentage,
-    //   lastPosition,
-    //   contentId
-    // );
 
     const progressPayload = {
       userId,
