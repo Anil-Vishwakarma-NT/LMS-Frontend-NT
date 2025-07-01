@@ -1,0 +1,273 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+  Typography, Spin, Alert, Card, Tag,
+  Button, Input, Radio, Checkbox, Space, message
+} from "antd";
+import axios from "axios";
+import {
+  InfoCircleOutlined,
+  ClockCircleOutlined,
+  SyncOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
+
+const { Title, Paragraph } = Typography;
+
+const CourseQuizAttempt = () => {
+  const { courseId } = useParams();
+  const [quiz, setQuiz] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [markedForReview, setMarkedForReview] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [start, setStart] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [error, setError] = useState("");
+
+  // Load quiz metadata
+  useEffect(() => {
+    const loadQuiz = async () => {
+      try {
+        const quizRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}`);
+        const quizData = quizRes.data?.data?.[0];
+
+        if (!quizData?.quizId) {
+          setError("No quiz available for this course.");
+          return;
+        }
+
+        const fullQuizRes = await axios.get(`http://localhost:8080/api/quizzes/${quizData.quizId}`);
+        setQuiz(fullQuizRes.data?.data || null);
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong while loading the quiz.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuiz();
+  }, [courseId]);
+
+  // Timer logic
+  useEffect(() => {
+    if (!start || timeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          message.warning("Time's up! Submitting quiz.");
+          handleSubmit();
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [start, timeLeft]);
+
+  const handleStartQuiz = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${quiz.quizId}`);
+      setQuestions(res.data?.data || []);
+      setStart(true);
+      setTimeLeft(quiz.timeLimit * 60);
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to load quiz questions");
+    }
+  };
+
+  const handleAnswerChange = (questionId, value) => {
+    setUserAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
+  };
+
+  const toggleMarkForReview = (questionId) => {
+    setMarkedForReview((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
+  };
+
+  const handleNext = () => {
+    if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1);
+  };
+
+  const handleBack = () => {
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+  };
+
+  const handleSubmit = () => {
+    console.log("Submitted answers:", userAnswers);
+    console.log("Marked for review:", markedForReview);
+    message.success("Quiz submitted!");
+    setStart(false);
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  if (loading) return <Spin fullscreen tip="Loading quiz..." />;
+  if (error) return <Alert type="error" message={error} showIcon />;
+  if (!quiz) return <Alert type="info" message="No quiz found." showIcon />;
+
+  const currentQuestion = questions[currentIndex];
+
+  return (
+    <div style={{ padding: 24 }}>
+      <Card title={`🎯 Attempt Quiz - ${quiz.title}`} bordered>
+        {!start ? (
+          <>
+            <Paragraph>
+              <InfoCircleOutlined /> <strong>Description:</strong> {quiz.description}
+            </Paragraph>
+            <Paragraph>
+              <strong>📘 Quiz Title:</strong> {quiz.title}
+            </Paragraph>
+            <Paragraph>
+              <ClockCircleOutlined /> <strong>Time Limit:</strong> {quiz.timeLimit} minutes
+            </Paragraph>
+            <Paragraph>
+              <SyncOutlined /> <strong>Attempts Allowed:</strong> {quiz.attemptsAllowed}
+            </Paragraph>
+            <Paragraph>
+              <CheckCircleOutlined /> <strong>Passing Score:</strong> {quiz.passingScore}%
+            </Paragraph>
+            <Paragraph>
+              <strong>Status:</strong>{" "}
+              <Tag color={quiz.isActive ? "green" : "red"}>
+                {quiz.isActive ? "Active" : "Inactive"}
+              </Tag>
+            </Paragraph>
+            <Button type="primary" onClick={handleStartQuiz}>
+              Start Quiz
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* Timer */}
+            <div style={{ marginBottom: 12, textAlign: "right" }}>
+              ⏳ Time Left: <Tag color={timeLeft < 60 ? "red" : "blue"}>{formatTime(timeLeft)}</Tag>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div style={{ marginBottom: 12 }}>
+              {questions.map((q, index) => (
+                <Button
+                  key={q.questionId}
+                  type={index === currentIndex ? "primary" : "default"}
+                  style={{ margin: 4 }}
+                  onClick={() => setCurrentIndex(index)}
+                >
+                  {index + 1}
+                  {markedForReview[q.questionId] && (
+                    <Tag color="purple" style={{ marginLeft: 4 }}>⚑</Tag>
+                  )}
+                </Button>
+              ))}
+            </div>
+
+            {/* Question */}
+            <div style={{ marginBottom: 12 }}>
+              <Title level={5} style={{ display: "inline-block", marginRight: 12 }}>
+                {`Q${currentIndex + 1}: ${currentQuestion?.questionText}`}
+              </Title>
+
+              <Tag color={
+                currentQuestion?.questionType === "SHORT_ANSWER" ? "blue" :
+                currentQuestion?.questionType === "MCQ_SINGLE" ? "green" :
+                currentQuestion?.questionType === "MCQ_MULTIPLE" ? "orange" :
+                "default"
+              }>
+                <strong>
+                  {currentQuestion?.questionType === "SHORT_ANSWER" && "Short Answer"}
+                  {currentQuestion?.questionType === "MCQ_SINGLE" && "Single Choice"}
+                  {currentQuestion?.questionType === "MCQ_MULTIPLE" && "Multiple Choice"}
+                </strong>
+              </Tag>
+
+              {markedForReview[currentQuestion?.questionId] && (
+                <Tag color="purple" style={{ marginLeft: 8 }}>Marked for Review</Tag>
+              )}
+            </div>
+
+            {/* Answer Input */}
+            {currentQuestion?.questionType === "SHORT_ANSWER" && (
+              <Input.TextArea
+                rows={4}
+                value={userAnswers[currentQuestion.questionId] || ""}
+                onChange={(e) => handleAnswerChange(currentQuestion.questionId, e.target.value)}
+              />
+            )}
+
+            {currentQuestion?.questionType === "MCQ_SINGLE" && (
+              <Radio.Group
+                onChange={(e) => handleAnswerChange(currentQuestion.questionId, e.target.value)}
+                value={userAnswers[currentQuestion.questionId]}
+              >
+                <Space direction="vertical">
+                  {JSON.parse(currentQuestion.options || "[]").map((opt) => (
+                    <Radio key={opt} value={opt}>
+                      {opt}
+                    </Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
+            )}
+
+            {currentQuestion?.questionType === "MCQ_MULTIPLE" && (
+              <Checkbox.Group
+                onChange={(checked) => handleAnswerChange(currentQuestion.questionId, checked)}
+                value={userAnswers[currentQuestion.questionId] || []}
+              >
+                <Space direction="vertical">
+                  {JSON.parse(currentQuestion.options || "[]").map((opt) => (
+                    <Checkbox key={opt} value={opt}>
+                      {opt}
+                    </Checkbox>
+                  ))}
+                </Space>
+              </Checkbox.Group>
+            )}
+
+            {/* Actions */}
+            <div style={{ marginTop: 24 }}>
+              <Button onClick={handleBack} disabled={currentIndex === 0}>
+                Back
+              </Button>{" "}
+              <Button
+                type="primary"
+                onClick={handleNext}
+                disabled={currentIndex === questions.length - 1}
+              >
+                Next
+              </Button>{" "}
+              <Button
+                type={markedForReview[currentQuestion?.questionId] ? "dashed" : "default"}
+                onClick={() => toggleMarkForReview(currentQuestion.questionId)}
+              >
+                {markedForReview[currentQuestion?.questionId] ? "Unmark Review" : "Mark for Review"}
+              </Button>{" "}
+              {currentIndex === questions.length - 1 && (
+                <Button danger onClick={handleSubmit}>
+                  Submit Quiz
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </Card>
+    </div>
+  );
+};
+
+export default CourseQuizAttempt;

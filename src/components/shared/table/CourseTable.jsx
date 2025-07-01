@@ -1,27 +1,29 @@
-import QuizModal from "./QuizModal";
-import React, { useState } from "react";
-
-// import React from "react";
-import { Table, Tooltip, Space, Button , message } from "antd";
-import { EditOutlined, DeleteOutlined, EyeOutlined, FilePdfOutlined, PlusOutlined} from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Tooltip, Space, Button, message } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FilePdfOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import QuizModal from "./QuizModal";
-import { previewCourseReportPdf, downloadCourseReportPdf} from "../../../service/BookService";
 import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
+import { previewCourseReportPdf, downloadCourseReportPdf } from "../../../service/BookService";
 
-const CourseTable = ({ onEditClick, onDeleteClick }) => {
+const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [isMetadataOnly, setIsMetadataOnly] = useState(false);
   const [quizToEdit, setQuizToEdit] = useState(null);
+  const [isMetadataOnly, setIsMetadataOnly] = useState(false);
   const [latestQuizId, setLatestQuizId] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportBlobUrl, setReportBlobUrl] = useState("");
   const [reportingCourseId, setReportingCourseId] = useState(null);
-
 
   const handlePreviewReport = async (courseId) => {
     try {
@@ -43,10 +45,10 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
   };
 
   const handleAddQuizClick = (course, metadataOnly = false) => {
-  setSelectedCourse(course);
-  setIsMetadataOnly(metadataOnly);
-  setQuizModalOpen(true);
-};   
+    setSelectedCourse(course);
+    setIsMetadataOnly(metadataOnly);
+    setQuizModalOpen(true);
+  };
 
   const handleQuizSubmit = async (quizMetadata) => {
     try {
@@ -54,63 +56,52 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
         ...quizMetadata,
         parentId: selectedCourse.courseId,
         createdBy: 1,
-        parentType: "course"
+        parentType: "course",
       };
-      console.log("payload", payload)
       const response = await axios.post("http://localhost:8080/api/quizzes", payload);
-      console.log("response1", response)
-      // const response = { success: true, quizId: "mock-quiz-123" };
       const result = response?.data?.data;
       const messageText = response?.data?.message;
 
       if (result?.quizId) {
-        const quizId = result.quizId;
         message.success(messageText || "Quiz created successfully.");
         setQuizModalOpen(false);
         fetchCourses();
-        navigate(`/course-content/${selectedCourse.courseId}/quizzes/${quizId}/questions`);
-    } else {
-      throw new Error("Invalid response format");
-    }
-  } catch (err) {
+        navigate(`/course-content/${selectedCourse.courseId}/quizzes/${result.quizId}/questions`);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (err) {
       console.error("Quiz creation failed", err);
       message.error("Failed to create quiz");
-  }
+    }
   };
 
   const fetchCourses = async () => {
-  try {
-    const response = await axios.get("http://localhost:8080/api/course");
+    try {
+      const response = await axios.get("http://localhost:8080/api/course");
 
-    const coursesWithQuizStatus = await Promise.all(
-      response.data.data.map(async (course) => {
-        try {
-          const quizResponse = await axios.get(`http://localhost:8080/api/quizzes/course/${course.courseId}`);
-          const quizzes = quizResponse?.data?.data || [];
-
-          if (quizzes.length > 0) {
-            // If you have multiple quizzes, pick the latest or the first one
-            const latestQuiz = quizzes[0]; 
+      const coursesWithQuizStatus = await Promise.all(
+        response.data.data.map(async (course) => {
+          try {
+            const quizResponse = await axios.get(`http://localhost:8080/api/quizzes/course/${course.courseId}`);
+            const quizzes = quizResponse?.data?.data || [];
+            const latestQuiz = quizzes[0];
             return {
               ...course,
-              quizCreated: true,
-              quizId: latestQuiz.quizId,
+              quizCreated: quizzes.length > 0,
+              quizId: latestQuiz?.quizId || null,
             };
-          } else {
+          } catch {
             return { ...course, quizCreated: false, quizId: null };
           }
-        } catch (err) {
-          return { ...course, quizCreated: false, quizId: null };
-        }
-      })
-    );
+        })
+      );
 
-    setCourses(coursesWithQuizStatus);
-  } catch (err) {
-    message.error("Failed to load courses");
-  }
-};
-
+      setCourses(coursesWithQuizStatus);
+    } catch (err) {
+      message.error("Failed to load courses");
+    }
+  };
 
   useEffect(() => {
     fetchCourses();
@@ -130,8 +121,7 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
     {
       title: "Created At",
       dataIndex: "createdAt",
-      render: (createdAt) =>
-        createdAt ? new Date(createdAt).toLocaleDateString() : "N/A",
+      render: (createdAt) => createdAt ? new Date(createdAt.split(".")[0]).toLocaleDateString() : "N/A",
     },
     {
       title: "Updated At",
@@ -141,76 +131,39 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
     {
       title: "Actions",
       key: "actions",
-      width: 283,
-      render: (_, record) => {
-        const quizExists = record.quizCreated;
-        return (
-          <Space wrap>
-            <Tooltip title="Edit">
-              <Button icon={<EditOutlined />} onClick={() => onEditClick(record)} />
-            </Tooltip>
-            <Tooltip title="Delete">
-              <Button icon={<DeleteOutlined />} danger onClick={() => onDeleteClick(record)} />
-            </Tooltip>
-            <Tooltip title="View Course">
-              <Button icon={<EyeOutlined />} onClick={() => navigate(`/course-content/${record.courseId}`)} />
-            </Tooltip>
-
-            {/* Create or Modify Quiz */}
-            {/* <Tooltip title={quizExists ? "Modify Quiz Metadata" : "Create Quiz Metadata"}>
-              <Button
-                icon={<FileAddOutlined />}
-                type="primary"
-                onClick={() => handleAddQuizClick(record, true)}
-              >
-                {quizExists ? "Modify Quiz" : "Create Quiz"}
-              </Button>
-            </Tooltip> */}
-
-            {/* Quiz Listing */}
-            {/* {quizExists ? (
-            <Tooltip title="Quiz List">
-              <Button
-                icon={<UnorderedListOutlined />}
-                onClick={() =>
-                  navigate(`/course-content/${record.courseId}/quizzes/${record.quizId}/questions`)
-                }
-              >
-                Quiz List
-              </Button>
+      width: 320,
+      render: (_, record) => (
+        <Space wrap>
+          <Tooltip title="Edit">
+            <Button icon={<EditOutlined />} onClick={() => onEditClick(record)} />
           </Tooltip>
-        ) : (
-            <Tooltip title="No quiz created">
-              <Button icon={<UnorderedListOutlined />} disabled>
-                Quiz List
+          <Tooltip title="Delete">
+            <Button icon={<DeleteOutlined />} danger onClick={() => onDeleteClick(record)} />
+          </Tooltip>
+          <Tooltip title="View Course">
+            <Button icon={<EyeOutlined />} onClick={() => navigate(`/course-content/${record.courseId}`)} />
+          </Tooltip>
+          <Tooltip title="Preview Report">
+            <Button
+              icon={<FilePdfOutlined />}
+              onClick={() => {
+                setReportingCourseId(record.courseId);
+                handlePreviewReport(record.courseId);
+              }}
+              type="text"
             />
           </Tooltip>
-            <Tooltip title="Preview Report">
-              <Button
-                icon={<FilePdfOutlined />}
-                onClick={() => {
-                  setReportingCourseId(record.courseId);
-                  handlePreviewReport(record.courseId);
-                }}
-                type="text"
-                </Button>
-            </Tooltip>
-          )} */}
-
           <Tooltip title="Manage Quiz">
-        <Button
-          type="primary"
-          icon={<UnorderedListOutlined />}
-          onClick={() =>
-            navigate(`/course-content/${record.courseId}/quizzes`)
-          }
-        >
-          Manage Quiz
-        </Button>
-      </Tooltip>
-          </Space>
-        );
-      },
+            <Button
+              type="primary"
+              icon={<UnorderedListOutlined />}
+              onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
+            >
+              Manage Quiz
+            </Button>
+          </Tooltip>
+        </Space>
+      ),
     },
   ];
 
@@ -218,10 +171,10 @@ const CourseTable = ({ onEditClick, onDeleteClick }) => {
     <div style={{ padding: "16px", marginLeft: "35px", marginRight: "25px" }}>
       <Table
         columns={columns}
-        dataSource={courses}
+        dataSource={entries || courses}
         rowKey="courseId"
         bordered
-        pagination={{ pageSize: 10 }}     
+        pagination={{ pageSize: 10 }}
       />
       <PDFReaderModal
         isOpen={isReportModalOpen}
