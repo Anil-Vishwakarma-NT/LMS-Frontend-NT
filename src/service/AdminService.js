@@ -1,9 +1,11 @@
-import {app, appCourse }from "./serviceLMS"
+import {app, appCourse, appUser, appUSer }from "./serviceLMS"
 
 
 export const getTotalUsers = async () => {
     try {
-        const response = await app.get('/admin/count')
+        console.log("getting total users");
+        const response = await app.get('user/api/service-api/admin/count')
+        console.log("response", response.data);
         return response.data.data
     } catch (error) {
         throw new Error(error?.response?.data?.message);
@@ -12,7 +14,7 @@ export const getTotalUsers = async () => {
 export const getTotalCourses = async () => {
     
     try {
-        const response = await appCourse.get('/api/course/count')
+        const response = await app.get('course/api/service-api/course/count')
         return response.data.data
     } catch (error) {
         throw new Error(error?.response?.data?.message);
@@ -21,7 +23,7 @@ export const getTotalCourses = async () => {
 export const getTotalBundles = async () => {
     
     try {
-        const response = await appCourse.get('/api/bundles/count')
+        const response = await app.get('user/api/service-api/bundles/count')
         return response.data.data
     } catch (error) {
         throw new Error(error?.response?.data?.message);
@@ -29,7 +31,7 @@ export const getTotalBundles = async () => {
 }
 export const getTotalEnrollment = async () => {
   try {
-    const response = await app.get('/api/enrollment/stats');
+    const response = await app.get('user/api/service-api/enrollment/stats');
 
     const data = response?.data?.data;
 
@@ -66,7 +68,7 @@ export const getRecentUser = async () => {
 export const getRecentCourse = async () => {
     
     try {
-        const response = await appCourse.get('/api/course/recent')
+        const response = await app.get('course/api/service-api/course/recent')
         return response.data.data
     } catch (error) {
         throw new Error(error?.response?.data?.message);

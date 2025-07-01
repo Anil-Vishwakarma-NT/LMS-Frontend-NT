@@ -9,7 +9,7 @@ const UserRoutes = ({children}) => {
     useEffect(() => {
       if (auth && auth.accessToken){
           try{
-              if(auth.roles === 'employee'){
+              if(auth.roles.includes("EMPLOYEE")){
                   setIsVerified(true)
               } else {
                 navigate('/')

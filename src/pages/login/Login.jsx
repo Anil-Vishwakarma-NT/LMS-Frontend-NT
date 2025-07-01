@@ -1,41 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import './Login.css';
 import image from "../../assets/login-image.jpeg";
 import Button from "../../components/shared/button/Button";
 import { userLogin } from "../../service/UserService";
 import { login } from "../../redux/authentication/authActions";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux';
 import {
   validateEmailOrMobile,
 } from "../../utility/validation";
 import Toast from "../../components/shared/toast/Toast";
 import JSEncrypt from "jsencrypt";
+import Password from "antd/es/input/Password";
 
 const Login = () => {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const auth = useSelector(state => state.auth);
-
-  const [userName, setUserName] = useState("")
-  const [password, setPassword] = useState("")
-  const [checkboxChecked, setCheckboxChecked] = useState(false)
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [checkboxChecked, setCheckboxChecked] = useState(false);
   const [errors, setErrors] = useState({});
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
-  const [userId, setUserId] = useState(null);
-  const [emp, setEmp] = useState(null);
 
   const publicKey = `-----BEGIN PUBLIC KEY-----
 MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
 W9/SyLNzJgBujCmOe49QnJNKD79eM/VUFHAGPLO5f1Krh9J1PoOZAEeimzdOnkFf
 zn6y8H7z4vwjIHAkzvW/uJBcV7PJRgPIr7awpn7J4TsU0zxCBb3CNgkwLrM5KmZG
 u/bvWV47VOzzM+ObAgMBAAE=
------END PUBLIC KEY-----`
-
+-----END PUBLIC KEY-----`;
 
   function parseJwt(token) {
     const base64Url = token.split('.')[1];
@@ -49,61 +44,9 @@ u/bvWV47VOzzM+ObAgMBAAE=
     return JSON.parse(jsonPayload);
   }
 
-
-  const fetchUserId = async () => {
-    try {
-      const response = await fetch(`http://localhost:8081/api/users/getUserId`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
-          "Content-Type": "application/json"
-        }
-      });
-      const userData = await response.json(); // Read and parse JSON in one step
-      console.log("Parsed JSON response:", userData);
-      return userData;
-    } catch (error) {
-      console.error("Error fetching user ID:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    if (auth.email) {
-      console.log("Fetching userId for email:", auth.email);
-      fetchUserId(auth.email).then((user) => {
-        if (user && user.userId) {
-          console.log("User fetched:", user);
-          setUserId(user.userId);
-          setEmp(user.firstName + user.lastName);
-        } else {
-          console.warn("No valid user returned or userId is missing:", user);
-        }
-      });
-    }
-  }, [auth.email]);
-
-
-
-  useEffect(() => {
-    if (auth && auth.accessToken) {
-      console.log(auth.roles)
-      if (auth.roles === "admin") {
-        console.log("congratulations !!!!");
-        console.log('token stored in localstorage!!');
-        navigate('/admin');
-      } else if (auth.roles === "employee") {
-        navigate('/user', { state: { userId: userId, name: emp } });
-      }
-      else {
-        navigate('/')
-      }
-    }
-  }, [auth?.accessToken, userId]);
-
   const validateForm = () => {
     let formErrors = {};
-    if (!password) formErrors.password = "Password is required!"
+    if (!password) formErrors.password = "Password is required!";
     if (!checkboxChecked) formErrors.checkbox = "You must agree!";
     if (!userName) {
       formErrors.userName = "Username is required!";
@@ -114,28 +57,48 @@ u/bvWV47VOzzM+ObAgMBAAE=
   };
 
   const handleLoginClick = async () => {
-
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors)
+      setErrors(formErrors);
       return;
     }
-
 
     try {
       const encryptor = new JSEncrypt();
       encryptor.setPublicKey(publicKey);
-      // const encodedPassword = btoa(password);
       const encodedPassword = encryptor.encrypt(password);
-      const response = await userLogin({ "email": userName, "password": encodedPassword });
-      console.log("request sent waiting for response");
-      console.log(response);
-      const { roles, sub: email } = parseJwt(response.accessToken);
-      console.log({ roles, email, "accessToken": response.accessToken });
 
-      dispatch(login({ roles, email, "accessToken": response.accessToken }));
-      window.localStorage.setItem('authtoken', response.accessToken);
-      console.log("accessToken is ", response.accessToken);
+      const response = await userLogin({ email: userName, password });
+
+      const {
+        roles,
+        email,
+        userId,
+        fullName
+      } = parseJwt(response.accessToken);
+
+      const normalizedRoles = Array.isArray(roles) ? roles : [roles];
+
+      // Store auth info in Redux
+      dispatch(login({
+        roles: normalizedRoles,
+        email,
+        accessToken: response.accessToken
+      }));
+
+      // Store token in localStorage
+      localStorage.setItem('authtoken', response.accessToken);
+      console.log("roles", normalizedRoles)
+      // ✅ Navigate based on role
+      if (normalizedRoles.includes("ADMIN")) {
+        console.log("enered admin");
+        navigate("/admin");
+      } else if (normalizedRoles.includes("EMPLOYEE")) {
+        navigate("/user", { state: { userId, name: fullName } });
+      } else {
+        navigate("/");
+      }
+
     } catch (error) {
       setToastMessage("Invalid credentials!");
       setToastType("error");
@@ -146,7 +109,6 @@ u/bvWV47VOzzM+ObAgMBAAE=
   return (
     <div className="login-page">
       <div className="login-container">
-
         <div className="login-img">
           <img src={image} alt="login-side-img" />
         </div>
@@ -157,13 +119,8 @@ u/bvWV47VOzzM+ObAgMBAAE=
             <p>Welcome back!</p>
             <p>Please log in to access your learning management system.</p>
           </div>
-          <label
-            style={{ marginBottom: "5px", marginTop: '5px' }}
-            className="label-text"
-            htmlFor="email"
-          >
-            Username:
-          </label>
+
+          <label className="label-text" htmlFor="email">Username:</label>
           <input
             className="login-input"
             type="text"
@@ -176,13 +133,8 @@ u/bvWV47VOzzM+ObAgMBAAE=
             required
           />
           {errors.userName && <div className="error-text">{errors.userName}</div>}
-          <label
-            style={{ marginBottom: "5px", marginTop: '5px' }}
-            className="label-text"
-            htmlFor="password"
-          >
-            Password:
-          </label>
+
+          <label className="label-text" htmlFor="password">Password:</label>
           <input
             className="login-input"
             type="password"
@@ -191,15 +143,14 @@ u/bvWV47VOzzM+ObAgMBAAE=
             onChange={e => {
               setPassword(e.target.value);
               setErrors({ ...errors, password: '' });
-
             }}
             required
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
+
           <div className='checkbox'>
             <input
               type="checkbox"
-              required={true}
               checked={checkboxChecked}
               onChange={() => {
                 setCheckboxChecked(!checkboxChecked);
@@ -213,6 +164,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
           <Button text="Login" type="submit" onClick={handleLoginClick} />
         </div>
       </div>
+
       <Toast
         message={toastMessage}
         type={toastType}

@@ -101,9 +101,9 @@ export async function countAllUsers() {
 
 export async function userLogin(data) {
   try {
-    const response = await app.post("/api/auth/login", data);
+    const response = await app.post("/api/client-api/auth/login", data);
     console.log("userLogin response", response.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
   }
