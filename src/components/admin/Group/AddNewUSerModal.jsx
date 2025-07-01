@@ -152,55 +152,39 @@ const AddNewUserModal = (
 
     return (
         <Modal
-            title={`Add new User`}
-            visible={isModalOpen}
+            title={`Add New User`}
+            open={isModalOpen}
             onCancel={handleCloseModal}
             footer={
                 <span>
-                    <Button
-                        key="reset"
-                        style={{ marginRight: 8 }}
-                        onClick={handleResetEmployees}
-                    >
+                    <Button key="reset" onClick={handleResetEmployees} style={{ marginRight: 8 }}>
                         Reset Employees
                     </Button>
-                    <Button
-                        key="reset"
-                        style={{ marginRight: 8 }}
-                        onClick={handleResetCourses}
-                    >
+                    <Button key="reset" onClick={handleResetCourses} style={{ marginRight: 8 }}>
                         Reset Courses
                     </Button>
-                    <Button
-                        key="submit"
-                        type="primary"
-                        onClick={handleAdd}
-                    >
+                    <Button key="submit" type="primary" onClick={handleAdd}>
                         Add Group
                     </Button>
-
-
                 </span>
-
-
             }
-            bodyStyle={{ height: 500 }}
-
+            bodyStyle={{ maxHeight: '80vh', overflowY: 'auto', paddingRight: 12 }}
+            style={{ top: 20 }}
         >
             <Form form={form} layout="vertical" name="group_form">
                 <Form.Item name="groupId" noStyle>
                     <Input type="hidden" />
                 </Form.Item>
 
-
+                {/* EMPLOYEES */}
                 <Form.Item label="Employees">
-                    <Row gutter={8} style={{ marginBottom: 16 }}>
+                    <Row gutter={8} style={{ marginBottom: 12 }}>
                         <Col flex="80px">
-                            <Button onClick={handleSelectAllEmployees}>Add All Employees</Button>
+                            <Button onClick={handleSelectAllEmployees}>Add All</Button>
                         </Col>
                         <Col flex="auto">
                             <Input.Search
-                                placeholder="Search by name or email..."
+                                placeholder="Search by name or email"
                                 enterButton
                                 allowClear
                                 value={searchValue}
@@ -208,14 +192,6 @@ const AddNewUserModal = (
                             />
                         </Col>
                     </Row>
-                    <Input.Search
-                        placeholder="Search by name or email..."
-                        enterButton
-                        allowClear
-                        style={{ width: '100%', marginBottom: 16 }}
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
                     <Form.Item
                         name="employees"
                         noStyle
@@ -224,29 +200,17 @@ const AddNewUserModal = (
                         <Checkbox.Group style={{ width: '100%' }}>
                             <div
                                 style={{
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    maxHeight: '350px',
-                                    overflowY: 'auto',
-                                    paddingRight: '55px',
-                                    gap: '10px',
+                                    gap: '8px',
+                                    paddingRight: '8px',
                                 }}
                             >
                                 {filteredUsers?.map((user) => (
-                                    <Checkbox
-                                        key={user.value}
-                                        value={user.value}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '6px 8px',
-                                            borderRadius: '4px',
-                                            transition: 'background 0.5s',
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.label}</span>
-                                        </div>
+                                    <Checkbox key={user.value} value={user.value}>
+                                        {user.label}
                                     </Checkbox>
                                 ))}
                                 {filteredUsers?.length === 0 && (
@@ -257,57 +221,40 @@ const AddNewUserModal = (
                     </Form.Item>
                 </Form.Item>
 
-
+                {/* COURSES */}
                 <Form.Item label="Courses">
-                    <Row gutter={8} style={{ marginBottom: 16 }}>
+                    <Row gutter={8} style={{ marginBottom: 12 }}>
                         <Col flex="80px">
-                            <Button onClick={handleSelectAllCourses}>Add All Courses</Button>
+                            <Button onClick={handleSelectAllCourses}>Add All</Button>
                         </Col>
                         <Col flex="auto">
                             <Input.Search
-                                placeholder="Search by course name..."
+                                placeholder="Search by course name"
                                 enterButton
                                 allowClear
-                                style={{ width: '100%', marginBottom: 16 }}
-                                value={searchValue}
+                                value={searchCourse}
                                 onChange={(e) => setSearchCourse(e.target.value)}
                             />
                         </Col>
                     </Row>
-                    <Form.Item
-                        name="courses"
-                        noStyle
-                    // rules={[{ required: true, message: 'Please select at least one employee' }]}
-                    >
+                    <Form.Item name="courses" noStyle>
                         <Checkbox.Group style={{ width: '100%' }}>
                             <div
                                 style={{
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    maxHeight: '350px',
-                                    overflowY: 'auto',
-                                    paddingRight: '55px',
-                                    gap: '10px',
+                                    gap: '8px',
+                                    paddingRight: '8px',
                                 }}
                             >
-                                {filteredCourses?.map((user) => (
-                                    <Checkbox
-                                        key={user.id}
-                                        value={user.id}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '6px 8px',
-                                            borderRadius: '4px',
-                                            transition: 'background 0.5s',
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.name}</span>
-                                        </div>
+                                {filteredCourses?.map((course) => (
+                                    <Checkbox key={course.id} value={course.id}>
+                                        {course.name}
                                     </Checkbox>
                                 ))}
-                                {filteredUsers?.length === 0 && (
+                                {filteredCourses?.length === 0 && (
                                     <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
                                 )}
                             </div>
@@ -315,6 +262,7 @@ const AddNewUserModal = (
                     </Form.Item>
                 </Form.Item>
 
+                {/* DEADLINE + ASSIGNED AT */}
                 <Form.Item
                     name="deadline"
                     label="Deadline"
@@ -324,14 +272,14 @@ const AddNewUserModal = (
                 </Form.Item>
                 <Form.Item
                     name="assignedAt"
-                    label="assignedAt"
-                    rules={[{ required: true, message: 'Please select a assignment date!' }]}
+                    label="Assigned At"
+                    rules={[{ required: true, message: 'Please select assignment date!' }]}
                 >
                     <DatePicker style={{ width: '100%' }} />
                 </Form.Item>
-
             </Form>
         </Modal>
+
     );
 };
 export default AddNewUserModal;
