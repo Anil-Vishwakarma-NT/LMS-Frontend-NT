@@ -10,6 +10,9 @@ import {
   TeamOutlined,
   SyncOutlined,
   ClockCircleOutlined,
+  BookOutlined,
+  PieChartOutlined,
+  ExclamationOutlined
 } from '@ant-design/icons';
 import { userStats } from "../../../service/UserService";
 import { userHistory } from '../../../service/IssuanceService';
@@ -17,6 +20,7 @@ import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService
 import DonutChart from './DonutChart';
 // import { setBrushSettings } from 'recharts/types/state/brushSlice';
 import './UserDashboard.css';
+import DeadlineTable from './DeadlinesTable';
 
 const { Text, Title } = Typography;
 
@@ -45,7 +49,7 @@ const UserDashboard = ({ setLoading }) => {
 
 
 
-  const fetchUserId = async (email) => {
+  const fetchUserId = async () => {
     try {
       const response = await fetch(`http://localhost:8081/api/users/getUserDetails`, {
         method: "GET",
@@ -258,7 +262,7 @@ const UserDashboard = ({ setLoading }) => {
       title: 'Total Bundles',
       number: 4,
       color: '#F7DC6F',
-      icon: <TeamOutlined style={{ color: '#F7DC6F' }} />,
+      icon: <BookOutlined style={{ color: '#F7DC6F' }} />,
     },
   ];
 
@@ -295,7 +299,7 @@ const UserDashboard = ({ setLoading }) => {
   return (
     <div className="user-dashboard-section" >
       <Title level={2} className="user-dashboard-header" style={{ marginTop: 80 }} justify="start">
-        Welcome {userName} 
+        Welcome {userName}
       </Title>
 
       {/* Stats Cards + Donut Chart */}
@@ -316,11 +320,23 @@ const UserDashboard = ({ setLoading }) => {
         ))}
       </Row>
       <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 32, height: 400 }}>
-        <Card title="Course Status Overview" bordered style={{ width: 530, margin: 5 }}>
+
+        <Card title={
+          <span>
+            <PieChartOutlined style={{ color: '#F7DC6F', marginRight: 8 }} />
+            Course Status Overview
+          </span>
+        } bordered style={{ width: 530, margin: 5 }}
+        >
           <DonutChart data={piedata} />
         </Card>
-        <Card title="Deadlines this week" bordered style={{ width: 550, margin: 5 }}>
-          <Table />
+        <Card title={
+          <span>
+            <ExclamationOutlined style={{ color: '#FF4D4F', marginRight: 8 }} />
+            Deadlines this week
+          </span>
+        } bordered style={{ width: 550, margin: 5 }}>
+          <DeadlineTable />
         </Card>
 
 
