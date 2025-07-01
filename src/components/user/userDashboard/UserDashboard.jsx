@@ -16,7 +16,7 @@ import { userHistory } from '../../../service/IssuanceService';
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
 import DonutChart from './DonutChart';
 // import { setBrushSettings } from 'recharts/types/state/brushSlice';
-
+import './UserDashboard.css';
 
 const { Text, Title } = Typography;
 
@@ -47,7 +47,7 @@ const UserDashboard = ({ setLoading }) => {
 
   const fetchUserId = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
+      const response = await fetch(`http://localhost:8081/api/users/getUserDetails`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
@@ -64,57 +64,94 @@ const UserDashboard = ({ setLoading }) => {
   };
 
 
+  const loadData = async () => {
+    console.log("userId", id)
+    console.log("userHistory ", userName);
+    setLoading(true);
+    try {
+      const statsData = await userStats(id, auth.accessToken)
+      console.log("userHIstory", statsData.data);
+      setDashStatsData(statsData.data);
+      const courses = await getUserEnrolledCourseDetails(id);
+      console.log("COURSES HISTORY", courses)
+      setCourseList(courses);
+      setFilteredCourses(courses);
+      console.log(Array.isArray(courses))
+      setCompleted(courses.filter(course => course.status === "Completed").length);
+      console.log("COMPLETED", completed);
+      setInprogress(courses.filter(course => course.status === "In Progress").length);
+      console.log("Inprogress", inprogress);
+      setDefaulters(courses.filter(course => course.status === "Defaulter").length);
+      console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
+      setNotStarted(courses.filter(course => course.status === "Not Started").length);
+      console.log("NotStarted", notStarted)
+      setCompletionFailed(courses.filter(course => course.status === "Completion Failed").length);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 1️⃣ fetch the user, wait for it, THEN save to state
   useEffect(() => {
     const handleResize = () => {
       setPageSize(window.innerHeight >= 1024 ? 11 : 10);
     };
-    console.log("Email for user", auth)
-    const data = fetchUserId(auth.email)
-    console.log("User data ", data)
-    setId(data.userId);
-    setUserName(data.firstName + data.lastName);
+
+    const getUser = async () => {
+      try {
+        const userData = await fetchUserId();   // await the request
+        setId(userData.userId);
+        setUserName(`${userData.firstName} ${userData.lastName}`);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getUser();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // 2️⃣ now re‑run when `id` (or token) changes
   useEffect(() => {
+    if (!id) return;               // guard: wait until we actually have an id
+
     const loadData = async () => {
-      console.log("userId", id)
-      console.log("userHistory ", userName);
       setLoading(true);
       try {
-        const statsData = await userStats(id, auth.accessToken)
+        const stats = await userStats(id, auth.token); // or auth.accessToken
+        setDashStatsData(stats.data);
 
-        console.log("userHIstory", statsData.data);
-        setDashStatsData(statsData.data);
         const courses = await getUserEnrolledCourseDetails(id);
-        console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
-        console.log(Array.isArray(courses))
-        setCompleted(courses.filter(course => course.status === "Completed").length);
-        console.log("COMPLETED", completed);
-        setInprogress(courses.filter(course => course.status === "In Progress").length);
-        console.log("Inprogress", inprogress);
-        setDefaulters(courses.filter(course => course.status === "Defaulter").length);
-        console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
-        setNotStarted(courses.filter(course => course.status === "Not Started").length);
-        console.log("NotStarted", notStarted)
-        setCompletionFailed(courses.filter(course => course.status === "Completion Failed").length);
-      } catch (error) {
-        console.error('Error loading user data:', error);
+
+        setCompleted(courses.filter(c => c.status === 'Completed').length);
+        setInprogress(courses.filter(c => c.status === 'In Progress').length);
+        setDefaulters(courses.filter(c => c.status === 'Defaulter').length);
+        setNotStarted(courses.filter(c => c.status === 'Not Started').length);
+        setCompletionFailed(
+          courses.filter(c => c.status === 'Completion Failed').length
+        );
+      } catch (err) {
+        console.error('Error loading user data:', err);
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [id, auth.accessToken, setLoading]);
+  }, [id]);   //  ← add every value that should retrigger the effect
+
+
 
   useEffect(() => {
     const loadUserHistory = async () => {
       setLoading(true);
       try {
+        loadData();
         const data = await userHistory(id);
         setUserHistoryData(data?.content || []);
         setTotalPages(data?.totalPages || 0);
@@ -125,7 +162,7 @@ const UserDashboard = ({ setLoading }) => {
       }
     };
     loadUserHistory();
-  }, [id, pageNumber, pageSize, setLoading]);
+  }, [setLoading]);
 
   const columns = [
     {
@@ -207,44 +244,22 @@ const UserDashboard = ({ setLoading }) => {
       id: 1,
       title: 'Total Enrollments',
       number: dashStatsData.enrollments,
-      color: '#13c2c2',
-      icon: <SolutionOutlined style={{ color: '#13c2c2' }} />,
+      color: '#7FB3D5',
+      icon: <SolutionOutlined style={{ color: '#7FB3D5' }} />,
     },
     {
       id: 2,
       title: 'Total Groups',
       number: dashStatsData.groups,
-      color: '#fa8c16',
-      icon: <TeamOutlined style={{ color: '#fa8c16' }} />,
+      color: '#76D7C4',
+      icon: <TeamOutlined style={{ color: '#76D7C4' }} />,
+    }, {
+      id: 3,
+      title: 'Total Bundles',
+      number: 4,
+      color: '#F7DC6F',
+      icon: <TeamOutlined style={{ color: '#F7DC6F' }} />,
     },
-    // {
-    //   id: 3,
-    //   title: 'Total Completed Courses',
-    //   number: completed,
-    //   color: '#52c41a',
-    //   icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-    // },
-    // {
-    //   id: 4,
-    //   title: 'Incomplete Courses',
-    //   number: inprogress,
-    //   color: '#faad14',
-    //   icon: <SyncOutlined style={{ color: '#faad14' }} />,
-    // },
-    // {
-    //   id: 5,
-    //   title: 'Defaulters',
-    //   number: defaulters,
-    //   color: '#f5222d',
-    //   icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
-    // },
-    // {
-    //   id: 5,
-    //   title: 'Not Started',
-    //   number: notStarted,
-    //   color: '#fa8c16',
-    //   icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
-    // },
   ];
 
 
@@ -253,90 +268,63 @@ const UserDashboard = ({ setLoading }) => {
       id: 3,
       title: 'Total Completed Courses',
       number: 5,
-      // color: '#52c41a',
-      // icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
     },
     {
       id: 4,
       title: 'Incomplete Courses',
       number: 3,
-      // color: '#faad14',
-      // icon: <SyncOutlined style={{ color: '#faad14' }} />,
     },
     {
       id: 5,
       title: 'Defaulters',
       number: 2,
-      // color: '#f5222d',
-      // icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
     },
     {
       id: 5,
       title: 'Not Started',
       number: 1,
-      // color: '#fa8c16',
-      // icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
     {
       id: 6,
       title: 'Completion Failed',
       number: completionFailed,
-      // color: '#fa8c16',
-      // icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
   ]
 
 
   return (
-    <div className="user-history-section">
-      <Title level={1} className="user-history-header" style={{ marginBottom: 16 }}>
-        {userName} Details
+    <div className="user-dashboard-section" >
+      <Title level={2} className="user-dashboard-header" style={{ marginTop: 80 }} justify="start">
+        Welcome {userName} 
       </Title>
 
       {/* Stats Cards + Donut Chart */}
-      <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 32, marginLeft: 50 }}>
+      <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 12, }} >
         {dashData.map((data) => (
-          <Col key={data.id} xs={24} sm={12} md={8} lg={6} xl={4}>
-            <Card className="user-history-card" bordered>
-              <Statistic
-                title={<Text strong>{data.title}</Text>}
-                value={data.number}
-                valueStyle={{ color: data.color }}
-                prefix={data.icon}
-              />
-            </Card>
-          </Col>
-        ))}
-
-        {/* Donut Chart occupies full width or half depending on screen */}
-        <Col xs={24} md={12} lg={8}>
-          <Card title="Course Status Overview" bordered>
-            <DonutChart data={piedata} />
+          <Card
+            key={data.id}
+            bordered
+            style={{ width: 350, margin: 5 }}
+          >
+            <Statistic
+              title={<Text strong>{data.title}</Text>}
+              value={data.number}
+              valueStyle={{ color: data.color }}
+              prefix={data.icon}
+            />
           </Card>
-        </Col>
+        ))}
       </Row>
+      <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 32, height: 400 }}>
+        <Card title="Course Status Overview" bordered style={{ width: 530, margin: 5 }}>
+          <DonutChart data={piedata} />
+        </Card>
+        <Card title="Deadlines this week" bordered style={{ width: 550, margin: 5 }}>
+          <Table />
+        </Card>
 
-      {/* Table */}
-      <div className="user-history-table">
-        {filteredCourses.length > 0 ? (
-          <Table
-            dataSource={filteredCourses}
-            columns={columns}
-            pagination={{
-              current: pageNumber + 1,
-              pageSize,
-              total: totalPages * pageSize,
-              onChange: (page) => setPageNumber(page - 1),
-              showSizeChanger: false,
-            }}
-            scroll={{ x: '100%', y: '100%' }}
-            locale={{ emptyText: 'No courses found for this user.' }}
-            rowKey={(record) => record.courseId}
-          />
-        ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
-      </div>
+
+      </Row>
     </div>
 
   );

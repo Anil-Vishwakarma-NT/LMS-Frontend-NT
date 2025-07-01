@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './Login.css';
 import image from "../../assets/login-image.jpeg";
 import Button from "../../components/shared/button/Button";
@@ -13,6 +13,7 @@ import Toast from "../../components/shared/toast/Toast";
 import JSEncrypt from "jsencrypt";
 
 const Login = () => {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,6 +36,7 @@ zn6y8H7z4vwjIHAkzvW/uJBcV7PJRgPIr7awpn7J4TsU0zxCBb3CNgkwLrM5KmZG
 u/bvWV47VOzzM+ObAgMBAAE=
 -----END PUBLIC KEY-----`
 
+
   function parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -47,6 +49,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
     return JSON.parse(jsonPayload);
   }
 
+
   const fetchUserId = async (email) => {
     try {
       const response = await fetch(`http://localhost:8081/api/users/getUserId?email=${email}`, {
@@ -56,7 +59,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
           "Content-Type": "application/json"
         }
       });
-      const userData = await response.json();
+      const userData = await response.json(); // Read and parse JSON in one step
       console.log("Parsed JSON response:", userData);
       return userData;
     } catch (error) {
@@ -64,6 +67,37 @@ u/bvWV47VOzzM+ObAgMBAAE=
       return null;
     }
   };
+
+  useEffect(() => {
+    if (auth.email) {
+      console.log("Fetching userId for email:", auth.email);
+      fetchUserId(auth.email).then((user) => {
+        if (user && user.userId) {
+          console.log("User fetched:", user);
+          setUserId(user.userId);
+          setEmp(user.firstName + user.lastName);
+        } else {
+          console.warn("No valid user returned or userId is missing:", user);
+        }
+      });
+    }
+  }, [auth.email]);
+
+
+
+  useEffect(() => {
+    if (auth && auth.accessToken) {
+      console.log(auth.roles)
+      if (auth.roles === "admin") {
+        navigate('/admin');
+      } else if (auth.roles === "employee") {
+        navigate('/user', { state: { userId: userId, name: emp } });
+      }
+      else {
+        navigate('/')
+      }
+    }
+  }, [auth?.accessToken, userId]);
 
   const validateForm = () => {
     let formErrors = {};
@@ -78,57 +112,32 @@ u/bvWV47VOzzM+ObAgMBAAE=
   };
 
   const handleLoginClick = async () => {
+
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
+      setErrors(formErrors)
       return;
     }
+
 
     try {
       const encryptor = new JSEncrypt();
       encryptor.setPublicKey(publicKey);
+      // const encodedPassword = btoa(password);
       const encodedPassword = encryptor.encrypt(password);
-
-      const response = await userLogin({ email: userName, password: encodedPassword });
+      const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
       console.log(response);
-
-      const { roles, sub: email } = parseJwt(response.accessToken);
+      const roles = parseJwt(response.accessToken).roles;
+      const email = parseJwt(response.accessToken).sub;
+      const responsejwt = parseJwt(response.accessToken);
+      console.log("JWT parsed", responsejwt)
       console.log({ roles, email, "accessToken": response.accessToken });
 
-      dispatch(login({ roles, email, accessToken: response.accessToken }));
+      dispatch(login({ roles, email, "accessToken": response.accessToken }));
       window.localStorage.setItem('authtoken', response.accessToken);
-
-      // 🔁 Fetch userId immediately after login
-      if (roles === "employee") {
-        console.log("Fetching userId for email:", email);
-        const user = await fetchUserId(email);
-        if (user && user.userId) {
-          console.log("User fetched:", user);
-          setUserId(user.userId);
-          setEmp(user.firstName + user.lastName);
-          navigate('/user', {
-            state: {
-              userId: user.userId,
-              name: `${user.firstName} ${user.lastName}`
-            }
-          });
-        } else {
-          console.warn("No valid user returned or userId is missing:", user);
-          setToastMessage("Failed to retrieve user details.");
-          setToastType("error");
-          setShowToast(true);
-        }
-      } else if (roles === "admin") {
-        console.log("congratulations !!!!");
-        console.log('token stored in localstorage!!');
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-
+      console.log("accessToken is ", response.accessToken);
     } catch (error) {
-      console.error("Login error:", error);
       setToastMessage("Invalid credentials!");
       setToastType("error");
       setShowToast(true);
@@ -168,7 +177,6 @@ u/bvWV47VOzzM+ObAgMBAAE=
             required
           />
           {errors.userName && <div className="error-text">{errors.userName}</div>}
-
           <label
             style={{ marginBottom: "5px", marginTop: '5px' }}
             className="label-text"
@@ -184,11 +192,11 @@ u/bvWV47VOzzM+ObAgMBAAE=
             onChange={e => {
               setPassword(e.target.value);
               setErrors({ ...errors, password: '' });
+
             }}
             required
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
-
           <div className='checkbox'>
             <input
               type="checkbox"

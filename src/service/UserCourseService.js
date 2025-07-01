@@ -76,7 +76,7 @@ export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
     console.log("Enrolled courses fetched ", enrollments);
-
+    let Allcourses = enrollments.length;
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
       console.log("Details fetched for course", courseDetails);
@@ -161,6 +161,7 @@ export async function getUserEnrolledCourseDetails(userId) {
         roundedCompletion,
         status,
         adherence,
+        Allcourses
 
       };
     });
