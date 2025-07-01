@@ -23,13 +23,31 @@ const courseApi = axios.create({
 });
 
 // Request interceptor for adding auth tokens if needed (for both APIs)
+// const addAuthInterceptor = (apiInstance) => {
+//   apiInstance.interceptors.request.use(
+//     (config) => {
+//       // Add auth token if available
+//       const token = localStorage.getItem('authToken');
+//       if (token) {
+//         config.headers.Authorization = `Bearer ${token}`;
+//       }
+//       return config;
+//     },
+//     (error) => {
+//       return Promise.reject(error);
+//     }
+//   );
+// };
 const addAuthInterceptor = (apiInstance) => {
   apiInstance.interceptors.request.use(
     (config) => {
-      // Add auth token if available
-      const token = localStorage.getItem('authToken');
+      // Make sure you're using a valid token for an existing user
+      const token = localStorage.getItem('authtoken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔐 Using auth token:', token.substring(0, 20) + '...');
+      } else {
+        console.warn('⚠️ No auth token found in localStorage');
       }
       return config;
     },
@@ -38,7 +56,6 @@ const addAuthInterceptor = (apiInstance) => {
     }
   );
 };
-
 // Response interceptor for handling common responses (for both APIs)
 const addResponseInterceptor = (apiInstance) => {
   apiInstance.interceptors.response.use(
@@ -137,12 +154,30 @@ const enrollmentService = {
     }
   },
 
+  /**
+   * Get all active employees
+   * @returns {Promise<{status: string, message: string, data: Array<{userId: number, username: string, firstName: string, lastName: string, email: string, manager: string, role: string}>}>} Standard response with active employees
+   */
   async getAllEmployees() {
     try {
-      const response = await enrollmentApi.get('/api/enrollment/active-employees');
+      const response = await enrollmentApi.get('/admin/active-employees');
       return response;
     } catch (error) {
-      console.error('Error fetching enrollment statistics:', error);
+      console.error('Error fetching all active employees:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get all groups
+   * @returns {Promise<{status: string, message: string, data: Array<{groupId: number, groupName: string, description: string, isActive: boolean, createdAt: string, updatedAt: string}>}>} Standard response with all groups
+   */
+  async getAllGroups() {
+    try {
+      const response = await enrollmentApi.get('/group/Allgroups');
+      return response;
+    } catch (error) {
+      console.error('Error fetching all groups:', error);
       throw error;
     }
   },
@@ -172,21 +207,6 @@ const enrollmentService = {
       return response;
     } catch (error) {
       console.error('Error fetching all user enrollments:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Get all active employees
-
-    * @returns {Promise<{status: string, message: string, data: Array<{userId: number, username: string, firstName: string, lastName: string, email: string, manager: string, role: string}>}>} Standard response with active employees
-   */
-  async getAllEmployees() {
-    try {
-      const response = await enrollmentApi.get('/admin/active-employees');
-      return response;
-    } catch (error) {
-      console.error('Error fetching all active employees:', error);
       throw error;
     }
   },
@@ -439,23 +459,23 @@ const enrollmentService = {
 
   // Helper methods for course and bundle data
 
-  /**
-   * Filter active courses from course list
-   * @param {Array} courses - Array of course objects
-   * @returns {Array} Filtered array of active courses
-   */
-  filterActiveCourses(courses) {
-    return courses.filter(course => course.isActive);
-  },
+/**
+ * Filter active courses from course list
+ * @param {Array} courses - Array of course objects
+ * @returns {Array} Filtered array of active courses
+ */
+filterActiveCourses(courses) {
+  return courses.filter(course => course.active); // Changed from isActive to active
+},
 
-  /**
-   * Filter active bundles from bundle list
-   * @param {Array} bundles - Array of bundle objects
-   * @returns {Array} Filtered array of active bundles
-   */
-  filterActiveBundles(bundles) {
-    return bundles.filter(bundle => bundle.isActive);
-  },
+/**
+ * Filter active bundles from bundle list
+ * @param {Array} bundles - Array of bundle objects
+ * @returns {Array} Filtered array of active bundles
+ */
+filterActiveBundles(bundles) {
+  return bundles.filter(bundle => bundle.active); // Changed from isActive to active
+},
 
   /**
    * Group courses by level
