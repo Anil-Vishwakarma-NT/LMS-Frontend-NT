@@ -1,149 +1,85 @@
-import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  Button,
-  Radio,
-  Space,
-  Typography,
-} from "antd";
+import React from "react";
+import { Modal, Form, Input, InputNumber, Switch, Button } from "antd";
 
-const { Option } = Select;
-const { Title } = Typography;
-
-const QuizModal = ({ open, onClose, course, onSubmit }) => {
+const QuizModal = ({ open, onClose, onSubmit, course }) => {
   const [form] = Form.useForm();
-  const [answerType, setAnswerType] = useState(null);
 
-  useEffect(() => {
-    if (open) {
-      form.resetFields();         // Clear form on open
-      setAnswerType(null);        // Reset answer type state
-    }
-  }, [open, form]);
-
-  const handleAnswerTypeChange = (value) => {
-    setAnswerType(value);
-  };
-
-  const handleSubmit = (values) => {
-    const quizData = {
-      courseId: course?.courseId,
-      ...values,
-    };
-    onSubmit(quizData);
-    onClose();
+  const handleFinish = (values) => {
+    onSubmit(values); // Submit metadata to parent (CourseTable)
+    form.resetFields(); // Optional: Reset form
   };
 
   return (
     <Modal
       open={open}
-      onCancel={onClose}
+      title={`Create Quiz for "${course?.title}"`}
+      onCancel={() => {
+        form.resetFields();
+        onClose();
+      }}
       footer={null}
-      title={`Add Quiz to "${course?.title || ""}"`}
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
-        <Form.Item
-          name="question"
-          label="Question"
-          rules={[{ required: true, message: "Please enter a question" }]}
-        >
-          <Input placeholder="Enter your quiz question" />
-        </Form.Item>
+    <Form
+  form={form}
+  layout="vertical"
+  onFinish={handleFinish}
+  initialValues={{ isActive: true, randomizeQuestions: false, showResultsAfterSubmission: false }}
+>
+  <Form.Item
+    label="Quiz Title"
+    name="title"
+    rules={[{ required: true, message: "Please enter the quiz title" }]}
+  >
+    <Input />
+  </Form.Item>
 
-        <Form.Item
-          name="answerType"
-          label="Answer Type"
-          rules={[{ required: true, message: "Please select an answer type" }]}
-        >
-          <Select onChange={handleAnswerTypeChange} placeholder="Select answer type">
-            <Option value="text">Text</Option>
-            <Option value="mcq_single">MCQ (Single Option)</Option>
-            <Option value="mcq_multiple">MCQ (Multiple Options)</Option>
-          </Select>
-        </Form.Item>
+  <Form.Item label="Description" name="description">
+    <Input.TextArea rows={3} />
+  </Form.Item>
 
-        {/* Text Answer */}
-        {answerType === "text" && (
-          <Form.Item
-            name="textAnswer"
-            label="Answer"
-            rules={[{ required: true, message: "Please enter the answer" }]}
-          >
-            <Input placeholder="Type the correct answer" />
-          </Form.Item>
-        )}
+  <Form.Item
+    label="Time Limit (in minutes)"
+    name="timeLimit"
+    rules={[{ required: true, message: "Enter time limit in minutes" }]}
+  >
+    <InputNumber min={1} style={{ width: "100%" }} />
+  </Form.Item>
 
-        {/* MCQ Options */}
-        {(answerType === "mcq_single" || answerType === "mcq_multiple") && (
-    <>
-    <Title level={5}>Options</Title>
-    {[1, 2, 3, 4].map((num) => (
-      <Form.Item
-        key={`option${num}`}
-        name={`option${num}`}
-        label={`Option ${num}`}
-        rules={[{ required: true, message: `Please enter option ${num}` }]}
-      >
-        <Input placeholder={`Enter option ${num}`} />
-      </Form.Item>
-    ))}
+  <Form.Item
+    label="Attempts Allowed"
+    name="attemptsAllowed"
+    rules={[{ required: true, message: "Enter allowed attempts" }]}
+  >
+    <InputNumber min={1} style={{ width: "100%" }} />
+  </Form.Item>
 
-    {answerType === "mcq_single" && (
-      <Form.Item
-        name="correctOption"
-        label="Correct Option"
-        rules={[{ required: true, message: "Please select the correct option" }]}
-      >
-        <Radio.Group>
-          <Space direction="vertical">
-            {[1, 2, 3, 4].map((num) => (
-              <Radio key={num} value={`option${num}`}>
-                Option {num}
-              </Radio>
-            ))}
-          </Space>
-        </Radio.Group>
-      </Form.Item>
-    )}
+  <Form.Item
+    label="Passing Score (%)"
+    name="passingScore"
+    rules={[{ required: true, message: "Enter passing score (%)" }]}
+  >
+    <InputNumber min={0} max={100} style={{ width: "100%" }} />
+  </Form.Item>
 
-    {answerType === "mcq_multiple" && (
-      <Form.Item
-        name="correctOptions"
-        label="Correct Option(s)"
-        rules={[
-          {
-            required: true,
-            message: "Please select one or more correct options",
-            type: 'array'
-          },
-        ]}
-      >
-        <Select mode="multiple" placeholder="Select correct option(s)">
-          {[1, 2, 3, 4].map((num) => (
-            <Option key={`option${num}`} value={`option${num}`}>
-              Option {num}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-        )}
-    </>
-    )}
+  <Form.Item label="Randomize Questions" name="randomizeQuestions" valuePropName="checked">
+    <Switch />
+  </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            Submit Quiz
-          </Button>
-        </Form.Item>
-      </Form>
+  <Form.Item label="Show Results After Submission" name="showResults" valuePropName="checked">
+    <Switch />
+  </Form.Item>
+
+  <Form.Item label="Active?" name="isActive" valuePropName="checked">
+    <Switch defaultChecked />
+  </Form.Item>
+
+  <Form.Item>
+    <Button type="primary" htmlType="submit" block>
+      Submit
+    </Button>
+  </Form.Item>
+</Form>
     </Modal>
   );
 };

@@ -28,6 +28,9 @@ import MyCourses from "./components/user/myCourses/MyCourses";
 import CourseContentUser from "./components/user/myCourses/CourseContentUser";
 import AllGroup from "./components/admin/Group/AllGroup";
 import GroupHistory from "./components/admin/Group/GroupHistory";
+import QuizListPage from "./pages/quiz/QuizListPage";
+import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
+import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
 
 
 function App() {
@@ -196,6 +199,12 @@ function App() {
             </AdminRoutes>
           }
         ></Route>
+        <Route path="/course-content/:courseId/quizzes" element={<QuizListPage />} />
+        <Route
+          path="/course-content/:courseId/quizzes/edit-question/:questionId"
+          element={<QuizQuestionEditPage />}
+        />
+        <Route path="/quiz/:courseId" element={<CourseQuizAttempt />} />
       </Routes>
     </>
   );

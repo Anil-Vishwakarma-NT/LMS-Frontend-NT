@@ -109,6 +109,12 @@ const CourseContent = () => {
           >
             Back to Courses
           </Button>
+          <Button
+            onClick={() => navigate(`/quiz/${courseId}`)}
+            className="common-btn"
+          >
+            Attempt Quiz
+          </Button>
         </div>
       </div>
 
