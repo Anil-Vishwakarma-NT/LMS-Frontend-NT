@@ -13,7 +13,7 @@ const AdminHOC = (Component) => function HOC() {
   const [loading, setLoading] = useState(false)
   const sidebarItems = [
     { path: '/admin', label: 'Dashboard', img: sideDash },
-    { path: '/categories', label: 'Categories', img: sideCategory },
+    { path: '/categories', label: 'Bundles', img: sideCategory },
     { path: '/books', label: 'Courses', img: sideBook },
     { path: '/group', label: 'Groups', img: sideIssuance },
     { path: '/users', label: 'Users', img: sideUsers },

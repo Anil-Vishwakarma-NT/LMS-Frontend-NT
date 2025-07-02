@@ -79,7 +79,7 @@ export const deleteSingleUser = async (user) => {
     try {
         console.log(user);
         const response = await app.delete("/group/remove-user", { data: user });
-        alert("USer deleted");
+        return response.data;
 
     }
     catch (error) {

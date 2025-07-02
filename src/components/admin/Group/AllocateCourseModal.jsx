@@ -1,26 +1,9 @@
 import { addUser, updateGroup, getUserCoursesInGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Col, DatePicker } from "antd";
+import { Modal, Form, Input, Select, Button, Row, Checkbox, Col, DatePicker } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 
 import { useEffect, useState } from 'react';
-
-
-
-
-const userOptions = [
-    { value: 1000000000001, label: "Alice Johnson" },
-    { value: 1000000000002, label: "Bob Smith" },
-    { value: 1000000000003, label: "Charlie Davis" },
-    { value: 1000000000004, label: "Dana Lee" },
-    { value: 1000000000005, label: "Evan Brown" },
-    { value: 1000000000006, label: "Fiona Garcia" },
-    { value: 1000000000007, label: "George Martin" },
-    { value: 1000000000008, label: "Hannah Wilson" },
-    { value: 1000000000009, label: "Ian Clark" },
-    { value: 1000000000010, label: "Julia Adams" }
-];
-
 
 const AllocateCourseModal = (
     {
@@ -109,98 +92,121 @@ const AllocateCourseModal = (
         }
     };
 
+    const handleSelectAllCourses = () => {
+        const allFilteredCoursesIds = filteredCourses.map(course => course.courseId);
+        form.setFieldsValue({ courses: allFilteredCoursesIds });
+    };
+
+    const selectedCourses = Form.useWatch("courses", form);
+
     return (
-        <Modal
-            title={`Allocate course to user`}
-            visible={isModalOpen}
-            onCancel={handleCloseModal}
-            footer={
-                <Button
-                    key="submit"
-                    type="primary"
-                    onClick={handleAdd}
-                >
-                    Add user
-                </Button>
-
-
-
-            }
-            bodyStyle={{ height: 500 }}
-
-        >
-            <Form form={form} layout="vertical" name="group_form">
-                <Form.Item name="groupId" noStyle>
-                    <Input type="hidden" />
-                </Form.Item>
-
-                <Form.Item label="Courses">
-                    <Input.Search
-                        placeholder="Search by course name..."
-                        enterButton
-                        allowClear
-                        style={{ width: '100%', marginBottom: 16 }}
-                        value={searchCourse}
-                        onChange={(e) => setSearchCourse(e.target.value)}
-                    />
-                    <Form.Item
-                        name="courses"
-                        noStyle
-                        rules={[{ required: true, message: 'Please select at least one Course' }]}
+        (courses?.length > 0 ?
+            <Modal
+                title={`Allocate course to user`}
+                visible={isModalOpen}
+                onCancel={handleCloseModal}
+                footer={
+                    <Button
+                        key="submit"
+                        type="primary"
+                        onClick={handleAdd}
                     >
-                        <Checkbox.Group style={{ width: '100%' }}>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    maxHeight: '350px',
-                                    overflowY: 'auto',
-                                    paddingRight: '55px',
-                                    gap: '10px',
-                                }}
-                            >
-                                {filteredCourses?.map((user) => (
-                                    <Checkbox
-                                        key={user.courseId}
-                                        value={user.courseId}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '6px 8px',
-                                            borderRadius: '4px',
-                                            transition: 'background 0.5s',
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.title}</span>
-                                        </div>
-                                    </Checkbox>
-                                ))}
-                                {filteredCourses?.length === 0 && (
-                                    <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                )}
-                            </div>
-                        </Checkbox.Group>
+                        Add user
+                    </Button>
+
+
+
+                }
+                bodyStyle={{ height: 500 }}
+
+            >
+                <Form form={form} layout="vertical" name="group_form">
+                    <Form.Item name="groupId" noStyle>
+                        <Input type="hidden" />
                     </Form.Item>
-                </Form.Item>
 
-                <Form.Item
-                    name="deadline"
-                    label="Deadline"
-                    rules={[{ required: true, message: 'Please select a deadline!' }]}
-                >
-                    <DatePicker style={{ width: '100%' }} />
-                </Form.Item>
-                <Form.Item
-                    name="assignedAt"
-                    label="assignedAt"
-                    rules={[{ required: true, message: 'Please select a assignment date!' }]}
-                >
-                    <DatePicker style={{ width: '100%' }} />
-                </Form.Item>
+                    <Form.Item label="Courses" >
+                        <Row gutter={8} style={{ marginBottom: 12 }}>
+                            <Col flex="80px">
+                                <Button onClick={handleSelectAllCourses}>Add All</Button>
+                            </Col>
+                            <Col flex="auto">
+                                <Input.Search
+                                    placeholder="Search by course name"
+                                    enterButton
+                                    allowClear
+                                    value={searchCourse}
+                                    onChange={(e) => setSearchCourse(e.target.value)}
+                                />
+                            </Col>
+                        </Row>
+                        <Form.Item
+                            name="courses"
+                            noStyle
+                            rules={[{ required: true, message: 'Please select at least one Course' }]}
+                        >
+                            <Checkbox.Group style={{ width: '100%' }}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        maxHeight: '350px',
+                                        overflowY: 'auto',
+                                        paddingRight: '55px',
+                                        gap: '10px',
+                                    }}
+                                >
+                                    {filteredCourses?.map((user) => (
+                                        <Checkbox
+                                            key={user.courseId}
+                                            value={user.courseId}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                padding: '6px 8px',
+                                                borderRadius: '4px',
+                                                transition: 'background 0.5s',
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <span style={{ fontWeight: 500 }}>{user.title}</span>
+                                            </div>
+                                        </Checkbox>
+                                    ))}
+                                    {filteredCourses?.length === 0 && (
+                                        <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
+                                    )}
+                                </div>
+                            </Checkbox.Group>
+                        </Form.Item>
+                    </Form.Item>
 
-            </Form>
-        </Modal>
+                    {selectedCourses?.length > 0 && <Form.Item
+                        name="deadline"
+                        label="Deadline"
+                        rules={[{ required: true, message: 'Please select a deadline!' }]}
+                    >
+                        <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>}
+                    {selectedCourses?.length > 0 &&
+                        <Form.Item
+                            name="assignedAt"
+                            label="assignedAt"
+                            rules={[{ required: true, message: 'Please select a assignment date!' }]}
+                        >
+                            <DatePicker style={{ width: '100%' }} />
+                        </Form.Item>
+                    }
+                </Form>
+            </Modal> : <Modal
+                title={`Allocate course to user`}
+                visible={isModalOpen}
+                onCancel={handleCloseModal}
+                footer={
+                    <Button onClick={handleCloseModal}>OK</Button>
+                }>
+                <span>All courses are already allocated to the user</span>
+            </Modal>)
     );
 };
 export default AllocateCourseModal;

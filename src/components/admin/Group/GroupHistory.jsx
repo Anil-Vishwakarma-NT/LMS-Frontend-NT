@@ -129,7 +129,7 @@ const GroupHistory = ({ setLoading }) => {
                 userId: deleteUser.id
             }
             const data = await deleteSingleUser(groupdetails);
-            setToastMessage(data?.message || "User deleted successfully!");
+            setToastMessage(data?.message || "User removed successfully!");
             setToastType("success");
             setShowToast(true);
             await getUsers();
@@ -180,16 +180,22 @@ const GroupHistory = ({ setLoading }) => {
         {
             title: 'Completion %',
             dataIndex: 'progress',
-            render: (progress) => (
-                <Progress
-                    percent={progress}
-                    size="small"
-                    type="circle"
-                    strokeColor={
-                        progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
-                    }
-                    wrap />
-            ),
+            render: (progress) => {
+                const rounded = Number(progress.toFixed(1));   // 1‑decimal‑place number
+                return (
+                    <Progress
+                        percent={rounded}
+                        size="small"
+                        type="circle"
+                        strokeColor={
+                            rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'
+                        }
+                        // ensures the label inside the circle also shows 1 decimal place
+                        format={(p) => `${p.toFixed(1)}%`}
+                    />
+                );
+
+            }
         },
         {
             title: 'Status',

@@ -100,7 +100,7 @@ const UserHistory = ({ setLoading }) => {
     },
     {
       title: 'Level',
-      dataIndex: 'level',
+      dataIndex: 'courseLevel',
       key: 'level',
       render: (level) => {
         const levelColor = {
