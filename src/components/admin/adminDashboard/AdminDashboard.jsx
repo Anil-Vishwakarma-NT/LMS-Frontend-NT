@@ -46,13 +46,13 @@ const AdminDashboard = () => {
     try {
       fetchUserCount();
       fetchCourseCount();
-      // fetchBundleCount();
-      // fetchGroupCount();
-      // fetchEnrollmentCount();
-      // fetchRecentUser();
+      fetchBundleCount();
+      fetchGroupCount();
+      fetchEnrollmentCount();
+      fetchRecentUser();
       fetchRecentCourse();
-      // fetchRecentBundle();
-      // fetchRecentGroup();
+      fetchRecentBundle();
+      fetchRecentGroup();
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }

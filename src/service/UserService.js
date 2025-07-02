@@ -1,9 +1,7 @@
 import { app } from "./serviceLMS";
-import axios from "axios";
-
 export async function fetchUsers() {
   try {
-    const response = await app.get("/api/user");
+    const response = await app.get("user/api/service-api/user");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -14,13 +12,7 @@ export async function userStats(userId, token) {
   try {
     console.log("inside userStats");
     const response = await app.get(
-      `/api/users/enrollments/${userId}/statistics`,
-      { 
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      `user/api/service-api/enrollments/${userId}/statistics`);
     console.log("userStats response", response.data.data);
 
     return response.data;
@@ -32,7 +24,7 @@ export async function userStats(userId, token) {
 
 export async function deleteUsers(id) {
   try {
-    const response = await app.delete(`/admin/remove-user/${id}`);
+    const response = await app.delete(`user/api/service-api/admin/remove-user/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -43,11 +35,7 @@ export async function fetchAllActiveUsers(token) {
   try {
     console.log("token");
     console.log(token);
-    const response = await app.get("/admin/active-employees", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await app.get("user/api/service-api/admin/active-employees");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -57,24 +45,16 @@ export async function fetchAllActiveUsers(token) {
 export async function fetchAllInactiveUsers(token) {
   try {
     console.log("getting inactive users");
-    const response = await app.get("/admin/inactive-employees", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await app.get("user/api/service-api/admin/inactive-employees");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
   }
 }
 
-export async function createUser(userData, token) {
+export async function createUser(userData) {
   try {
-    const response = await app.post("/admin/register", userData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await app.post("user/api/service-api/admin/register",userData);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Something went wrong");
@@ -83,7 +63,7 @@ export async function createUser(userData, token) {
 
 export async function updateUser(userData, id) {
   try {
-    const response = await app.patch(`/admin/update-user/${id}`, userData);
+    const response = await app.patch(`user/api/service-api/admin/update-user/${id}`, userData);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -92,7 +72,7 @@ export async function updateUser(userData, id) {
 
 export async function countAllUsers() {
   try {
-    const response = await app.get("/api/user/userCount");
+    const response = await app.get("user/api/service-api/user/userCount");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -133,15 +113,8 @@ export async function logoutUser(token) {
 
 export async function previewUserReportPdf(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf`,
-      {
-        responseType: "blob", // Required to properly handle PDF binary
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
-    );
+    const response = await app.get(
+      `user/api/service-api/report/user/${userId}/pdf`  );
     return response.data;
   } catch (error) {
     console.error("Error fetching course report PDF:", error);
@@ -153,14 +126,8 @@ export async function previewUserReportPdf(userId) {
 
 export async function downloadUserReportPdf(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf/download`,
-      {
-        responseType: "blob", // Important for file download
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
+    const response = await app.get(
+      `user/api/service-api/report/user/${userId}/pdf/download` 
     );
 
     const blob = new Blob([response.data], { type: "application/pdf" });
