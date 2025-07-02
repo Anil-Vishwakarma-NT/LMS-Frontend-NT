@@ -81,7 +81,6 @@ const CoursesAdmin = ({ setLoading }) => {
   const showConfirmDelete = (course) => {
     Modal.confirm({
       title: "Are you sure you want to delete this course?",
-      content: course.title,
       okText: "Yes",
       okType: "danger",
       cancelText: "No",
