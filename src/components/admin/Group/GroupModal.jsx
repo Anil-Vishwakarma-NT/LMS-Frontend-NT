@@ -8,20 +8,6 @@ import { useEffect, useState } from 'react';
 
 
 
-const userOptions = [
-    { value: 1000000000001, label: "Alice Johnson" },
-    { value: 1000000000002, label: "Bob Smith" },
-    { value: 1000000000003, label: "Charlie Davis" },
-    { value: 1000000000004, label: "Dana Lee" },
-    { value: 1000000000005, label: "Evan Brown" },
-    { value: 1000000000006, label: "Fiona Garcia" },
-    { value: 1000000000007, label: "George Martin" },
-    { value: 1000000000008, label: "Hannah Wilson" },
-    { value: 1000000000009, label: "Ian Clark" },
-    { value: 1000000000010, label: "Julia Adams" }
-];
-
-
 const GroupModal = (
     {
         isModalOpen,
