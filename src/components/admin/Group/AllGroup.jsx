@@ -1,7 +1,5 @@
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import Toast from "../../shared/toast/Toast";
-
-
 import { Layout, Typography, Divider } from 'antd';
 import { useState, useEffect } from 'react';
 import { getAllGroups, deleteGroup } from "../../../service/GroupService";
@@ -37,7 +35,7 @@ const AllGroup = ({ setLoading }) => {
     }, [])
 
 
-    const processedGroups = groupList.map((group, index) => ({
+    const processedGroups = groupList?.map((group, index) => ({
         id: group.groupId,
         srNo: index + 1,
         groupName: group.groupName,
@@ -151,7 +149,7 @@ const AllGroup = ({ setLoading }) => {
                     </div>
                     <Divider style={{ marginTop: 0 }} />
                     <div className="user-table">
-                        {processedGroups.length > 0 ? (
+                        {processedGroups?.length > 0 ? (
                             <Table
                                 dataSource={processedGroups}
                                 columns={fields}
