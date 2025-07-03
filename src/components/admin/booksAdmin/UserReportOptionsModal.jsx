@@ -106,9 +106,24 @@ const UserReportOptionsModal = ({ isOpen, onClose, onSubmit, userId }) => {
       </Checkbox>
 
       <Collapse bordered style={{ marginTop: 16 }}>
-
         <Panel header="User KPIs" key="2">
           <div style={{ maxHeight: 250, overflowY: "auto" }}>
+          <Checkbox
+            checked={USER_KPIS.every(kpi => selectedOptions.includes(kpi))}
+            indeterminate={
+              USER_KPIS.some(kpi => selectedOptions.includes(kpi)) &&
+              !USER_KPIS.every(kpi => selectedOptions.includes(kpi))
+            }
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedOptions(prev => [...prev, ...USER_KPIS.filter(kpi => !prev.includes(kpi))]);
+              } else {
+                setSelectedOptions(prev => prev.filter(kpi => !USER_KPIS.includes(kpi)));
+              }
+            }}
+          >
+            Select All User KPIs
+          </Checkbox>
             {USER_KPIS.map((kpi) => (
               <div key={kpi}>
                 <Checkbox
@@ -124,6 +139,22 @@ const UserReportOptionsModal = ({ isOpen, onClose, onSubmit, userId }) => {
         </Panel>
         <Panel header="Global KPIs" key="1">
           <div style={{ maxHeight: 250, overflowY: "auto" }}>
+          <Checkbox
+            checked={GLOBAL_USER_KPIS.every(kpi => selectedOptions.includes(kpi))}
+            indeterminate={
+              GLOBAL_USER_KPIS.some(kpi => selectedOptions.includes(kpi)) &&
+              !GLOBAL_USER_KPIS.every(kpi => selectedOptions.includes(kpi))
+            }
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedOptions(prev => [...prev, ...GLOBAL_USER_KPIS.filter(kpi => !prev.includes(kpi))]);
+              } else {
+                setSelectedOptions(prev => prev.filter(kpi => !GLOBAL_USER_KPIS.includes(kpi)));
+              }
+            }}
+          >
+            Select All Global KPIs
+          </Checkbox>
             {GLOBAL_USER_KPIS.map((kpi) => (
               <div key={kpi}>
                 <Checkbox

@@ -104,6 +104,22 @@ const CourseReportOptionsModal = ({ isOpen, onClose, onSubmit, courseId }) => {
       <Collapse bordered style={{ marginTop: 16 }}>
         <Panel header="Course KPIs" key="1">
           <div style={{ maxHeight: 250, overflowY: "auto" }}>
+          <Checkbox
+            checked={COURSE_KPIS.every(kpi => selectedOptions.includes(kpi))}
+            indeterminate={
+              COURSE_KPIS.some(kpi => selectedOptions.includes(kpi)) &&
+              !COURSE_KPIS.every(kpi => selectedOptions.includes(kpi))
+            }
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedOptions(prev => [...prev, ...COURSE_KPIS.filter(kpi => !prev.includes(kpi))]);
+              } else {
+                setSelectedOptions(prev => prev.filter(kpi => !COURSE_KPIS.includes(kpi)));
+              }
+            }}
+          >
+            Select All Course KPIs
+          </Checkbox>
             {COURSE_KPIS.map((kpi) => (
               <div key={kpi}>
                 <Checkbox
@@ -119,6 +135,22 @@ const CourseReportOptionsModal = ({ isOpen, onClose, onSubmit, courseId }) => {
         </Panel>
         <Panel header="Global KPIs" key="2">
           <div style={{ maxHeight: 250, overflowY: "auto" }}>
+                      <Checkbox
+                        checked={GLOBAL_KPIS.every(kpi => selectedOptions.includes(kpi))}
+                        indeterminate={
+                          GLOBAL_KPIS.some(kpi => selectedOptions.includes(kpi)) &&
+                          !GLOBAL_KPIS.every(kpi => selectedOptions.includes(kpi))
+                        }
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOptions(prev => [...prev, ...GLOBAL_KPIS.filter(kpi => !prev.includes(kpi))]);
+                          } else {
+                            setSelectedOptions(prev => prev.filter(kpi => !GLOBAL_KPIS.includes(kpi)));
+                          }
+                        }}
+                      >
+                        Select All Global KPIs
+                      </Checkbox>
             {GLOBAL_KPIS.map((kpi) => (
               <div key={kpi}>
                 <Checkbox
