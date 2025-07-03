@@ -44,6 +44,7 @@ const UsersAdmin = ({ setLoading }) => {
     setUserList(activeUsers.data);
     setInactiveUserList(inactiveUsers.data);
   }
+
   useEffect(() => {
     getUserLists();
   }, []);
@@ -121,7 +122,7 @@ const UsersAdmin = ({ setLoading }) => {
       dataIndex: "srNo",
       title: "Sr. No.",
       key: "srNo",
-      width: 50
+      width: 70
     },
     {
       dataIndex: "employeeId",

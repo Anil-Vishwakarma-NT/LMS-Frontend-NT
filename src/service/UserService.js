@@ -12,7 +12,40 @@ export async function userStats(userId) {
   try {
     const response = await app.get(
       `user/api/service-api/enrollments/${userId}/statistics`);
-      return response.data;
+
+    return response.data;
+  } catch (error) {
+    console.log("userStat error");
+    throw new Error(error?.response?.data?.message);
+  }
+}
+
+
+export async function userdeadlines() {
+  try {
+
+    const response = await app.get(
+      'user/api/service-api/users/getDeadlines'
+    );
+    console.log("user deadlines response", response.data.data);
+    
+    return response.data;
+  } catch (error) {
+    console.log("userStat error");
+    throw new Error(error?.response?.data?.message);
+  }
+}
+
+
+export async function userdeadlines() {
+  try {
+
+    const response = await app.get(
+      '/api/users/getDeadlines'
+    );
+    console.log("user deadlines response", response.data.data);
+    
+    return response.data;
   } catch (error) {
     console.log("userStat error");
     throw new Error(error?.response?.data?.message);

@@ -4,7 +4,13 @@ import userProfile from "../../../assets/man.png";
 import userHistory from "../../../assets/clock.png";
 import userIssuance from "../../../assets/occupation.png";
 
+
+import Loader from '../loader/Loader';
+
+
 const UserHOC = (Component) => function HOC() {
+
+  const [loading, setLoading] = useState(false)
 
 const sidebarItems = [
   { path: "/user", label: "Employee Dashboard", img: userHistory },
@@ -12,12 +18,15 @@ const sidebarItems = [
 ];
 
   return (
+    <>
+    {loading && <Loader data-testid="loader" />}
     <div className='adminhoc'>
         <Sidebar items={sidebarItems} />
         <div className='dash-area'>
-            <Component />
+            <Component loading={loading} setLoading={setLoading} />
         </div>
     </div>
+    </>
   )
 }
 
