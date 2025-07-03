@@ -1,4 +1,4 @@
-import { app, appCourse } from './serviceLMS'; 
+import {app} from './serviceLMS'; 
 /**
  * Enrollment Service
  * Provides methods to interact with enrollment-related API endpoints
