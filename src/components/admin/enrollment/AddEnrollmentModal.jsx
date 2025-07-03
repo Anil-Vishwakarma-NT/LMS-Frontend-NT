@@ -15,7 +15,7 @@ import {
   Checkbox
 } from 'antd';
 import { UserOutlined, TeamOutlined, BookOutlined, AppstoreOutlined } from '@ant-design/icons';
-import enrollmentService from './enrollmentService';
+import enrollmentService from '../../../service/enrollmentService';
 
 const { Option } = Select;
 const { Text } = Typography;

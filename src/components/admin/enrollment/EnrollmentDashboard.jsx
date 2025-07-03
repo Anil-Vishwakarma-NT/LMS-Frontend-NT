@@ -35,7 +35,7 @@ import {
 } from '@ant-design/icons';
 
 import { Layout } from 'antd';
-import enrollmentService from './enrollmentService';
+import enrollmentService from '../../../service/enrollmentService';
 import AdminHOC from '../../shared/HOC/AdminHOC';
 import AddEnrollmentModal from './AddEnrollmentModal';
 
