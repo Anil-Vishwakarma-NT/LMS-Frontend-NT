@@ -15,7 +15,7 @@ import {
   Checkbox
 } from 'antd';
 import { UserOutlined, TeamOutlined, BookOutlined, AppstoreOutlined } from '@ant-design/icons';
-import enrollmentService from './enrollmentService';
+import enrollmentService from '../../../service/enrollmentService';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -309,7 +309,7 @@ const AddEnrollmentModal = ({ visible, onCancel, onSuccess }) => {
     setSubmitting(true);
     try {
       // Get current user ID (this should come from your auth context)
-      const currentUserId = 6; // Replace with actual current user ID from auth context
+      const currentUserId = 1; // Replace with actual current user ID from auth context
       
       // Format enrollment data according to the required API format
       const enrollmentData = {

@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
+import {app} from "../../service/serviceLMS";
 
 const { Option } = Select;
 
@@ -90,7 +91,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   console.log("📤 Final Payload:", payload);
 
   try {
-    await axios.post("http://localhost:8080/api/quiz-questions", payload);
+    await app.post("course/api/service-api/quiz-questions", payload);
     message.success("Question added successfully");
     form.resetFields();
     setStep(1);

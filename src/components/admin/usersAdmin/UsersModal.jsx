@@ -80,8 +80,9 @@ const UsersModal = ({
       }
 
       setLoading(true);
-      const token = localStorage.getItem("authtoken");
-      const data = await createUser(values, token);
+      // const token = localStorage.getItem("authtoken");
+      console.log("NEW USERVALUES", values);
+      const data = await createUser(values);
       setToastMessage(data?.message || "User added successfully!");
       setToastType("success");
       setShowToast(true);

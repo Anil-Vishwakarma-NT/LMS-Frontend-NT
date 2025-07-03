@@ -1,8 +1,8 @@
-import axios from "axios";
+import {app}from "./serviceLMS"
 
 export const fetchAllCourses = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/api/course");
+    const response = await app.get("course/api/service-api/course");
     return response.data.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -14,9 +14,7 @@ export const fetchAllCourses = async () => {
 
 export async function deleteCourse(courseId) {
   try {
-    const response = await axios.delete(
-      `http://localhost:8080/api/course/${courseId}`
-    );
+    const response = await app.delete(`course/api/service-api/course/${courseId}`);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course deletion failed");
@@ -25,10 +23,7 @@ export async function deleteCourse(courseId) {
 
 export async function updateCourse(courseId, updatedData) {
   try {
-    const response = await axios.put(
-      `http://localhost:8080/api/course/${courseId}`,
-      updatedData
-    );
+    const response = await app.put(`course/api/service-api/course/${courseId}`, updatedData);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course update failed");
@@ -37,10 +32,7 @@ export async function updateCourse(courseId, updatedData) {
 
 export async function createCourse(courseData) {
   try {
-    const response = await axios.post(
-      "http://localhost:8080/api/course",
-      courseData
-    );
+    const response = await app.post("course/api/service-api/course",courseData);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course creation failed");
@@ -49,9 +41,7 @@ export async function createCourse(courseData) {
 
 export async function fetchCourseById(courseId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/course/${courseId}`
-    );
+    const response = await app.get(`course/api/service-api/course/${courseId}`);
     console.log(response.data.data);
     return response.data.data;
   } catch (error) {
@@ -61,9 +51,7 @@ export async function fetchCourseById(courseId) {
 
 export async function fetchCourseContentByCourseId(courseId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/course-content/course/${courseId}`
-    );
+    const response = await app.get(`course/api/service-api/course-content/course/${courseId}`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -74,9 +62,7 @@ export async function fetchCourseContentByCourseId(courseId) {
 
 export async function deleteCourseContent(id) {
   try {
-    const response = await axios.delete(
-      `http://localhost:8080/api/course-content/${id}`
-    );
+    const response = await app.delete(`course/api/service-api/course-content/${id}`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -87,10 +73,7 @@ export async function deleteCourseContent(id) {
 
 export async function updateCourseContent(id, updatedData) {
   try {
-    const response = await axios.put(
-      `http://localhost:8080/api/course-content/${id}`,
-      updatedData
-    );
+    const response = await app.put(`course/api/service-api/course-content/${id}`,updatedData);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -101,10 +84,7 @@ export async function updateCourseContent(id, updatedData) {
 
 export async function createCourseContent(newData) {
   try {
-    const response = await axios.post(
-      "http://localhost:8080/api/course-content",
-      newData
-    );
+    const response = await app.post("course/api/service-api/course-content",newData);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -115,15 +95,9 @@ export async function createCourseContent(newData) {
 
 export async function previewCourseReportPdf(courseId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/course/${courseId}/pdf`,
-      {
+    const response = await app.get(`user/api/service-api/report/course/${courseId}/pdf`,{
         responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
-    );
+      })
     return response.data;
   } catch (error) {
     console.error("Error fetching course report PDF:", error);
@@ -135,15 +109,10 @@ export async function previewCourseReportPdf(courseId) {
 
 export async function downloadCourseReportPdf(courseId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/course/${courseId}/pdf/download`,
-      {
+    const response = await app.get(
+      `user/api/service-api/report/course/${courseId}/pdf/download`,{
         responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
-    );
+      });
 
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);

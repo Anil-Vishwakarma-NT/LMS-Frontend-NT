@@ -40,7 +40,7 @@ const UsersAdmin = ({ setLoading }) => {
 
   async function getUserLists() {
     const activeUsers = await fetchAllActiveUsers();
-    const inactiveUsers = await fetchAllInactiveUsers(auth.accessToken);
+    const inactiveUsers = await fetchAllInactiveUsers();
     setUserList(activeUsers.data);
     setInactiveUserList(inactiveUsers.data);
   }
