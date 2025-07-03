@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Login.css';
-import image from "../../assets/login-image.jpeg";
+import image from "../../assets/login-image-trial.jpg";
 import Button from "../../components/shared/button/Button";
 import { userLogin } from "../../service/UserService";
 import { login } from "../../redux/authentication/authActions";
@@ -145,7 +145,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page" style={{ backgroundColor: '#81b7ee' }}>
       <div className="login-container">
 
         <div className="login-img">
