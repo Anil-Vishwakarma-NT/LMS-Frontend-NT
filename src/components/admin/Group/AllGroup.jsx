@@ -37,7 +37,7 @@ const AllGroup = ({ setLoading }) => {
     }, [])
 
 
-    const processedGroups = groupList.map((group, index) => ({
+    const processedGroups = groupList?.map((group, index) => ({
         id: group.groupId,
         srNo: index + 1,
         groupName: group.groupName,
@@ -151,7 +151,7 @@ const AllGroup = ({ setLoading }) => {
                     </div>
                     <Divider style={{ marginTop: 0 }} />
                     <div className="user-table">
-                        {processedGroups.length > 0 ? (
+                        {processedGroups?.length > 0 ? (
                             <Table
                                 dataSource={processedGroups}
                                 columns={fields}
