@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {app} from "../../../service/serviceLMS";
 import { Table, Tooltip, Space, Button, message } from "antd";
 import {
   EditOutlined,
@@ -58,7 +59,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
         createdBy: 1,
         parentType: "course",
       };
-      const response = await axios.post("http://localhost:8080/api/quizzes", payload);
+      const response = await app.post("course/api/service-api/quizzes", payload);
       const result = response?.data?.data;
       const messageText = response?.data?.message;
 
@@ -78,12 +79,12 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/course");
+      const response = await app.get("course/api/service-api/course");
 
       const coursesWithQuizStatus = await Promise.all(
         response.data.data.map(async (course) => {
           try {
-            const quizResponse = await axios.get(`http://localhost:8080/api/quizzes/course/${course.courseId}`);
+            const quizResponse = await app.get(`course/api/service-api/quizzes/course/${course.courseId}`);
             const quizzes = quizResponse?.data?.data || [];
             const latestQuiz = quizzes[0];
             return {

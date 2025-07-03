@@ -203,6 +203,7 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
+import { app } from "../../service/serviceLMS";
 import QuizQuestionModal from "./QuizQuestionModal";
 import ViewQuestionModal from "./ViewQuestionModal";
 import EditQuestionModal from "./QuizQuestionEditPage";
@@ -227,7 +228,7 @@ const QuizListPage = () => {
 
   const fetchQuizMetadata = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}`);
+      const res = await app.get(`course/api/service-api/quizzes/course/${courseId}`);
       setQuiz(res.data?.data?.[0] || null);
       setCourseTitle(res.data?.data?.[0].title || "");
     } catch (err) {
@@ -237,7 +238,7 @@ const QuizListPage = () => {
 
   const fetchQuestions = async (quizId) => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${quizId}`);
+      const res = await app.get(`course/api/service-api/quiz-questions/quiz/${quizId}`);
       setQuizQuestions(res.data?.data || []);
     } catch (err) {
       message.error("Failed to load quiz questions");
@@ -261,7 +262,7 @@ const QuizListPage = () => {
 
   const handleDeleteQuestion = async (questionId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/quiz-questions/${questionId}`);
+      await app.delete(`course/api/service-api/quiz-questions/${questionId}`);
       setQuizQuestions(prev => prev.filter(q => q.questionId !== questionId));
       message.success("Question deleted successfully");
     } catch (error) {
@@ -460,10 +461,10 @@ const QuizListPage = () => {
         onSubmit={async (formData) => {
           try {
             if (quiz) {
-              await axios.put(`http://localhost:8080/api/quizzes/${quiz.quizId}`, formData);
+              await app.put(`course/api/service-api/quizzes/${quiz.quizId}`, formData);
               message.success("Quiz metadata updated successfully");
             } else {
-              const response = await axios.post(`http://localhost:8080/api/quizzes`, {
+              const response = await app.post(`course/api/service-api/quizzes`, {
                 ...formData,
                 parentId: courseId,
                 parentType: "course",

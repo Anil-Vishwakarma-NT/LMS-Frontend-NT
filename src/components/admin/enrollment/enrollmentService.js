@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // Base URLs for different services
 const ENROLLMENT_BASE_URL = 'http://localhost:8081';
 const COURSE_BASE_URL = 'http://localhost:8080';

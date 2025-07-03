@@ -95,7 +95,9 @@ export async function createCourseContent(newData) {
 
 export async function previewCourseReportPdf(courseId) {
   try {
-    const response = await app.get(`course/api/service-api/report/course/${courseId}/pdf`);
+    const response = await app.get(`user/api/service-api/report/course/${courseId}/pdf`,{
+        responseType: "blob",
+      })
     return response.data;
   } catch (error) {
     console.error("Error fetching course report PDF:", error);
@@ -108,7 +110,9 @@ export async function previewCourseReportPdf(courseId) {
 export async function downloadCourseReportPdf(courseId) {
   try {
     const response = await app.get(
-      `course/api/service-api/report/course/${courseId}/pdf/download`);
+      `user/api/service-api/report/course/${courseId}/pdf/download`,{
+        responseType: "blob",
+      });
 
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);

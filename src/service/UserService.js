@@ -8,14 +8,11 @@ export async function fetchUsers() {
   }
 }
 
-export async function userStats(userId, token) {
+export async function userStats(userId) {
   try {
-    console.log("inside userStats");
     const response = await app.get(
       `user/api/service-api/enrollments/${userId}/statistics`);
-    console.log("userStats response", response.data.data);
-
-    return response.data;
+      return response.data;
   } catch (error) {
     console.log("userStat error");
     throw new Error(error?.response?.data?.message);
@@ -31,10 +28,8 @@ export async function deleteUsers(id) {
   }
 }
 
-export async function fetchAllActiveUsers(token) {
-  try {
-    console.log("token");
-    console.log(token);
+export async function fetchAllActiveUsers() {
+  try {  
     const response = await app.get("user/api/service-api/admin/active-employees");
     return response.data;
   } catch (error) {
@@ -42,9 +37,8 @@ export async function fetchAllActiveUsers(token) {
   }
 }
 
-export async function fetchAllInactiveUsers(token) {
+export async function fetchAllInactiveUsers() {
   try {
-    console.log("getting inactive users");
     const response = await app.get("user/api/service-api/admin/inactive-employees");
     return response.data;
   } catch (error) {
@@ -54,16 +48,16 @@ export async function fetchAllInactiveUsers(token) {
 
 export async function createUser(userData) {
   try {
-    const response = await app.post("user/api/service-api/admin/register",userData);
+    const response = await app.post("user/api/service-api/admin/register", userData);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Something went wrong");
   }
 }
 
-export async function updateUser(userData, id) {
+export async function updateUser(userData, userId) {
   try {
-    const response = await app.patch(`user/api/service-api/admin/update-user/${id}`, userData);
+    const response = await app.patch(`user/api/service-api/admin/update-user/${userId}`, userData);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -82,32 +76,27 @@ export async function countAllUsers() {
 export async function userLogin(data) {
   try {
     const response = await app.post("/api/client-api/auth/login", data);
-    console.log("userLogin response", response.data);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
   }
 }
 
-export async function getUserByToken(token) {
-  try {
-    const response = await app.get("/api/current-user", {
-      headers: {
-        Authorization: token,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error?.response?.data?.message);
-  }
-}
+// export async function getUserByToken(token) {
+//   try {
+//     const response = await app.get("/api/current-user", {
+//       headers: {
+//         Authorization: token,
+//       },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error?.response?.data?.message);
+//   }
+// }
 
-export async function logoutUser(token) {
-  const response = await app.post("/api/auth/logout", {
-    headers: {
-      Authorization: token,
-    },
-  });
+export async function logoutUser() {
+  const response = await app.post("/api/auth/logout");
   window.localStorage.removeItem("authtoken");
 }
 
