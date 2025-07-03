@@ -19,13 +19,30 @@
 }
 
 /* ===================== DashCard Wrapper ===================== */
+/* outer wrapper ------------------------------------------------------- */
 .user-history-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-    margin-top: 24px;
-    justify-content: center;
+    /* responsive grid: minimum 240 px, grow to fill row */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    /* a touch more breathing room */
+    padding: 24px 0;
+    /* top & bottom spacing */
+    justify-items: center;
+    /* centre each card inside its cell */
+}
+
+/* individual cards ---------------------------------------------------- */
+.user-history-card {
+    width: 100%;
+    /* full width of its grid cell */
+    max-width: 260px;
+    /* cap so they don’t stretch too wide on big screens */
+    height: 150px;
+    /* a bit taller for nicer proportions */
+    border: 1px solid #e0e0e0;
+    /* optional subtle shadow */
+    /* box-shadow: 0 2px 6px rgba(0,0,0,.06); */
 }
 
 /* === Individual Card Styling === */

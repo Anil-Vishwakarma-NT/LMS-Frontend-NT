@@ -26,9 +26,12 @@ import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboa
 import CourseContentAdmin from "./components/admin/booksAdmin/CourseContentAdmin";
 import MyCourses from "./components/user/myCourses/MyCourses";
 import CourseContentUser from "./components/user/myCourses/CourseContentUser";
+import AllGroup from "./components/admin/Group/AllGroup";
+import GroupHistory from "./components/admin/Group/GroupHistory";
 import QuizListPage from "./pages/quiz/QuizListPage";
 import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -169,6 +172,22 @@ function App() {
           element={
             <AdminRoutes>
               <EnrollmentDashboard />
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path="/group"
+          element={
+            <AdminRoutes>
+              <AllGroup />
+            </AdminRoutes>
+          }
+        />
+         <Route
+          path="/group-history/:id"
+          element={
+            <AdminRoutes>
+              <GroupHistory />
             </AdminRoutes>
           }
         />

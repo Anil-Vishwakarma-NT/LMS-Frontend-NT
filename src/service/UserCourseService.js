@@ -51,9 +51,11 @@ export async function fetchUserNameById(userId) {
 export async function fetchCourseDetails(courseId) {
   console.log("courseID", courseId)
   try {
+    console.log("FetchCourseDetails fetching ......")
     const response = await axios.get(
       `http://localhost:8080/api/course/${courseId}`
     );
+    console.log("FetchCourseDetails", response.data.data)
     console.log("response of fetchCourseDetails", response)
     return response.data.data;
   } catch (error) {
@@ -76,7 +78,7 @@ export async function getUserEnrolledCourseDetails(userId) {
   try {
     const enrollments = await fetchUserEnrolledCourses(userId);
     console.log("Enrolled courses fetched ", enrollments);
-
+    let Allcourses = enrollments.length;
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
       const courseDetails = await fetchCourseDetails(enrollment.courseId);
       console.log("Details fetched for course", courseDetails);
@@ -91,6 +93,7 @@ export async function getUserEnrolledCourseDetails(userId) {
       console.log("Completion percentage fetched", completionPercentage);
 
       const roundedCompletion = parseFloat(completionPercentage.toFixed(2));
+
       console.log("ROUNDED COMPLETION PERC", roundedCompletion);
 
       const todayISO = new Date().toISOString().split("T")[0];
@@ -160,6 +163,8 @@ export async function getUserEnrolledCourseDetails(userId) {
         roundedCompletion,
         status,
         adherence,
+        Allcourses
+
       };
     });
 

@@ -89,8 +89,6 @@ u/bvWV47VOzzM+ObAgMBAAE=
     if (auth && auth.accessToken) {
       console.log(auth.roles)
       if (auth.roles === "admin") {
-        console.log("congratulations !!!!");
-        console.log('token stored in localstorage!!');
         navigate('/admin');
       } else if (auth.roles === "employee") {
         navigate('/user', { state: { userId: userId, name: emp } });
@@ -130,7 +128,10 @@ u/bvWV47VOzzM+ObAgMBAAE=
       const response = await userLogin({ "email": userName, "password": encodedPassword });
       console.log("request sent waiting for response");
       console.log(response);
-      const { roles, sub: email } = parseJwt(response.accessToken);
+      const roles = parseJwt(response.accessToken).roles;
+      const email = parseJwt(response.accessToken).sub;
+      const responsejwt = parseJwt(response.accessToken);
+      console.log("JWT parsed", responsejwt)
       console.log({ roles, email, "accessToken": response.accessToken });
 
       dispatch(login({ roles, email, "accessToken": response.accessToken }));
