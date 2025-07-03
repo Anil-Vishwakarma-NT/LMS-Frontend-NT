@@ -1,3 +1,4 @@
+import { app, appCourse } from "../../service/serviceLMS";
 import React, { useState } from "react";
 import {
   Modal,
@@ -90,7 +91,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   console.log("📤 Final Payload:", payload);
 
   try {
-    await axios.post("http://localhost:8080/api/quiz-questions", payload);
+    await appCourse.post("/api/quiz-questions", payload);
     message.success("Question added successfully");
     form.resetFields();
     setStep(1);

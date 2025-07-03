@@ -1,5 +1,6 @@
+import { app, appCourse } from "../../../service/serviceLMS";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
   Typography, Spin, Alert, Card, Tag,
   Button, Input, Radio, Checkbox, Space, message
@@ -16,6 +17,9 @@ const { Title, Paragraph } = Typography;
 
 const CourseQuizAttempt = () => {
   const { courseId } = useParams();
+  const location = useLocation();
+  const userId = location.state?.userId || Number(localStorage.getItem("userId"));
+
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [userAnswers, setUserAnswers] = useState({});
@@ -25,12 +29,13 @@ const CourseQuizAttempt = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState("");
+  const [quizAttemptId, setQuizAttemptId] = useState(null);
 
   // Load quiz metadata
   useEffect(() => {
     const loadQuiz = async () => {
       try {
-        const quizRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}`);
+        const quizRes = await appCourse.get(`/api/quizzes/course/${courseId}`);
         const quizData = quizRes.data?.data?.[0];
 
         if (!quizData?.quizId) {
@@ -38,7 +43,7 @@ const CourseQuizAttempt = () => {
           return;
         }
 
-        const fullQuizRes = await axios.get(`http://localhost:8080/api/quizzes/${quizData.quizId}`);
+        const fullQuizRes = await appCourse.get(`/api/quizzes/${quizData.quizId}`);
         setQuiz(fullQuizRes.data?.data || null);
       } catch (err) {
         console.error(err);
@@ -71,13 +76,32 @@ const CourseQuizAttempt = () => {
 
   const handleStartQuiz = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/quiz-questions/quiz/${quiz.quizId}`);
-      setQuestions(res.data?.data || []);
+      if (!quiz || !quiz.quizId) return;
+
+      const payload = {
+        attempt: 1,
+        quizId: quiz.quizId,
+        userId: userId,
+      };
+
+      const attemptRes = await appCourse.post("/api/quiz-attempt", payload);
+      console.log("attemptRes", attemptRes)
+      const attemptId = attemptRes.data?.quizAttemptId;
+      console.log("attemptId", attemptId)
+
+      setQuizAttemptId(attemptId);
+      message.success("Quiz attempt started!");
+
+      // Load questions
+      const questionsRes = await appCourse.get(`/api/quiz-questions/quiz/${quiz.quizId}`);
+      setQuestions(questionsRes.data?.data || []);
+
+      // Start quiz
       setStart(true);
       setTimeLeft(quiz.timeLimit * 60);
     } catch (err) {
       console.error(err);
-      message.error("Failed to load quiz questions");
+      message.error("Failed to load quiz questions.");
     }
   };
 
@@ -106,6 +130,8 @@ const CourseQuizAttempt = () => {
   const handleSubmit = () => {
     console.log("Submitted answers:", userAnswers);
     console.log("Marked for review:", markedForReview);
+    console.log("Quiz Attempt ID:", quizAttemptId); // ✅ Stored attempt ID
+
     message.success("Quiz submitted!");
     setStart(false);
   };
@@ -127,23 +153,12 @@ const CourseQuizAttempt = () => {
       <Card title={`🎯 Attempt Quiz - ${quiz.title}`} bordered>
         {!start ? (
           <>
-            <Paragraph>
-              <InfoCircleOutlined /> <strong>Description:</strong> {quiz.description}
-            </Paragraph>
-            <Paragraph>
-              <strong>📘 Quiz Title:</strong> {quiz.title}
-            </Paragraph>
-            <Paragraph>
-              <ClockCircleOutlined /> <strong>Time Limit:</strong> {quiz.timeLimit} minutes
-            </Paragraph>
-            <Paragraph>
-              <SyncOutlined /> <strong>Attempts Allowed:</strong> {quiz.attemptsAllowed}
-            </Paragraph>
-            <Paragraph>
-              <CheckCircleOutlined /> <strong>Passing Score:</strong> {quiz.passingScore}%
-            </Paragraph>
-            <Paragraph>
-              <strong>Status:</strong>{" "}
+            <Paragraph><InfoCircleOutlined /> <strong>Description:</strong> {quiz.description}</Paragraph>
+            <Paragraph><strong>📘 Quiz Title:</strong> {quiz.title}</Paragraph>
+            <Paragraph><ClockCircleOutlined /> <strong>Time Limit:</strong> {quiz.timeLimit} minutes</Paragraph>
+            <Paragraph><SyncOutlined /> <strong>Attempts Allowed:</strong> {quiz.attemptsAllowed}</Paragraph>
+            <Paragraph><CheckCircleOutlined /> <strong>Passing Score:</strong> {quiz.passingScore}%</Paragraph>
+            <Paragraph><strong>Status:</strong>{" "}
               <Tag color={quiz.isActive ? "green" : "red"}>
                 {quiz.isActive ? "Active" : "Inactive"}
               </Tag>
@@ -159,7 +174,7 @@ const CourseQuizAttempt = () => {
               ⏳ Time Left: <Tag color={timeLeft < 60 ? "red" : "blue"}>{formatTime(timeLeft)}</Tag>
             </div>
 
-            {/* Navigation Buttons */}
+            {/* Navigation */}
             <div style={{ marginBottom: 12 }}>
               {questions.map((q, index) => (
                 <Button
@@ -241,16 +256,8 @@ const CourseQuizAttempt = () => {
 
             {/* Actions */}
             <div style={{ marginTop: 24 }}>
-              <Button onClick={handleBack} disabled={currentIndex === 0}>
-                Back
-              </Button>{" "}
-              <Button
-                type="primary"
-                onClick={handleNext}
-                disabled={currentIndex === questions.length - 1}
-              >
-                Next
-              </Button>{" "}
+              <Button onClick={handleBack} disabled={currentIndex === 0}>Back</Button>{" "}
+              <Button onClick={handleNext} disabled={currentIndex === questions.length - 1} type="primary">Next</Button>{" "}
               <Button
                 type={markedForReview[currentQuestion?.questionId] ? "dashed" : "default"}
                 onClick={() => toggleMarkForReview(currentQuestion.questionId)}
@@ -258,9 +265,7 @@ const CourseQuizAttempt = () => {
                 {markedForReview[currentQuestion?.questionId] ? "Unmark Review" : "Mark for Review"}
               </Button>{" "}
               {currentIndex === questions.length - 1 && (
-                <Button danger onClick={handleSubmit}>
-                  Submit Quiz
-                </Button>
+                <Button danger onClick={handleSubmit}>Submit Quiz</Button>
               )}
             </div>
           </>

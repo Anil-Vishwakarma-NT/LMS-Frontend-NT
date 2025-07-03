@@ -27,6 +27,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:local": "env-cmd -f .env react-scripts start",
+    "build:dev": "env-cmd -f .env.development react-scripts build",
+    "build:prod": "env-cmd -f .env.production react-scripts build",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --transformIgnorePatterns 'node_modules/(?!axios)/'",
     "coverage": "react-scripts test --env=jsdom --transformIgnorePatterns 'node_modules/(?!axios)/' --watchAll=false --coverage --collectCoverageFrom='src/components/admin/categoriesAdmin/CategoriesAdmin.jsx' --collectCoverageFrom='src/components/shared/confirmDeletePopup/ConfirmDeletePopup.jsx' --collectCoverageFrom='src/components/shared/HOC/AdminHOC.jsx' --collectCoverageFrom='src/components/shared/modal/Modal.jsx' --collectCoverageFrom='src/components/shared/button/Button.jsx' --collectCoverageFrom='src/components/shared/pagination/Paginate.jsx' --collectCoverageFrom='src/components/shared/toast/Toast.jsx' --collectCoverageFrom='src/components/shared/tooltip/Tooltip.jsx' --collectCoverageFrom='src/service/CategoryService.js' --collectCoverageFrom='src/components/shared/loader/Loader.jsx' --collectCoverageFrom='src/redux/store.js' --collectCoverageFrom='src/redux/rootReducer.js' ",
@@ -50,5 +53,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
   }
 }

@@ -1,9 +1,10 @@
 import axios from "axios";
+import { app, appCourse} from "./serviceLMS"; 
 
 export async function fetchUserEnrolledCourses(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/enrollment/userCourses/${userId}`,
+    const response = await app.get(
+      `/api/enrollment/userCourses/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -21,8 +22,8 @@ export async function fetchUserEnrolledCourses(userId) {
 
 export async function fetchUserNameById(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/users/${userId}`,
+    const response = await app.get(
+      `/api/users/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -51,8 +52,8 @@ export async function fetchUserNameById(userId) {
 export async function fetchCourseDetails(courseId) {
   console.log("courseID", courseId)
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/course/${courseId}`
+    const response = await appCourse.get(
+      `/api/course/${courseId}`
     );
     console.log("response of fetchCourseDetails", response)
     return response.data.data;
@@ -63,8 +64,8 @@ export async function fetchCourseDetails(courseId) {
 
 export async function getCourseProgressWithMeta(userId, courseId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/user-progress/meta?userId=${userId}&courseId=${courseId}`
+    const response = await appCourse.get(
+      `/api/user-progress/meta?userId=${userId}&courseId=${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -172,8 +173,8 @@ export async function getUserEnrolledCourseDetails(userId) {
 
 export async function fetchContentProgress(userId, courseId, contentId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
+    const response = await appCourse.get(
+      `/api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
     );
     console.log(response.data);
     return response.data;
@@ -213,8 +214,8 @@ export async function updateContentProgress(
 
     console.log(progressPayload);
 
-    await axios.post(
-      `http://localhost:8080/api/user-progress/update`,
+    await appCourse.post(
+      `/api/user-progress/update`,
       progressPayload
     );
 

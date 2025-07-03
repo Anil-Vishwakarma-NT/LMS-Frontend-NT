@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Base URLs for different services
-const ENROLLMENT_BASE_URL = 'http://localhost:8081';
-const COURSE_BASE_URL = 'http://localhost:8080';
+const ENROLLMENT_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
+const COURSE_BASE_URL = process.env.REACT_APP_COURSE_API_BASE_URL || "http://localhost:8080";
 
 // Create axios instance for enrollment API
 const enrollmentApi = axios.create({

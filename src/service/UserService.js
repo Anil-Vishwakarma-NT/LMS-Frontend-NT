@@ -1,4 +1,4 @@
-import { app } from "./serviceLMS";
+import { app, appCourse } from "./serviceLMS";
 import axios from "axios";
 
 export async function fetchUsers() {
@@ -133,8 +133,8 @@ export async function logoutUser(token) {
 
 export async function previewUserReportPdf(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf`,
+    const response = await app.get(
+      `/api/report/user/${userId}/pdf`,
       {
         responseType: "blob", // Required to properly handle PDF binary
         headers: {
@@ -153,8 +153,8 @@ export async function previewUserReportPdf(userId) {
 
 export async function downloadUserReportPdf(userId) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf/download`,
+    const response = await app.get(
+      `/api/report/user/${userId}/pdf/download`,
       {
         responseType: "blob", // Important for file download
         headers: {
