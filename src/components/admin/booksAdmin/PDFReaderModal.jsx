@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button } from "antd";
+import { Modal, Button, Dropdown, Menu } from "antd";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "./PDFReaderModal.css";
@@ -10,7 +10,8 @@ const PDFReaderModal = ({
   onClose,
   blockTime,
   showDownload = false,
-  onDownload = () => {}
+  onDownloadPdf = () => {},
+  onDownloadExcel = () => {}
 }) => {
   const effectiveBlockTime = typeof blockTime === "number" ? blockTime : 10;
   const isBlockingEnabled = effectiveBlockTime > 0;
@@ -58,6 +59,17 @@ const PDFReaderModal = ({
 
   if (!isOpen) return null;
 
+  const downloadMenu = (
+    <Menu>
+      <Menu.Item key="pdf" onClick={onDownloadPdf}>
+        Download as PDF
+      </Menu.Item>
+      <Menu.Item key="excel" onClick={onDownloadExcel}>
+        Download as Excel
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Modal
       open={isOpen}
@@ -77,7 +89,6 @@ const PDFReaderModal = ({
       maskStyle={{ backgroundColor: "rgba(0,0,0,0.85)" }}
       destroyOnClose
     >
-      {/* Header */}
       <div
         style={{
           padding: "12px 16px",
@@ -94,14 +105,15 @@ const PDFReaderModal = ({
 
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           {showDownload && (
-            <Button
-              onClick={onDownload}
-              size="small"
-              type="default"
-              style={{ color: "#000000", borderColor: "#555" }}
-            >
-              Download
-            </Button>
+            <Dropdown overlay={downloadMenu} placement="bottomRight">
+              <Button
+                size="small"
+                type="default"
+                style={{ color: "#000000", borderColor: "#555" }}
+              >
+                Download
+              </Button>
+            </Dropdown>
           )}
           <Button
             onClick={toggleFullScreen}
@@ -124,17 +136,15 @@ const PDFReaderModal = ({
         </div>
       </div>
 
-      {/* PDF Content */}
       <div
         style={{
           flex: 1,
-          overflow: "auto",
+          overflow: "hidden",
           backgroundColor: "#1e1e1e",
-          padding: 12,
         }}
       >
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <Viewer fileUrl={pdfUrl} />
+          <Viewer fileUrl={pdfUrl} defaultScale={1.5} />
         </Worker>
       </div>
     </Modal>

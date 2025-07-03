@@ -40,7 +40,7 @@ const CoursesModal = ({
       ownerId: parseInt(values.ownerId, 10),
       description: values.description,
       courseLevel: values.courseLevel,
-      active: values.isActive === "true",
+      isActive: values.isActive === "true",
     };
 
     setLoading(true);

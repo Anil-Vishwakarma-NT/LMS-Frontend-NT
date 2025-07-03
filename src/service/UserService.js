@@ -15,7 +15,7 @@ export async function userStats(userId, token) {
     console.log("inside userStats");
     const response = await app.get(
       `/api/users/enrollments/${userId}/statistics`,
-      { 
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -131,32 +131,24 @@ export async function logoutUser(token) {
   window.localStorage.removeItem("authtoken");
 }
 
-export async function previewUserReportPdf(userId) {
-  try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf`,
-      {
-        responseType: "blob", // Required to properly handle PDF binary
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching course report PDF:", error);
-    throw new Error(
-      error?.response?.data?.message || "Failed to fetch course report PDF"
-    );
-  }
-}
+export const previewUserReportPdf = async (options) => {
+  return axios
+    .post(`http://localhost:8081/api/custom-user-report/preview-pdf`, options, {
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+      },
+    })
+    .then((res) => res.data);
+};
 
-export async function downloadUserReportPdf(userId) {
+export async function downloadUserReportPdf(options) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/user/${userId}/pdf/download`,
+    const response = await axios.post(
+      `http://localhost:8081/api/custom-user-report/download-pdf`,
+      options,
       {
-        responseType: "blob", // Important for file download
+        responseType: "blob",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
@@ -168,15 +160,48 @@ export async function downloadUserReportPdf(userId) {
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = `user-report-${userId}.pdf`;
+    link.download = `user-report-${options.userId}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error downloading course report PDF:", error);
+    console.error("Error downloading user report PDF:", error);
     throw new Error(
-      error?.response?.data?.message || "Failed to download course report PDF"
+      error?.response?.data?.message || "Failed to download user report PDF"
+    );
+  }
+}
+
+export async function downloadUserReportExcel(options) {
+  try {
+    const response = await axios.post(
+      `http://localhost:8081/api/custom-user-report/download-excel`,
+      options,
+      {
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        },
+      }
+    );
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `user-report-${options.userId}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading user report Excel:", error);
+    throw new Error(
+      error?.response?.data?.message || "Failed to download user report Excel"
     );
   }
 }

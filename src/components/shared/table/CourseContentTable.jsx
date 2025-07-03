@@ -22,7 +22,7 @@ const getResourceType = (resourceLink) => {
   return "unknown";
 };
 
-const CourseContentTable = ({ onEditClick, fields, entries, onDeleteClick }) => {
+const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCourseContent }) => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
   const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
@@ -149,7 +149,7 @@ const CourseContentTable = ({ onEditClick, fields, entries, onDeleteClick }) => 
           <Tooltip title="Delete">
             <Button
               icon={<DeleteOutlined />}
-              onClick={() => onDeleteClick(record.courseContentId)}
+              onClick={() => showConfirmDeleteCourseContent(record.courseContentId)}
               type="text"
               danger
             />
@@ -170,7 +170,7 @@ const CourseContentTable = ({ onEditClick, fields, entries, onDeleteClick }) => 
         isOpen={isPDFModalOpen}
         pdfUrl={currentPDFUrl}
         onClose={handleClosePDFModal}
-        blockTime={10}
+        blockTime={0}
       />
 
       <div style={{ padding:"16px", marginLeft: "35px", marginRight: "25px" }}>

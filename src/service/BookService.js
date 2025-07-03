@@ -113,30 +113,45 @@ export async function createCourseContent(newData) {
   }
 }
 
-export async function previewCourseReportPdf(courseId) {
-  try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/course/${courseId}/pdf`,
-      {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching course report PDF:", error);
-    throw new Error(
-      error?.response?.data?.message || "Failed to fetch course report PDF"
-    );
-  }
-}
+// export async function previewCourseReportPdf(courseId) {
+//   try {
+//     const response = await axios.get(
+//       `http://localhost:8081/api/custom-report/preview-pdf`,
+//       {
+//         responseType: "blob",
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+//         },
+//       }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching course report PDF:", error);
+//     throw new Error(
+//       error?.response?.data?.message || "Failed to fetch course report PDF"
+//     );
+//   }
+// }
 
-export async function downloadCourseReportPdf(courseId) {
+
+
+export const previewCourseReportPdf = async (options) => {
+  return axios
+    .post(`http://localhost:8081/api/custom-report/preview-pdf`, options, {
+      responseType: "blob",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+              },
+    })
+    .then((res) => res.data);
+};
+
+
+export async function downloadCourseReportPdf(options) {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/report/course/${courseId}/pdf/download`,
+    const response = await axios.post(
+      `http://localhost:8081/api/custom-report/download-pdf`,
+      options, // Send the full options (courseId + kpis etc.)
       {
         responseType: "blob",
         headers: {
@@ -150,7 +165,7 @@ export async function downloadCourseReportPdf(courseId) {
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = `course-report-${courseId}.pdf`;
+    link.download = `course-report-${options.courseId}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -159,6 +174,39 @@ export async function downloadCourseReportPdf(courseId) {
     console.error("Error downloading course report PDF:", error);
     throw new Error(
       error?.response?.data?.message || "Failed to download course report PDF"
+    );
+  }
+}
+
+export async function downloadCourseReportExcel(options) {
+  try {
+    const response = await axios.post(
+      `http://localhost:8081/api/custom-report/download-excel`,
+      options, // Send the full options (courseId + kpis etc.)
+      {
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        },
+      }
+    );
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `course-report-${options.courseId}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading course report Excel:", error);
+    throw new Error(
+      error?.response?.data?.message || "Failed to download course report Excel"
     );
   }
 }

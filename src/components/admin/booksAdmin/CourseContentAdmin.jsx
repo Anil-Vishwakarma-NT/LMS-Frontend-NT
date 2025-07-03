@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Button, Input, Typography, message } from "antd";
+import { Button, Input, Typography, message, Modal } from "antd";
 import CourseContentTable from "../../shared/table/CourseContentTable";
 import {
   fetchCourseContentByCourseId,
@@ -11,6 +11,7 @@ import {
 import CourseContentModal from "../booksAdmin/CourseContentModal";
 
 const { Title } = Typography;
+const { confirm } = Modal;
 
 const CourseContentAdmin = ({ setLoading }) => {
   const { courseId } = useParams();
@@ -114,6 +115,17 @@ const CourseContentAdmin = ({ setLoading }) => {
     }
   };
 
+  const showConfirmDeleteCourseContent = (contentId) => {
+    confirm({
+      title: "Are you sure you want to delete this content?",
+      content: "This action cannot be undone.",
+      okText: "Yes, delete it",
+      okType: "danger",
+      cancelText: "No",
+      onOk: () => handleDeleteCourseContent(contentId),
+    });
+  };
+
   const handleEditCourseContent = (content) => {
     setSelectedContent(content);
     setIsModalOpen(true);
@@ -180,7 +192,7 @@ const CourseContentAdmin = ({ setLoading }) => {
         <CourseContentTable
           fields={contentFields}
           entries={filteredContent}
-          onDeleteClick={handleDeleteCourseContent}
+          showConfirmDeleteCourseContent={showConfirmDeleteCourseContent}
           onEditClick={handleEditCourseContent}
         />
       )}
