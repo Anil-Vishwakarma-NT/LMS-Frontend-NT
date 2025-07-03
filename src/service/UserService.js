@@ -15,7 +15,7 @@ export async function userStats(userId, token) {
     console.log("inside userStats");
     const response = await app.get(
       `/api/users/enrollments/${userId}/statistics`,
-      { 
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -23,6 +23,22 @@ export async function userStats(userId, token) {
     );
     console.log("userStats response", response.data.data);
 
+    return response.data;
+  } catch (error) {
+    console.log("userStat error");
+    throw new Error(error?.response?.data?.message);
+  }
+}
+
+
+export async function userdeadlines() {
+  try {
+
+    const response = await app.get(
+      '/api/users/getDeadlines'
+    );
+    console.log("user deadlines response", response.data.data);
+    
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -39,16 +55,17 @@ export async function deleteUsers(id) {
   }
 }
 
-export async function fetchAllActiveUsers(token) {
+
+export async function fetchAllActiveUsers() {
   try {
-    console.log("token");
-    console.log(token);
-    const response = await app.get("/admin/active-employees", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    // console.log("token");
+    // console.log(token);
+    const response = await app.get('/admin/active-employees', {
+      // headers: {
+      //     Authorization: `Bearer ${token}`,
+      // }
     });
-    return response.data;
+    return response.data
   } catch (error) {
     throw new Error(error?.response?.data?.message);
   }

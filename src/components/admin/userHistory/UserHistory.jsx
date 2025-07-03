@@ -54,20 +54,19 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await Promise.all([
-          getUserEnrolledCourseDetails(id),
-        ]);
+        const courses = await getUserEnrolledCourseDetails(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
+        console.log(Array.isArray(courses))
         setCompleted(courses.filter(course => course.status === "Completed").length);
         console.log("COMPLETED", completed);
         setInprogress(courses.filter(course => course.status === "In Progress").length);
         console.log("Inprogress", inprogress);
         setDefaulters(courses.filter(course => course.status === "Defaulter").length);
-        console.log("defaulter", defaulters);
+        console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
         setNotStarted(courses.filter(course => course.status === "Not Started").length);
-        console.log(defaulters)
+        console.log("NotStarted", notStarted)
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
@@ -101,7 +100,7 @@ const UserHistory = ({ setLoading }) => {
     },
     {
       title: 'Level',
-      dataIndex: 'level',
+      dataIndex: 'courseLevel',
       key: 'level',
       render: (level) => {
         const levelColor = {
@@ -115,10 +114,12 @@ const UserHistory = ({ setLoading }) => {
     {
       title: 'Description',
       dataIndex: 'description',
+      key: 'description'
     },
     {
       title: 'Assigned By',
       dataIndex: 'assignedById',
+      key: 'assignedById',
     },
     {
       title: 'Enrollment Date',
@@ -137,10 +138,11 @@ const UserHistory = ({ setLoading }) => {
         <Progress
           percent={progress}
           size="small"
+          type="circle"
           strokeColor={
             progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
           }
-        />
+          wrap />
       ),
     },
     {
@@ -204,11 +206,13 @@ const UserHistory = ({ setLoading }) => {
     {
       id: 5,
       title: 'Not Started',
-      number: inprogress,
+      number: notStarted,
       color: '#fa8c16',
       icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
   ];
+
+
 
   return (
     <div className="user-history-section">
@@ -217,13 +221,7 @@ const UserHistory = ({ setLoading }) => {
       </Title>
       <div className="user-history-stats">
         {dashData.map((data) => (
-          <Card
-            key={data.id}
-            style={{
-              width: 220,
-              height: 130,
-              border: '1px solid #e0e0e0',
-            }}>
+          <Card key={data.id} className="user-history-card">
             <Statistic
               title={<Text strong>{data.title}</Text>}
               value={data.number}
@@ -233,6 +231,7 @@ const UserHistory = ({ setLoading }) => {
           </Card>
         ))}
       </div>
+
 
       <div className="user-history-table">
         {filteredCourses.length > 0 ? (
@@ -246,9 +245,9 @@ const UserHistory = ({ setLoading }) => {
               onChange: (page) => setPageNumber(page - 1),
               showSizeChanger: false,
             }}
-            scroll={{ x: '100%' }}
+            scroll={{ x: '100%', y: '100%' }}
             locale={{ emptyText: 'No courses found for this user.' }}
-            rowKey={(record) => record.id}
+            rowKey={(record) => record.courseId}
           />
         ) : (
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

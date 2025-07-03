@@ -39,11 +39,12 @@ const UsersAdmin = ({ setLoading }) => {
 
 
   async function getUserLists() {
-    const activeUsers = await fetchAllActiveUsers(auth.accessToken);
+    const activeUsers = await fetchAllActiveUsers();
     const inactiveUsers = await fetchAllInactiveUsers(auth.accessToken);
     setUserList(activeUsers.data);
     setInactiveUserList(inactiveUsers.data);
   }
+
   useEffect(() => {
     getUserLists();
   }, []);
@@ -121,7 +122,7 @@ const UsersAdmin = ({ setLoading }) => {
       dataIndex: "srNo",
       title: "Sr. No.",
       key: "srNo",
-      width: 50
+      width: 70
     },
     {
       dataIndex: "employeeId",

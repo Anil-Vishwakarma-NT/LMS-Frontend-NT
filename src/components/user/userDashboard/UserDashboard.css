@@ -1,0 +1,16 @@
+/* UserDashboard.css (or a global stylesheet) */
+.user-dashboard-section {
+    /* take the whole viewport */
+    /* min-height: 100vh; */
+
+    /* keep content nicely centred and readable */
+    padding: 24px 6vw;
+    /* responsive side‑gutters */
+    background: #f4f6f8;
+    /* subtle grey like in the screenshot */
+
+    /* stack header + rows vertically and push them apart */
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+}
