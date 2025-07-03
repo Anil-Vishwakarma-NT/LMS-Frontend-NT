@@ -102,7 +102,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
   const validateForm = () => {
     let formErrors = {};
     if (!password) formErrors.password = "Password is required!"
-    if (!checkboxChecked) formErrors.checkbox = "You must agree!";
+    // if (!checkboxChecked) formErrors.checkbox = "You must agree!";
     if (!userName) {
       formErrors.userName = "Username is required!";
     } else if (!validateEmailOrMobile(userName)) {
@@ -145,7 +145,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
   };
 
   return (
-    <div className="login-page" style={{ backgroundColor: '#81b7ee' }}>
+    <div className="login-page" style={{ backgroundColor: '#ccdcfa' }}>
       <div className="login-container">
 
         <div className="login-img">
@@ -197,7 +197,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
             required
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
-          <div className='checkbox'>
+          {/* <div className='checkbox'>
             <input
               type="checkbox"
               required={true}
@@ -208,8 +208,8 @@ u/bvWV47VOzzM+ObAgMBAAE=
               }}
             />
             <div className='checkbox-text'>Agree to all Terms and Conditions?</div>
-          </div>
-          {errors.checkbox && <div className="error-text">{errors.checkbox}</div>}
+          </div> */}
+          {/* {errors.checkbox && <div className="error-text">{errors.checkbox}</div>} */}
 
           <Button text="Login" type="submit" onClick={handleLoginClick} />
         </div>
