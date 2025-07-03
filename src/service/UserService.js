@@ -1,5 +1,4 @@
-import { app, appCourse } from "./serviceLMS";
-import axios from "axios";
+import { app } from "./serviceLMS";
 
 export async function fetchUsers() {
   try {

@@ -1,9 +1,9 @@
 import { app, appCourse } from "../../../service/serviceLMS";
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import {
   Typography, Spin, Alert, Card, Tag,
-  Button, Input, Radio, Checkbox, Space, message
+  Button, Input, Radio, Checkbox, Space, message, Modal 
 } from "antd";
 import axios from "axios";
 import {
@@ -30,6 +30,8 @@ const CourseQuizAttempt = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState("");
   const [quizAttemptId, setQuizAttemptId] = useState(null);
+  const [currentAttemptNumber, setAttempt] = useState(null);
+  const navigate = useNavigate();
 
   // Load quiz metadata
   useEffect(() => {
@@ -79,7 +81,6 @@ const CourseQuizAttempt = () => {
       if (!quiz || !quiz.quizId) return;
 
       const payload = {
-        attempt: 1,
         quizId: quiz.quizId,
         userId: userId,
       };
@@ -87,10 +88,19 @@ const CourseQuizAttempt = () => {
       const attemptRes = await appCourse.post("/api/quiz-attempt", payload);
       console.log("attemptRes", attemptRes)
       const attemptId = attemptRes.data?.quizAttemptId;
+      const currentAttempt = attemptRes.data?.attempt;
       console.log("attemptId", attemptId)
-
       setQuizAttemptId(attemptId);
-      message.success("Quiz attempt started!");
+      setAttempt(currentAttempt)
+      const attemptData = attemptRes.data;
+      const attemptsLeft = attemptData?.attemptsLeft ?? 0;
+      if (attemptsLeft === 0) {
+        Modal.warning({
+          title: "No Attempts Left",
+          content: "You have exhausted all your quiz attempts.",
+        });
+        return;
+      }
 
       // Load questions
       const questionsRes = await appCourse.get(`/api/quiz-questions/quiz/${quiz.quizId}`);
@@ -127,14 +137,81 @@ const CourseQuizAttempt = () => {
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted answers:", userAnswers);
-    console.log("Marked for review:", markedForReview);
-    console.log("Quiz Attempt ID:", quizAttemptId); // ✅ Stored attempt ID
-
-    message.success("Quiz submitted!");
-    setStart(false);
+  const confirmSubmit = () => {
+    Modal.confirm({
+      title: "Submit Quiz?",
+      content: "Are you sure you want to submit your quiz? You won't be able to change your answers after this.",
+      okText: "Yes, Submit",
+      cancelText: "No, Review Again",
+      onOk: () => handleSubmit(),
+      centered: true,
+    });
   };
+
+  const handleSubmit = async () => {
+    
+  if (!quizAttemptId || !quiz?.quizId) {
+    message.error("Missing quiz attempt information.");
+    return;
+  }
+  
+
+  try {
+    const now = new Date().toISOString().split(".")[0]; 
+
+    const userResponses = questions.map((question) => ({
+      userId,
+      quizId: quiz.quizId,
+      questionId: question.questionId,
+      attempt: currentAttemptNumber, 
+      userAnswer: JSON.stringify(userAnswers[question.questionId] || []),
+      answeredAt: now,
+    }));
+
+    const submissionPayload = {
+      userResponses,
+      notes: "SUBMITTED",
+      timeSpent: quiz.timeLimit * 60 - timeLeft, // total time spent in seconds
+    };
+
+    const submitUrl = `/api/quiz-submissions/${quizAttemptId}`;
+    const res = await appCourse.post(submitUrl, submissionPayload);
+
+    message.success("Quiz submitted successfully!");
+
+    const result = res.data?.data;
+    const scoreDetails = result?.scoreDetails
+      ? JSON.parse(result.scoreDetails)
+      : {
+          correctAnswers: result.correctAnswers,
+          percentageScore: result.percentageScore,
+          totalScore: result.totalScore,
+        };
+    navigate(`/course-content-user/${courseId}`, {
+      state: {
+        quizResult: {
+          correctAnswers: scoreDetails.correctAnswers,
+          percentageScore: scoreDetails.percentageScore,
+          totalScore: scoreDetails.totalScore,
+          passingScore: quiz.passingScore
+        },
+      },
+    });
+
+    setStart(false);
+    setUserAnswers({});
+    setMarkedForReview({});
+    setCurrentIndex(0);
+    setQuizAttemptId(null);
+    setAttempt(null);
+    setQuestions([]);
+    setTimeLeft(0);
+  } catch (error) {
+    console.error("Quiz submission error:", error);
+    message.error("Failed to submit quiz.");
+  }
+};
+
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -265,7 +342,7 @@ const CourseQuizAttempt = () => {
                 {markedForReview[currentQuestion?.questionId] ? "Unmark Review" : "Mark for Review"}
               </Button>{" "}
               {currentIndex === questions.length - 1 && (
-                <Button danger onClick={handleSubmit}>Submit Quiz</Button>
+                <Button danger onClick={confirmSubmit}>Submit Quiz</Button>
               )}
             </div>
           </>

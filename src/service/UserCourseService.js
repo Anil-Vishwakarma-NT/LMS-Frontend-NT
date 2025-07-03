@@ -1,4 +1,3 @@
-import axios from "axios";
 import { app, appCourse} from "./serviceLMS"; 
 
 export async function fetchUserEnrolledCourses(userId) {
