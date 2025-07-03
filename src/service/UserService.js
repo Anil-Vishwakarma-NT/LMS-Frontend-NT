@@ -37,20 +37,20 @@ export async function userdeadlines() {
 }
 
 
-export async function userdeadlines() {
-  try {
+// export async function userdeadlines() {
+//   try {
 
-    const response = await app.get(
-      '/api/users/getDeadlines'
-    );
-    console.log("user deadlines response", response.data.data);
+//     const response = await app.get(
+//       '/api/users/getDeadlines'
+//     );
+//     console.log("user deadlines response", response.data.data);
     
-    return response.data;
-  } catch (error) {
-    console.log("userStat error");
-    throw new Error(error?.response?.data?.message);
-  }
-}
+//     return response.data;
+//   } catch (error) {
+//     console.log("userStat error");
+//     throw new Error(error?.response?.data?.message);
+//   }
+// }
 
 export async function deleteUsers(id) {
   try {
