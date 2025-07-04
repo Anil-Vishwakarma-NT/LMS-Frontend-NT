@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation  } from "react-router-dom";
 import UserHOC from "../../shared/HOC/UserHOC"; 
 import "../../admin/booksAdmin/BooksAdmin.css";
-import { Button, Input, Typography } from "antd";
+import { Button, Input, Typography, Modal  } from "antd";
 import UserCourseContentTable from "../../shared/table/UserCourseContentTable";
 import { fetchCourseContentByCourseId, fetchCourseById, } from "../../../service/BookService";
 import { fetchContentProgress } from "../../../service/UserCourseService";
@@ -18,7 +18,9 @@ const CourseContent = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
-  const [contentIds, setContentIds] = useState([]); 
+  const [contentIds, setContentIds] = useState([]);
+  const location = useLocation();
+  const quizResult = location.state?.quizResult;
 
 
   const auth = useSelector((state) => state.auth);
@@ -83,6 +85,45 @@ const CourseContent = () => {
     setFilteredContent(filtered);
   }, [searchTerm, courseContent]);
 
+  useEffect(() => {
+  if (quizResult) {
+    console.log("ooooooooooooooooooo", quizResult?.passingScore)
+    const passingScore = quizResult?.passingScore ?? 50;
+    const isPassed = quizResult.percentageScore >= passingScore;
+
+    Modal.success({
+      title: isPassed ? "🎉 You Passed!" : "😓 Better Luck Next Time!",
+      content: (
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+            <strong>✅ Correct Answers:</strong> <span style={{ color: "#52c41a" }}>{quizResult.correctAnswers}</span>
+          </p>
+          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+            <strong>📊 Percentage Score:</strong> <span style={{ color: "#1890ff" }}>{quizResult.percentageScore}%</span>
+          </p>
+          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+            <strong>🏆 Total Score:</strong> <span style={{ color: "#faad14" }}>{quizResult.totalScore}</span>
+          </p>
+
+          <div style={{ marginTop: 20 }}>
+            <progress
+              value={quizResult.percentageScore}
+              max="100"
+              style={{ width: "80%", height: "16px", borderRadius: "8px" }}
+            />
+          </div>
+        </div>
+      ),
+      okText: "Back to Course",
+      centered: true,
+      onOk: () => {
+        navigate(location.pathname, { replace: true }); // clear state after OK
+      },
+    });
+  }
+}, [quizResult, location.pathname, navigate]);
+
+
   const contentFields = [
     { index: 1, title: "Title" },
     { index: 2, title: "Description" },
@@ -110,7 +151,7 @@ const CourseContent = () => {
             Back to Courses
           </Button>
           <Button
-            onClick={() => navigate(`/quiz/${courseId}`)}
+            onClick={() => navigate(`/quiz/${courseId}?userId=${userId}`)}
             className="common-btn"
           >
             Attempt Quiz
