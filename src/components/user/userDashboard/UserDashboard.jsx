@@ -47,25 +47,17 @@ const UserDashboard = ({ setLoading }) => {
   const [completionFailed, setCompletionFailed] = useState(0);
 
 
-
-
-  const fetchUserId = async () => {
-    try {
-      const response = await fetch(`http://localhost:8081/api/users/getUserDetails`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
-          "Content-Type": "application/json"
-        }
-      });
-      const userData = await response.json();
-      console.log("Parsed JSON response:", userData);
-      return userData;
-    } catch (error) {
-      console.error("Error fetching user ID:", error);
-      return null;
-    }
-  };
+  function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
 
 
   const loadData = async () => {
@@ -73,7 +65,7 @@ const UserDashboard = ({ setLoading }) => {
     console.log("userHistory ", userName);
     setLoading(true);
     try {
-      const statsData = await userStats(id, auth.accessToken)
+      const statsData = await userStats(id)
       console.log("userHIstory", statsData.data);
       setDashStatsData(statsData.data);
       const courses = await getUserEnrolledCourseDetails(id);
@@ -97,7 +89,7 @@ const UserDashboard = ({ setLoading }) => {
     }
   };
 
-  // 1️⃣ fetch the user, wait for it, THEN save to state
+
   useEffect(() => {
     const handleResize = () => {
       setPageSize(window.innerHeight >= 1024 ? 11 : 10);
@@ -105,9 +97,16 @@ const UserDashboard = ({ setLoading }) => {
 
     const getUser = async () => {
       try {
-        const userData = await fetchUserId();   // await the request
-        setId(userData.userId);
-        setUserName(`${userData.firstName} ${userData.lastName}`);
+        const {
+          roles,
+          email,
+          userId,
+          fullName
+        } = parseJwt(auth.accessToken);
+
+        setId(userId);
+        setUserName(fullName);
+        // alert("FETCHING USER DATA")
       } catch (err) {
         console.error(err);
       }
@@ -118,55 +117,12 @@ const UserDashboard = ({ setLoading }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 2️⃣ now re‑run when `id` (or token) changes
+
   useEffect(() => {
-    if (!id) return;               // guard: wait until we actually have an id
-
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const stats = await userStats(id, auth.token); // or auth.accessToken
-        setDashStatsData(stats.data);
-
-        const courses = await getUserEnrolledCourseDetails(id);
-        setCourseList(courses);
-        setFilteredCourses(courses);
-
-        setCompleted(courses.filter(c => c.status === 'Completed').length);
-        setInprogress(courses.filter(c => c.status === 'In Progress').length);
-        setDefaulters(courses.filter(c => c.status === 'Defaulter').length);
-        setNotStarted(courses.filter(c => c.status === 'Not Started').length);
-        setCompletionFailed(
-          courses.filter(c => c.status === 'Completion Failed').length
-        );
-      } catch (err) {
-        console.error('Error loading user data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (!id) return;
     loadData();
-  }, [id]);   //  ← add every value that should retrigger the effect
-
-
-
-  useEffect(() => {
-    const loadUserHistory = async () => {
-      setLoading(true);
-      try {
-        loadData();
-        const data = await userHistory(id);
-        setUserHistoryData(data?.content || []);
-        setTotalPages(data?.totalPages || 0);
-      } catch (error) {
-        console.error('Error loading user history:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadUserHistory();
-  }, [setLoading]);
+  }, [id]);
+ 
 
   const columns = [
     {
