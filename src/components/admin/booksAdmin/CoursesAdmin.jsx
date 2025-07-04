@@ -8,7 +8,7 @@ import {
   deleteCourse,
   updateCourse,
 } from "../../../service/BookService";
-import handleCreateCourse from "../booksAdmin/BooksModal";
+import handleCreateCourse from "./BooksModal";
 
 const { Title } = Typography;
 

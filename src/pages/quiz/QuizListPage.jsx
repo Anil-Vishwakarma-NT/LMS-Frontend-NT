@@ -1,4 +1,4 @@
-import { app, appCourse } from "../../service/serviceLMS";
+import { app} from "../../service/serviceLMS";
 
 
 import React, { useEffect, useState } from "react";
@@ -30,8 +30,6 @@ import {
   DeleteOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import axios from "axios";
-import { app } from "../../service/serviceLMS";
 import QuizQuestionModal from "./QuizQuestionModal";
 import ViewQuestionModal from "./ViewQuestionModal";
 import EditQuestionModal from "./QuizQuestionEditPage";

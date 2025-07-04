@@ -1,4 +1,4 @@
-import { app, appCourse } from "../../service/serviceLMS";
+import { app} from "../../service/serviceLMS";
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -11,8 +11,7 @@ import {
   Modal,
   message,
 } from "antd";
-import axios from "axios";
-import { app } from "../../service/serviceLMS";
+ 
 
 const { Option } = Select;
 

@@ -1,4 +1,4 @@
-import { app, appCourse } from "../../service/serviceLMS";
+import {app} from "../../service/serviceLMS";
 import React, { useState } from "react";
 import {
   Modal,
@@ -12,9 +12,7 @@ import {
   message,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import axios from "axios";
-import {app} from "../../service/serviceLMS";
-
+ 
 const { Option } = Select;
 
 const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
