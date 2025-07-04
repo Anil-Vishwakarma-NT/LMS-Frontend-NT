@@ -8,6 +8,7 @@ import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined } fr
 import GroupModal from "./GroupModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 const { Content } = Layout;
@@ -16,7 +17,7 @@ const AllGroup = ({ setLoading }) => {
 
 
     const navigate = useNavigate();
-
+    const auth = useSelector((state) => state.auth);
     const [groupList, setGroupList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);

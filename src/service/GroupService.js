@@ -127,3 +127,17 @@ export const getUserCoursesInGroup = async (group) => {
         throw new Error(error?.response?.data?.message);
     }
 }
+
+export const getUserGroups = async () => {
+
+    try {
+        const response = await app.post('/group/user-groups')
+        console.log("GROUP DETAILS", response.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Error fetching groups");
+        throw new Error(error?.response?.data?.message);
+    }
+
+};
