@@ -1,9 +1,22 @@
 import axios from "axios";
 import { app } from "./serviceLMS";
-export async function fetchUserEnrolledCourses(userId) {
+export async function fetchUserEnrolledCourses() {
+  try {
+    const response = await app.get(
+      `user/api/service-api/users/userCourses`);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch enrolled courses."
+    );
+  }
+}
+
+export async function fetchUserEnrolledCoursesById(userId) {
   try {
     const response = await app.get(
       `user/api/service-api/enrollment/userCourses/${userId}`);
+      console.log("Response of fetchUserEnrolledCoursesById", response.data.data)
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -60,9 +73,17 @@ export async function getCourseProgressWithMeta(userId, courseId) {
   }
 }
 
+
 export async function getUserEnrolledCourseDetails(userId) {
   try {
-    const enrollments = await fetchUserEnrolledCourses(userId);
+    let enrollments= [];
+    if(userId === null || userId === undefined) {
+     enrollments= await fetchUserEnrolledCourses();
+    }
+    else{
+     enrollments = await fetchUserEnrolledCoursesById(userId);
+     console.log("Enrollments fetched by ID", enrollments);
+    }
     console.log("Enrolled courses fetched ", enrollments);
     let Allcourses = enrollments.length;
     const courseDetailsPromises = enrollments.map(async (enrollment) => {
@@ -153,6 +174,7 @@ export async function getUserEnrolledCourseDetails(userId) {
 
       };
     });
+
 
     return await Promise.all(courseDetailsPromises);
   } catch (error) {

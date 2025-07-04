@@ -37,7 +37,7 @@ const CourseQuizAttempt = () => {
   useEffect(() => {
     const loadQuiz = async () => {
       try {
-        const quizRes = await appCourse.get(`/api/quizzes/course/${courseId}`);
+        const quizRes = await app.get(`course/api/service-api/quizzes/course/${courseId}`);
         const quizData = quizRes.data?.data?.[0];
 
         if (!quizData?.quizId) {
@@ -45,7 +45,7 @@ const CourseQuizAttempt = () => {
           return;
         }
 
-        const fullQuizRes = await appCourse.get(`/api/quizzes/${quizData.quizId}`);
+        const fullQuizRes = await app.get(`course/api/service-api/quizzes/${quizData.quizId}`);
         setQuiz(fullQuizRes.data?.data || null);
       } catch (err) {
         console.error(err);
@@ -85,7 +85,7 @@ const CourseQuizAttempt = () => {
         userId: userId,
       };
 
-      const attemptRes = await appCourse.post("/api/quiz-attempt", payload);
+      const attemptRes = await app.post("course/api/service-api/quiz-attempt", payload);
       console.log("attemptRes", attemptRes)
       const attemptId = attemptRes.data?.quizAttemptId;
       const currentAttempt = attemptRes.data?.attempt;
@@ -103,7 +103,7 @@ const CourseQuizAttempt = () => {
       }
 
       // Load questions
-      const questionsRes = await appCourse.get(`/api/quiz-questions/quiz/${quiz.quizId}`);
+      const questionsRes = await app.get(`course/api/service-api/quiz-questions/quiz/${quiz.quizId}`);
       setQuestions(questionsRes.data?.data || []);
 
       // Start quiz
@@ -174,8 +174,8 @@ const CourseQuizAttempt = () => {
       timeSpent: quiz.timeLimit * 60 - timeLeft, // total time spent in seconds
     };
 
-    const submitUrl = `/api/quiz-submissions/${quizAttemptId}`;
-    const res = await appCourse.post(submitUrl, submissionPayload);
+    const submitUrl = `course/api/service-api/quiz-submissions/${quizAttemptId}`;
+    const res = await app.post(submitUrl, submissionPayload);
 
     message.success("Quiz submitted successfully!");
 

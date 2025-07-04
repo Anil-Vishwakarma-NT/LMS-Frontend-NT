@@ -9,10 +9,9 @@ export async function fetchUsers() {
 }
 
 export async function userStats(userId) {
-  try {
+  try {  
     const response = await app.get(
       `user/api/service-api/enrollments/${userId}/statistics`);
-
     return response.data;
   } catch (error) {
     console.log("userStat error");

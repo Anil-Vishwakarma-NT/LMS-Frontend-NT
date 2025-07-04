@@ -47,25 +47,37 @@ const UserDashboard = ({ setLoading }) => {
   const [completionFailed, setCompletionFailed] = useState(0);
 
 
+  function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
 
 
-  const fetchUserId = async () => {
-    try {
-      const response = await fetch(`user/api/service-api/users/getUserDetails`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
-          "Content-Type": "application/json"
-        }
-      });
-      const userData = await response.json();
-      console.log("Parsed JSON response:", userData);
-      return userData;
-    } catch (error) {
-      console.error("Error fetching user ID:", error);
-      return null;
-    }
-  };
+
+  // const fetchUserId = async () => {
+  //   try {
+  //     const response = await fetch(`user/api/service-api/users/getUserDetails`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,
+  //         "Content-Type": "application/json"
+  //       }
+  //     });
+  //     const userData = await response.json();
+  //     console.log("Parsed JSON response:", userData);
+  //     return userData;
+  //   } catch (error) {
+  //     console.error("Error fetching user ID:", error);
+  //     return null;
+  //   }
+  // };
 
 
   const loadData = async () => {
@@ -73,6 +85,7 @@ const UserDashboard = ({ setLoading }) => {
     console.log("userHistory ", userName);
     setLoading(true);
     try {
+      
       const statsData = await userStats(id, auth.accessToken)
       console.log("userHIstory", statsData.data);
       setDashStatsData(statsData.data);
@@ -97,7 +110,7 @@ const UserDashboard = ({ setLoading }) => {
     }
   };
 
-  // 1️⃣ fetch the user, wait for it, THEN save to state
+
   useEffect(() => {
     const handleResize = () => {
       setPageSize(window.innerHeight >= 1024 ? 11 : 10);
@@ -105,9 +118,14 @@ const UserDashboard = ({ setLoading }) => {
 
     const getUser = async () => {
       try {
-        const userData = await fetchUserId();   // await the request
-        setId(userData.userId);
-        setUserName(`${userData.firstName} ${userData.lastName}`);
+        const {
+        roles,
+        email,
+        userId,
+        fullName
+      } = parseJwt(auth.accessToken);
+        setId(userId);
+        setUserName(fullName||"N/A");
       } catch (err) {
         console.error(err);
       }
@@ -118,55 +136,56 @@ const UserDashboard = ({ setLoading }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 2️⃣ now re‑run when `id` (or token) changes
+  
   useEffect(() => {
-    if (!id) return;               // guard: wait until we actually have an id
+    if (!id) return;              // guard: wait until we actually have an id
+    // const loadData = async () => {
+    //   setLoading(true);
+    //   try {
+    //     alert("User ID: " + id);
+    //     const stats = await userStats(id);
+        
+    //     setDashStatsData(stats.data);
+        
+    //     const courses = await getUserEnrolledCourseDetails(id);
+    //     setCourseList(courses);
+    //     setFilteredCourses(courses);
 
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const stats = await userStats(id, auth.token); // or auth.accessToken
-        setDashStatsData(stats.data);
-
-        const courses = await getUserEnrolledCourseDetails(id);
-        setCourseList(courses);
-        setFilteredCourses(courses);
-
-        setCompleted(courses.filter(c => c.status === 'Completed').length);
-        setInprogress(courses.filter(c => c.status === 'In Progress').length);
-        setDefaulters(courses.filter(c => c.status === 'Defaulter').length);
-        setNotStarted(courses.filter(c => c.status === 'Not Started').length);
-        setCompletionFailed(
-          courses.filter(c => c.status === 'Completion Failed').length
-        );
-      } catch (err) {
-        console.error('Error loading user data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     setCompleted(courses.filter(c => c.status === 'Completed').length);
+    //     setInprogress(courses.filter(c => c.status === 'In Progress').length);
+    //     setDefaulters(courses.filter(c => c.status === 'Defaulter').length);
+    //     setNotStarted(courses.filter(c => c.status === 'Not Started').length);
+    //     setCompletionFailed(
+    //       courses.filter(c => c.status === 'Completion Failed').length
+    //     );
+    //   } catch (err) {
+    //     console.error('Error loading user data:', err);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
     loadData();
   }, [id]);   //  ← add every value that should retrigger the effect
 
 
 
-  useEffect(() => {
-    const loadUserHistory = async () => {
-      setLoading(true);
-      try {
-        loadData();
-        const data = await userHistory(id);
-        setUserHistoryData(data?.content || []);
-        setTotalPages(data?.totalPages || 0);
-      } catch (error) {
-        console.error('Error loading user history:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadUserHistory();
-  }, [setLoading]);
+  // useEffect(() => {
+  //   const loadUserHistory = async () => {
+  //     setLoading(true);
+  //     try {
+  //       loadData();
+  //       const data = await userHistory(id);
+  //       setUserHistoryData(data?.content || []);
+  //       setTotalPages(data?.totalPages || 0);
+  //     } catch (error) {
+  //       console.error('Error loading user history:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadUserHistory();
+  // }, [setLoading]);
 
   const columns = [
     {
@@ -260,7 +279,7 @@ const UserDashboard = ({ setLoading }) => {
     }, {
       id: 3,
       title: 'Total Bundles',
-      number: 4,
+      number: dashStatsData.bundles || 0,
       color: '#F7DC6F',
       icon: <BookOutlined style={{ color: '#F7DC6F' }} />,
     },
@@ -271,22 +290,22 @@ const UserDashboard = ({ setLoading }) => {
     {
       id: 3,
       title: 'Total Completed Courses',
-      number: 5,
+      number: completed,
     },
     {
       id: 4,
       title: 'Incomplete Courses',
-      number: 3,
+      number: inprogress,
     },
     {
       id: 5,
       title: 'Defaulters',
-      number: 2,
+      number: defaulters,
     },
     {
       id: 5,
       title: 'Not Started',
-      number: 1,
+      number: notStarted,
     },
     {
       id: 6,
