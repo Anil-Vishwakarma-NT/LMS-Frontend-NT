@@ -3,14 +3,7 @@ import { app } from "./serviceLMS";
 export async function fetchUserEnrolledCourses(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/enrollment/userCourses/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      `user/api/service-api/enrollment/userCourses/${userId}`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -22,14 +15,7 @@ export async function fetchUserEnrolledCourses(userId) {
 export async function fetchUserNameById(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/users/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      `user/api/service-api/users/${userId}`);
 
     const data = response.data;
 
