@@ -128,7 +128,7 @@ export async function userLogin(data) {
 // }
 
 export async function logoutUser() {
-  const response = await app.post("/api/auth/logout");
+  const response = await app.post("/api/client-api/auth/logout");
   window.localStorage.removeItem("authtoken");
 }
 
