@@ -113,39 +113,16 @@ export async function createCourseContent(newData) {
   }
 }
 
-// export async function previewCourseReportPdf(courseId) {
-//   try {
-//     const response = await axios.get(
-//       `http://localhost:8081/api/custom-report/preview-pdf`,
-//       {
-//         responseType: "blob",
-//         headers: {
-//           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-//         },
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching course report PDF:", error);
-//     throw new Error(
-//       error?.response?.data?.message || "Failed to fetch course report PDF"
-//     );
-//   }
-// }
-
-
-
 export const previewCourseReportPdf = async (options) => {
   return axios
     .post(`http://localhost:8081/api/custom-report/preview-pdf`, options, {
       responseType: "blob",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-              },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+      },
     })
     .then((res) => res.data);
 };
-
 
 export async function downloadCourseReportPdf(options) {
   try {
