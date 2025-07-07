@@ -5,8 +5,7 @@ import {
   fetchAllActiveUsers,
   deleteUsers,
   fetchAllInactiveUsers,
-  previewUserReportPdf,
-  downloadUserReportPdf
+  previewUserReportPdf, downloadUserReportPdf, downloadUserReportExcel
 } from "../../../service/UserService";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +15,8 @@ import UsersModal from "./UsersModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import "./UsersAdmin.css"; // Importing CSS
 import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
+import UserReportOptionsModal from "../../admin/booksAdmin/UserReportOptionsModal";
+
 
 const UsersAdmin = ({ setLoading }) => {
 
@@ -33,7 +34,9 @@ const UsersAdmin = ({ setLoading }) => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportBlobUrl, setReportBlobUrl] = useState("");
-  const [reportingCourseId, setReportingCourseId] = useState(null);
+  const [reportingUserId, setReportingUserId] = useState(null);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [reportOptions, setReportOptions] = useState(null);
 
   const auth = useSelector((state) => state.auth);
 
@@ -49,23 +52,36 @@ const UsersAdmin = ({ setLoading }) => {
     getUserLists();
   }, []);
 
-  const handlePreviewReport = async (courseId) => {
+  const handleReportOptionsSubmit = async (options) => {
     try {
-      const blob = await previewUserReportPdf(courseId);
+      setShowOptionsModal(false);
+      setReportOptions(options);  
+  
+      const blob = await previewUserReportPdf(options);
       const blobUrl = URL.createObjectURL(blob);
       setReportBlobUrl(blobUrl);
       setIsReportModalOpen(true);
-    } catch (error) {
-      console.error("Failed to load report PDF:", error.message);
+    } catch (err) {
+      message.error("Failed to generate report");
     }
   };
 
-  const handleDownload = (courseId) => {
-    if (!courseId) {
-      message.warning("No user selected for download");
-      return;
+  const handleDownloadPdf = async () => {
+    try {
+      await downloadUserReportPdf(reportOptions); 
+      message.success("PDF downloaded successfully");
+    } catch {
+      message.error("Failed to download PDF");
     }
-    downloadUserReportPdf(courseId);
+  };
+  
+  const handleDownloadExcel = async () => {
+    try {
+      await downloadUserReportExcel(reportOptions);
+      message.success("Excel downloaded successfully");
+    } catch {
+      message.error("Failed to download Excel");
+    }
   };
 
 
@@ -205,12 +221,11 @@ const UsersAdmin = ({ setLoading }) => {
                 <Button
                   icon={<FilePdfOutlined />}
                   onClick={() => {
-                    setReportingCourseId(record?.id);
-                    handlePreviewReport(record?.id);
+                    setReportingUserId(record?.id);
+                    setShowOptionsModal(true);  
                   }}
                 />
               </Tooltip>
-
             </Space>
           </>
         )
@@ -270,17 +285,26 @@ const UsersAdmin = ({ setLoading }) => {
         </div>
 
         <PDFReaderModal
-          isOpen={isReportModalOpen}
-          pdfUrl={reportBlobUrl}
-          onClose={() => {
-            setIsReportModalOpen(false);
-            URL.revokeObjectURL(reportBlobUrl);
-            setSelectedUser(null);
-          }}
-          blockTime={0}
-          showDownload={true}
-          onDownload={() => handleDownload(reportingCourseId)}
-        />
+        isOpen={isReportModalOpen}
+        pdfUrl={reportBlobUrl}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          URL.revokeObjectURL(reportBlobUrl);
+          setSelectedUser(null);
+        }}
+        blockTime={0}
+        showDownload={true}
+        onDownloadPdf={handleDownloadPdf}
+        onDownloadExcel={handleDownloadExcel}
+      />
+      {showOptionsModal && (
+      <UserReportOptionsModal
+        isOpen={showOptionsModal}
+        onClose={() => setShowOptionsModal(false)}
+        onSubmit={(options) => handleReportOptionsSubmit(options)}
+        userId={String(reportingUserId)}
+      />
+        )}
 
         <UsersModal
           title={selectedUser ? "Edit Employee Details" : "Add New Employee"}
