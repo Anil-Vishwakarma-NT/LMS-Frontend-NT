@@ -94,20 +94,17 @@ export async function createCourseContent(newData) {
 }
 
 export const previewCourseReportPdf = async (options) => {
-  return axios
-    .post(`http://localhost:8081/api/custom-report/preview-pdf`, options, {
-      responseType: "blob",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-      },
+  return app
+    .post(`user/api/service-api/custom-report/preview-pdf`, options, {
+      responseType: "blob"
     })
     .then((res) => res.data);
 };
 
 export async function downloadCourseReportPdf(options) {
   try {
-    const response = await axios.post(
-      `http://localhost:8081/api/custom-report/download-pdf`,
+    const response = await app.post(
+      `user/api/service-api/custom-report/download-pdf`,
       options, // Send the full options (courseId + kpis etc.)
       {
         responseType: "blob",
@@ -133,14 +130,11 @@ export async function downloadCourseReportPdf(options) {
 
 export async function downloadCourseReportExcel(options) {
   try {
-    const response = await axios.post(
-      `http://localhost:8081/api/custom-report/download-excel`,
+    const response = await app.post(
+      `user/api/service-api/custom-report/download-excel`,
       options, // Send the full options (courseId + kpis etc.)
       {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
+        responseType: "blob"
       }
     );
 

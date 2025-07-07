@@ -133,26 +133,19 @@ export async function logoutUser() {
 }
 
 export const previewUserReportPdf = async (options) => {
-  return axios
-    .post(`http://localhost:8081/api/custom-user-report/preview-pdf`, options, {
-      responseType: "blob",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-      },
+  return app
+    .post(`user/api/service-api/custom-user-report/preview-pdf`, options, {
+      responseType: "blob" 
     })
     .then((res) => res.data);
 };
 
 export async function downloadUserReportPdf(options) {
   try {
-    const response = await axios.post(
-      `http://localhost:8081/api/custom-user-report/download-pdf`,
-      options,
+    const response = await app.post(
+      `user/api/service-api/custom-user-report/download-pdf`,options,
       {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
+        responseType: "blob" 
       }
     );
 
@@ -176,14 +169,10 @@ export async function downloadUserReportPdf(options) {
 
 export async function downloadUserReportExcel(options) {
   try {
-    const response = await axios.post(
-      `http://localhost:8081/api/custom-user-report/download-excel`,
-      options,
+    const response = await app.post(
+      `user/api/service-api/custom-user-report/download-excel`,options,
       {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
+        responseType: "blob" 
       }
     );
 
