@@ -68,7 +68,7 @@ const UserDashboard = ({ setLoading }) => {
       const statsData = await userStats(id)
       console.log("userHIstory", statsData.data);
       setDashStatsData(statsData.data);
-      const courses = await getUserEnrolledCourseDetails(id);
+      const courses = await getUserEnrolledCourseDetails();
       console.log("COURSES HISTORY", courses)
       setCourseList(courses);
       setFilteredCourses(courses);
@@ -122,7 +122,7 @@ const UserDashboard = ({ setLoading }) => {
     if (!id) return;
     loadData();
   }, [id]);
- 
+
 
   const columns = [
     {
