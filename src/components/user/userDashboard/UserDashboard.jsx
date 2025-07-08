@@ -63,7 +63,7 @@ const UserDashboard = ({ setLoading }) => {
 
   // const fetchUserId = async () => {
   //   try {
-  //     const response = await fetch(`user/api/service-api/users/getUserDetails`, {
+  //     const response = await fetch(`user/api/client-api/users/getUserDetails`, {
   //       method: "GET",
   //       headers: {
   //         "Authorization": `Bearer ${localStorage.getItem("authtoken")}`,

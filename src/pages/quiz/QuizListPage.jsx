@@ -54,7 +54,7 @@ const QuizListPage = () => {
 
   const fetchQuizMetadata = async () => {
     try {
-      const res = await app.get(`course/api/service-api/quizzes/course/${courseId}`);
+      const res = await app.get(`course/api/client-api/quizzes/course/${courseId}`);
       setQuiz(res.data?.data?.[0] || null);
       setCourseTitle(res.data?.data?.[0].title || "");
     } catch (err) {
@@ -64,7 +64,7 @@ const QuizListPage = () => {
 
   const fetchQuestions = async (quizId) => {
     try {
-      const res = await app.get(`course/api/service-api/quiz-questions/quiz/${quizId}`);
+      const res = await app.get(`course/api/client-api/quiz-questions/quiz/${quizId}`);
       setQuizQuestions(res.data?.data || []);
     } catch (err) {
       message.error("Failed to load quiz questions");
@@ -88,7 +88,7 @@ const QuizListPage = () => {
 
   const handleDeleteQuestion = async (questionId) => {
     try {
-      await app.delete(`course/api/service-api/quiz-questions/${questionId}`);
+      await app.delete(`course/api/client-api/quiz-questions/${questionId}`);
       setQuizQuestions(prev => prev.filter(q => q.questionId !== questionId));
       message.success("Question deleted successfully");
     } catch (error) {
@@ -287,10 +287,10 @@ const QuizListPage = () => {
         onSubmit={async (formData) => {
           try {
             if (quiz) {
-              await app.put(`course/api/service-api/quizzes/${quiz.quizId}`, formData);
+              await app.put(`course/api/client-api/quizzes/${quiz.quizId}`, formData);
               message.success("Quiz metadata updated successfully");
             } else {
-              const response = await app.post(`course/api/service-api/quizzes`, {
+              const response = await app.post(`course/api/client-api/quizzes`, {
                 ...formData,
                 parentId: courseId,
                 parentType: "course",

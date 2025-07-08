@@ -1,7 +1,7 @@
 import { app } from "./serviceLMS";
 export async function fetchUsers() {
   try {
-    const response = await app.get("user/api/service-api/users");
+    const response = await app.get("user/api/client-api/users");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -11,7 +11,7 @@ export async function fetchUsers() {
 export async function userStats(userId) {
   try {  
     const response = await app.get(
-      `user/api/service-api/enrollments/${userId}/statistics`);
+      `user/api/client-api/enrollments/${userId}/statistics`);
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -24,7 +24,7 @@ export async function userdeadlines() {
   try {
 
     const response = await app.get(
-      'user/api/service-api/users/getDeadlines'
+      'user/api/client-api/users/getDeadlines'
     );
     console.log("user deadlines response", response.data.data);
     
@@ -53,7 +53,7 @@ export async function userdeadlines() {
 
 export async function deleteUsers(id) {
   try {
-    const response = await app.delete(`user/api/service-api/admin/remove-user/${id}`);
+    const response = await app.delete(`user/api/client-api/admin/remove-user/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -62,7 +62,7 @@ export async function deleteUsers(id) {
 
 export async function fetchAllActiveUsers() {
   try {  
-    const response = await app.get("user/api/service-api/admin/active-employees");
+    const response = await app.get("user/api/client-api/admin/active-employees");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -71,7 +71,7 @@ export async function fetchAllActiveUsers() {
 
 export async function fetchAllInactiveUsers() {
   try {
-    const response = await app.get("user/api/service-api/admin/inactive-employees");
+    const response = await app.get("user/api/client-api/admin/inactive-employees");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -80,7 +80,7 @@ export async function fetchAllInactiveUsers() {
 
 export async function createUser(userData) {
   try {
-    const response = await app.post("user/api/service-api/admin/register", userData);
+    const response = await app.post("user/api/client-api/admin/register", userData);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Something went wrong");
@@ -89,7 +89,8 @@ export async function createUser(userData) {
 
 export async function updateUser(userData, userId) {
   try {
-    const response = await app.patch(`user/api/service-api/admin/update-user/${userId}`, userData);
+    const response = await app.patch(`user/api/client-api/admin/update-user/${userId}`, userData);
+    console.log("Update User Response:", response.data);
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -98,7 +99,7 @@ export async function updateUser(userData, userId) {
 
 export async function countAllUsers() {
   try {
-    const response = await app.get("user/api/service-api/user/userCount");
+    const response = await app.get("user/api/client-api/user/userCount");
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -134,7 +135,7 @@ export async function logoutUser() {
 
 export const previewUserReportPdf = async (options) => {
   return app
-    .post(`user/api/service-api/custom-user-report/preview-pdf`, options, {
+    .post(`user/api/client-api/custom-user-report/preview-pdf`, options, {
       responseType: "blob" 
     })
     .then((res) => res.data);
@@ -143,7 +144,7 @@ export const previewUserReportPdf = async (options) => {
 export async function downloadUserReportPdf(options) {
   try {
     const response = await app.post(
-      `user/api/service-api/custom-user-report/download-pdf`,options,
+      `user/api/client-api/custom-user-report/download-pdf`,options,
       {
         responseType: "blob" 
       }
@@ -170,7 +171,7 @@ export async function downloadUserReportPdf(options) {
 export async function downloadUserReportExcel(options) {
   try {
     const response = await app.post(
-      `user/api/service-api/custom-user-report/download-excel`,options,
+      `user/api/client-api/custom-user-report/download-excel`,options,
       {
         responseType: "blob" 
       }

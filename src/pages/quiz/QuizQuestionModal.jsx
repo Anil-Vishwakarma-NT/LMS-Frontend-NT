@@ -90,7 +90,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   console.log("📤 Final Payload:", payload);
 
   try {
-    await app.post("course/api/service-api/quiz-questions", payload);
+    await app.post("course/api/client-api/quiz-questions", payload);
     message.success("Question added successfully");
     form.resetFields();
     setStep(1);

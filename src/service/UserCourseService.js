@@ -3,7 +3,7 @@ import { app } from "./serviceLMS";
 export async function fetchUserEnrolledCourses() {
   try {
     const response = await app.get(
-      `user/api/service-api/users/userCourses`);
+      `user/api/client-api/users/userCourses`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -15,7 +15,7 @@ export async function fetchUserEnrolledCourses() {
 export async function fetchUserEnrolledCoursesById(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/enrollment/userCourses/${userId}`);
+      `user/api/client-api/enrollment/userCourses/${userId}`);
       console.log("Response of fetchUserEnrolledCoursesById", response.data.data)
     return response.data.data;
   } catch (error) {
@@ -28,7 +28,7 @@ export async function fetchUserEnrolledCoursesById(userId) {
 export async function fetchUserNameById(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/users/${userId}`);
+      `user/api/client-api/users/${userId}`);
 
     const data = response.data;
 
@@ -52,7 +52,7 @@ export async function fetchCourseDetails(courseId) {
   try {
     console.log("FetchCourseDetails fetching ......")
     const response = await app.get(
-      `course/api/service-api/course/${courseId}`
+      `course/api/client-api/course/${courseId}`
     );
     console.log("FetchCourseDetails", response.data.data)
     console.log("response of fetchCourseDetails", response)
@@ -65,7 +65,7 @@ export async function fetchCourseDetails(courseId) {
 export async function getCourseProgressWithMeta(userId, courseId) {
   try {
     const response = await app.get(
-      `course/api/service-api/user-progress/meta?userId=${userId}&courseId=${courseId}`
+      `course/api/client-api/user-progress/meta?userId=${userId}&courseId=${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -186,7 +186,7 @@ export async function getUserEnrolledCourseDetails(userId) {
 export async function fetchContentProgress(userId, courseId, contentId) {
   try {
     const response = await app.get(
-      `course/api/service-api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
+      `course/api/client-api/user-progress/content?userId=${userId}&courseId=${courseId}&contentId=${contentId}`
     );
     console.log(response.data);
     return response.data;
@@ -227,7 +227,7 @@ export async function updateContentProgress(
     console.log(progressPayload);
 
     await app.post(
-      `course/api/service-api/user-progress/update`,
+      `course/api/client-api/user-progress/update`,
       progressPayload
     );
 
