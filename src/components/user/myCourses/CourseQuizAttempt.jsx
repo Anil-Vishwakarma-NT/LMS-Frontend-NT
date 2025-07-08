@@ -148,25 +148,39 @@ const CourseQuizAttempt = () => {
     });
   };
 
-  const handleSubmit = async () => {
-    
+const handleSubmit = async () => {
   if (!quizAttemptId || !quiz?.quizId) {
     message.error("Missing quiz attempt information.");
     return;
   }
-  
 
   try {
     const now = new Date().toISOString().split(".")[0]; 
 
-    const userResponses = questions.map((question) => ({
-      userId,
-      quizId: quiz.quizId,
-      questionId: question.questionId,
-      attempt: currentAttemptNumber, 
-      userAnswer: JSON.stringify(userAnswers[question.questionId] || []),
-      answeredAt: now,
-    }));
+    const userResponses = questions.map((question) => {
+      let userAnswer = userAnswers[question.questionId] || [];
+      
+      // Normalize all answers to array format
+      if (question.questionType === "MCQ_MULTIPLE") {
+        // Already an array, keep as is
+        userAnswer = userAnswer;
+      } else if (question.questionType === "MCQ_SINGLE") {
+        // Convert single value to array
+        userAnswer = userAnswer ? [userAnswer] : [];
+      } else if (question.questionType === "SHORT_ANSWER") {
+        // Convert string to array
+        userAnswer = userAnswer ? [userAnswer] : [];
+      }
+
+      return {
+        userId,
+        quizId: quiz.quizId,
+        questionId: question.questionId,
+        attempt: currentAttemptNumber, 
+        userAnswer: JSON.stringify(userAnswer), // Now always an array
+        answeredAt: now,
+      };
+    });
 
     const submissionPayload = {
       userResponses,
