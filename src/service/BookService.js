@@ -2,7 +2,7 @@ import {app}from "./serviceLMS"
 
 export const fetchAllCourses = async () => {
   try {
-    const response = await app.get("course/api/service-api/course");
+    const response = await app.get("course/api/client-api/course");
     return response.data.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -14,7 +14,7 @@ export const fetchAllCourses = async () => {
 
 export async function deleteCourse(courseId) {
   try {
-    const response = await app.delete(`course/api/service-api/course/${courseId}`);
+    const response = await app.delete(`course/api/client-api/course/${courseId}`);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course deletion failed");
@@ -23,7 +23,7 @@ export async function deleteCourse(courseId) {
 
 export async function updateCourse(courseId, updatedData) {
   try {
-    const response = await app.put(`course/api/service-api/course/${courseId}`, updatedData);
+    const response = await app.put(`course/api/client-api/course/${courseId}`, updatedData);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course update failed");
@@ -32,7 +32,7 @@ export async function updateCourse(courseId, updatedData) {
 
 export async function createCourse(courseData) {
   try {
-    const response = await app.post("course/api/service-api/course",courseData);
+    const response = await app.post("course/api/client-api/course",courseData);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course creation failed");
@@ -41,7 +41,7 @@ export async function createCourse(courseData) {
 
 export async function fetchCourseById(courseId) {
   try {
-    const response = await app.get(`course/api/service-api/course/${courseId}`);
+    const response = await app.get(`course/api/client-api/course/${courseId}`);
     console.log(response.data.data);
     return response.data.data;
   } catch (error) {
@@ -51,7 +51,7 @@ export async function fetchCourseById(courseId) {
 
 export async function fetchCourseContentByCourseId(courseId) {
   try {
-    const response = await app.get(`course/api/service-api/course-content/course/${courseId}`);
+    const response = await app.get(`course/api/client-api/course-content/course/${courseId}`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -62,7 +62,7 @@ export async function fetchCourseContentByCourseId(courseId) {
 
 export async function deleteCourseContent(id) {
   try {
-    const response = await app.delete(`course/api/service-api/course-content/${id}`);
+    const response = await app.delete(`course/api/client-api/course-content/${id}`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -73,7 +73,7 @@ export async function deleteCourseContent(id) {
 
 export async function updateCourseContent(id, updatedData) {
   try {
-    const response = await app.put(`course/api/service-api/course-content/${id}`,updatedData);
+    const response = await app.put(`course/api/client-api/course-content/${id}`,updatedData);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -84,7 +84,7 @@ export async function updateCourseContent(id, updatedData) {
 
 export async function createCourseContent(newData) {
   try {
-    const response = await app.post("course/api/service-api/course-content",newData);
+    const response = await app.post("course/api/client-api/course-content",newData);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -95,7 +95,7 @@ export async function createCourseContent(newData) {
 
 export const previewCourseReportPdf = async (options) => {
   return app
-    .post(`user/api/service-api/custom-report/preview-pdf`, options, {
+    .post(`user/api/client-api/custom-report/preview-pdf`, options, {
       responseType: "blob"
     })
     .then((res) => res.data);
@@ -104,7 +104,7 @@ export const previewCourseReportPdf = async (options) => {
 export async function downloadCourseReportPdf(options) {
   try {
     const response = await app.post(
-      `user/api/service-api/custom-report/download-pdf`,
+      `user/api/client-api/custom-report/download-pdf`,
       options, // Send the full options (courseId + kpis etc.)
       {
         responseType: "blob",
@@ -131,7 +131,7 @@ export async function downloadCourseReportPdf(options) {
 export async function downloadCourseReportExcel(options) {
   try {
     const response = await app.post(
-      `user/api/service-api/custom-report/download-excel`,
+      `user/api/client-api/custom-report/download-excel`,
       options, // Send the full options (courseId + kpis etc.)
       {
         responseType: "blob"

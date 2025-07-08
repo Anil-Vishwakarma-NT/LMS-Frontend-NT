@@ -23,7 +23,7 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
-        const res = await app.get(`course/api/service-api/quiz-questions/${questionId}`);
+        const res = await app.get(`course/api/client-api/quiz-questions/${questionId}`);
         const data = res.data?.data;
 
         if (data) {
@@ -89,7 +89,7 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
         position: values.position
       };
 
-      await app.put(`course/api/service-api/quiz-questions/${questionId}`, payload);
+      await app.put(`course/api/client-api/quiz-questions/${questionId}`, payload);
 
       message.success("Question updated successfully");
       if (onUpdate) onUpdate();

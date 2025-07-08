@@ -22,7 +22,7 @@ const enrollmentService = {
    */
   async enroll(enrollmentData) {
     try {
-      const response = await app.post('user/api/service-api/enrollment/enroll', enrollmentData);
+      const response = await app.post('user/api/client-api/enrollment/enroll', enrollmentData);
       return response.data;
     } catch (error) {
       console.error('Error enrolling users:', error);
@@ -36,7 +36,7 @@ const enrollmentService = {
    */
   async getEnrollmentStatistics() {
     try {
-      const response = await app.get('user/api/service-api/enrollment/statistics');
+      const response = await app.get('user/api/client-api/enrollment/statistics');
       return response.data;
     } catch (error) {
       console.error('Error fetching enrollment statistics:', error);
@@ -50,7 +50,7 @@ const enrollmentService = {
    */
   async getAllEmployees() {
     try {
-      const response = await app.get('user/api/service-api/admin/active-employees');
+      const response = await app.get('user/api/client-api/admin/active-employees');
       return response.data;
     } catch (error) {
       console.error('Error fetching all active employees:', error);
@@ -64,7 +64,7 @@ const enrollmentService = {
    */
   async getAllGroups() {
     try {
-      const response = await app.get('user/api/service-api/group/Allgroups');
+      const response = await app.get('user/api/client-api/group/Allgroups');
       return response.data;
     } catch (error) {
       console.error('Error fetching all groups:', error);
@@ -79,7 +79,7 @@ const enrollmentService = {
    */
   async getUserEnrollmentsByUserId(userId) {
     try {
-      const response = await app.get(`user/api/service-api/enrollment/user-enrollments/${userId}`);
+      const response = await app.get(`user/api/client-api/enrollment/user-enrollments/${userId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching enrollments for user ${userId}:`, error);
@@ -93,7 +93,7 @@ const enrollmentService = {
    */
   async getAllUserEnrollments() {
     try {
-      const response = await app.get('user/api/service-api/enrollment/user-enrollments');
+      const response = await app.get('user/api/client-api/enrollment/user-enrollments');
       return response.data;
     } catch (error) {
       console.error('Error fetching all user enrollments:', error);
@@ -107,7 +107,7 @@ const enrollmentService = {
    */
   async getUserCourseEnrollments() {
     try {
-      const response = await app.get('user/api/service-api/enrollment/user-course-enrollments');
+      const response = await app.get('user/api/client-api/enrollment/user-course-enrollments');
       return response.data;
     } catch (error) {
       console.error('Error fetching user course enrollments:', error);
@@ -121,7 +121,7 @@ const enrollmentService = {
    */
   async getUserBundleEnrollments() {
     try {
-      const response = await app.get('user/api/service-api/enrollment/user-bundle-enrollments');
+      const response = await app.get('user/api/client-api/enrollment/user-bundle-enrollments');
       return response.data;
     } catch (error) {
       console.error('Error fetching user bundle enrollments:', error);
@@ -136,7 +136,7 @@ const enrollmentService = {
    */
   async getEnrolledCoursesByUserId(userId) {
     try {
-      const response = await app.get(`user/api/service-api/enrollment/userCourses/${userId}`);
+      const response = await app.get(`user/api/client-api/enrollment/userCourses/${userId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching enrolled courses for user ${userId}:`, error);
@@ -152,7 +152,7 @@ const enrollmentService = {
    */
   async getAllCourses() {
     try {
-      const response = await app.get('course/api/service-api/course');
+      const response = await app.get('course/api/client-api/course');
       return response.data;
     } catch (error) {
       console.error('Error fetching all courses:', error);
@@ -166,7 +166,7 @@ const enrollmentService = {
    */
   async getAllBundles() {
     try {
-      const response = await app.get('course/api/service-api/bundles');
+      const response = await app.get('course/api/client-api/bundles');
       return response.data;
     } catch (error) {
       console.error('Error fetching all bundles:', error);
@@ -181,7 +181,7 @@ const enrollmentService = {
    */
   async getCoursesByBundleId(bundleId) {
     try {
-      const response = await app.get(`course/api/service-api/bundles/course-bundles/${bundleId}`);
+      const response = await app.get(`course/api/client-api/bundles/course-bundles/${bundleId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching courses for bundle ${bundleId}:`, error);
