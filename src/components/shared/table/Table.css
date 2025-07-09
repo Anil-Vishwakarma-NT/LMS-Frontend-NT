@@ -1,0 +1,22 @@
+.edit-logo.disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+.view-icon {
+    font-size: 24px;
+    color: #4CAF50;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.view-icon:hover {
+    color: #45A049;
+}
