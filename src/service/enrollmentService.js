@@ -64,7 +64,7 @@ const enrollmentService = {
    */
   async getAllGroups() {
     try {
-      const response = await app.get('user/api/client-api/group/Allgroups');
+      const response = await app.get('user/api/client-api/group/all-active-groups');
       return response.data;
     } catch (error) {
       console.error('Error fetching all groups:', error);
