@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import UserHOC from "../../shared/HOC/UserHOC";
 import './UserDashboard.css';
-import { Table, Tag, Progress, Col, Row, Card, Empty, Statistic, Typography } from 'antd';
+import { Tag, Progress, Row, Card, Statistic, Typography } from 'antd';
 import {
-  CheckCircleOutlined,
   SolutionOutlined,
   TeamOutlined,
-  SyncOutlined,
-  ClockCircleOutlined,
   BookOutlined,
   PieChartOutlined,
   ExclamationOutlined
 } from '@ant-design/icons';
 import { userStats } from "../../../service/UserService";
-import { userHistory } from '../../../service/IssuanceService';
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
 import DonutChart from './DonutChart';
-// import { setBrushSettings } from 'recharts/types/state/brushSlice';
 import './UserDashboard.css';
 import DeadlineTable from './DeadlinesTable';
 
@@ -33,10 +28,7 @@ const UserDashboard = ({ setLoading }) => {
   const [userName, setUserName] = useState("N/A");
   const auth = useSelector((state) => state.auth)
 
-  const [userHistoryData, setUserHistoryData] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(() => (window.innerHeight >= 1024 ? 11 : 10));
-  const [totalPages, setTotalPages] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [dashStatsData, setDashStatsData] = useState({ enrollments: 0, groups: 0 });
@@ -123,82 +115,6 @@ const UserDashboard = ({ setLoading }) => {
     loadData();
   }, [id]);
 
-
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Level',
-      dataIndex: 'level',
-      key: 'level',
-      render: (level) => {
-        const levelColor = {
-          beginner: 'green',
-          intermediate: 'blue',
-          professional: 'purple',
-        }[level?.toLowerCase()] || 'gray';
-        return <Tag color={levelColor}>{level || 'Not Defined'}</Tag>;
-      },
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description'
-    },
-    {
-      title: 'Assigned By',
-      dataIndex: 'assignedById',
-      key: 'assignedById',
-    },
-    {
-      title: 'Enrollment Date',
-      dataIndex: 'enrollmentDate',
-      render: (date) => new Date(date).toLocaleDateString('en-GB'),
-    },
-    {
-      title: 'Deadline',
-      dataIndex: 'deadline',
-      render: (date) => new Date(date).toLocaleDateString('en-GB'),
-    },
-    {
-      title: 'Completion %',
-      dataIndex: 'roundedCompletion',
-      render: (progress) => (
-        <Progress
-          percent={progress}
-          size="small"
-          // type="circle"
-          strokeColor={
-            progress >= 95 ? '#52c41a' : progress >= 50 ? '#1890ff' : '#69c0ff'
-          }
-          wrap />
-      ),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      filters: [
-        { text: 'Completed', value: 'Completed' },
-        { text: 'In Progress', value: 'In Progress' },
-        { text: 'Not Started', value: 'Not Started' },
-        { text: 'Defaulter', value: 'Defaulter' },
-      ],
-      onFilter: (value, record) => record.status === value,
-      render: (status) => {
-        const color = {
-          completed: 'green',
-          'in progress': 'orange',
-          'not started': 'purple',
-          'defaulter': 'red'
-        }[status?.toLowerCase()] || 'gray';
-        return <span style={{ color }}>{status}</span>;
-      },
-    },
-  ];
-
   const dashData = [
     {
       id: 1,
@@ -225,27 +141,22 @@ const UserDashboard = ({ setLoading }) => {
 
   const piedata = [
     {
-      id: 3,
       title: 'Total Completed Courses',
-      number: 5,
+      number: completed,
     },
     {
-      id: 4,
       title: 'Incomplete Courses',
-      number: 3,
+      number: inprogress,
     },
     {
-      id: 5,
       title: 'Defaulters',
-      number: 2,
+      number: defaulters,
     },
     {
-      id: 5,
       title: 'Not Started',
-      number: 1,
+      number: notStarted,
     },
     {
-      id: 6,
       title: 'Completion Failed',
       number: completionFailed,
     },
@@ -257,8 +168,6 @@ const UserDashboard = ({ setLoading }) => {
       <Title level={2} className="user-dashboard-header" style={{ marginTop: 80 }} justify="start">
         Welcome {userName}
       </Title>
-
-      {/* Stats Cards + Donut Chart */}
       <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 12, }} >
         {dashData.map((data) => (
           <Card

@@ -11,7 +11,7 @@ export async function fetchUsers() {
 export async function userStats(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/enrollments/${userId}/statistics`);
+      `user/api/service-api/users/${userId}/statistics`);
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -27,7 +27,7 @@ export async function userdeadlines() {
       'user/api/service-api/users/getDeadlines'
     );
     console.log("user deadlines response", response.data.data);
-    
+
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -43,7 +43,7 @@ export async function userdeadlines() {
 //       '/api/users/getDeadlines'
 //     );
 //     console.log("user deadlines response", response.data.data);
-    
+
 //     return response.data;
 //   } catch (error) {
 //     console.log("userStat error");
@@ -61,7 +61,7 @@ export async function deleteUsers(id) {
 }
 
 export async function fetchAllActiveUsers() {
-  try {  
+  try {
     const response = await app.get("user/api/service-api/admin/active-employees");
     return response.data;
   } catch (error) {
@@ -135,7 +135,7 @@ export async function logoutUser() {
 export async function previewUserReportPdf(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/report/user/${userId}/pdf`  );
+      `user/api/service-api/report/user/${userId}/pdf`);
     return response.data;
   } catch (error) {
     console.error("Error fetching course report PDF:", error);
@@ -148,7 +148,7 @@ export async function previewUserReportPdf(userId) {
 export async function downloadUserReportPdf(userId) {
   try {
     const response = await app.get(
-      `user/api/service-api/report/user/${userId}/pdf/download` 
+      `user/api/service-api/report/user/${userId}/pdf/download`
     );
 
     const blob = new Blob([response.data], { type: "application/pdf" });

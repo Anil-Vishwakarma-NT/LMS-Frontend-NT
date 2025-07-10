@@ -94,7 +94,7 @@ export const addUser = async (user) => {
     try {
         console.log(user);
         const response = await app.post("user/api/service-api/group/add-user", user);
-        alert("USer added");
+        return response.data
     }
     catch (error) {
         alert("Couldn't fetch users");
@@ -131,7 +131,7 @@ export const getUserCoursesInGroup = async (group) => {
 export const getUserGroups = async () => {
 
     try {
-        const response = await app.post('/group/user-groups')
+        const response = await app.get('user/api/service-api/group/user-groups')
         console.log("GROUP DETAILS", response.data);
         return response.data.data;
     }

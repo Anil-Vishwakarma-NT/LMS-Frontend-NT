@@ -31,8 +31,8 @@ import GroupHistory from "./components/admin/Group/GroupHistory";
 import QuizListPage from "./pages/quiz/QuizListPage";
 import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
-import UserGroup from "./components/user/myGroups/UserGroup";import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
-
+import UserGroup from "./components/user/myGroups/UserGroup"; import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
+import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -191,13 +191,22 @@ function App() {
             </AdminRoutes>
           }
         />
-        
+
         <Route
           path="/group-history/:id"
           element={
             <AdminRoutes>
               <GroupHistory />
             </AdminRoutes>
+          }
+        />
+
+        <Route
+          path="/group-user-history/:id"
+          element={
+            <UserRoutes>
+              <UserGroupHistory />
+            </UserRoutes>
           }
         />
         <Route
