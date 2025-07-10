@@ -47,7 +47,7 @@ const UserGroup = ({ setLoading }) => {
 
     const handleViewGroupClick = (id, name) => {
         console.log("usersAdmin name ", id);
-        navigate(`/group-history/${id}`, {
+        navigate(`/group-user-history/${id}`, {
             state: { name: name }
         });
     };

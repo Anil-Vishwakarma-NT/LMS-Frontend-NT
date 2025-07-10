@@ -22,7 +22,7 @@ const MyCourses = () => {
 
     if (token) {
       try {
-       const decoded = jwtDecode(token);
+        const decoded = jwtDecode(token);
         const id = decoded?.userId;
 
         if (id) {
@@ -43,7 +43,7 @@ const MyCourses = () => {
       try {
         if (!userId) return;
 
-        const data = await getUserEnrolledCourseDetails(userId);
+        const data = await getUserEnrolledCourseDetails();
         setCourseList(data);
         setFilteredCourses(data);
       } catch (error) {

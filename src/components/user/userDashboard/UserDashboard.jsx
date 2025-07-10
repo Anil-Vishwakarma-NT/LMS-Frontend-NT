@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import UserHOC from "../../shared/HOC/UserHOC";
 import './UserDashboard.css';
-import { Table, Tag, Progress, Col, Row, Card, Empty, Statistic, Typography } from 'antd';
+import { Tag, Progress, Row, Card, Statistic, Typography } from 'antd';
 import {
-  CheckCircleOutlined,
   SolutionOutlined,
   TeamOutlined,
-  SyncOutlined,
-  ClockCircleOutlined,
   BookOutlined,
   PieChartOutlined,
   ExclamationOutlined
 } from '@ant-design/icons';
 import { userStats } from "../../../service/UserService";
-import { userHistory } from '../../../service/IssuanceService';
 import { getUserEnrolledCourseDetails } from "../../../service/UserCourseService";
 import DonutChart from './DonutChart';
-// import { setBrushSettings } from 'recharts/types/state/brushSlice';
 import './UserDashboard.css';
 import DeadlineTable from './DeadlinesTable';
 
@@ -33,10 +28,7 @@ const UserDashboard = ({ setLoading }) => {
   const [userName, setUserName] = useState("N/A");
   const auth = useSelector((state) => state.auth)
 
-  const [userHistoryData, setUserHistoryData] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(() => (window.innerHeight >= 1024 ? 11 : 10));
-  const [totalPages, setTotalPages] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [dashStatsData, setDashStatsData] = useState({ enrollments: 0, groups: 0 });
@@ -58,6 +50,7 @@ const UserDashboard = ({ setLoading }) => {
     );
     return JSON.parse(jsonPayload);
   }
+<<<<<<< HEAD
 
 
 
@@ -78,6 +71,8 @@ const UserDashboard = ({ setLoading }) => {
   //     return null;
   //   }
   // };
+=======
+>>>>>>> 33f99b9047ad3af3e8c3ac367f486128af1b61c1
 
 
   const loadData = async () => {
@@ -85,11 +80,15 @@ const UserDashboard = ({ setLoading }) => {
     console.log("userHistory ", userName);
     setLoading(true);
     try {
+<<<<<<< HEAD
       
       const statsData = await userStats(id, auth.accessToken)
+=======
+      const statsData = await userStats(id)
+>>>>>>> 33f99b9047ad3af3e8c3ac367f486128af1b61c1
       console.log("userHIstory", statsData.data);
       setDashStatsData(statsData.data);
-      const courses = await getUserEnrolledCourseDetails(id);
+      const courses = await getUserEnrolledCourseDetails();
       console.log("COURSES HISTORY", courses)
       setCourseList(courses);
       setFilteredCourses(courses);
@@ -119,6 +118,7 @@ const UserDashboard = ({ setLoading }) => {
     const getUser = async () => {
       try {
         const {
+<<<<<<< HEAD
         roles,
         email,
         userId,
@@ -126,6 +126,17 @@ const UserDashboard = ({ setLoading }) => {
       } = parseJwt(auth.accessToken);
         setId(userId);
         setUserName(fullName||"N/A");
+=======
+          roles,
+          email,
+          userId,
+          fullName
+        } = parseJwt(auth.accessToken);
+
+        setId(userId);
+        setUserName(fullName);
+        // alert("FETCHING USER DATA")
+>>>>>>> 33f99b9047ad3af3e8c3ac367f486128af1b61c1
       } catch (err) {
         console.error(err);
       }
@@ -136,6 +147,7 @@ const UserDashboard = ({ setLoading }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+<<<<<<< HEAD
   
   useEffect(() => {
     if (!id) return;              // guard: wait until we actually have an id
@@ -261,6 +273,13 @@ const UserDashboard = ({ setLoading }) => {
       },
     },
   ];
+=======
+
+  useEffect(() => {
+    if (!id) return;
+    loadData();
+  }, [id]);
+>>>>>>> 33f99b9047ad3af3e8c3ac367f486128af1b61c1
 
   const dashData = [
     {
@@ -288,27 +307,22 @@ const UserDashboard = ({ setLoading }) => {
 
   const piedata = [
     {
-      id: 3,
       title: 'Total Completed Courses',
       number: completed,
     },
     {
-      id: 4,
       title: 'Incomplete Courses',
       number: inprogress,
     },
     {
-      id: 5,
       title: 'Defaulters',
       number: defaulters,
     },
     {
-      id: 5,
       title: 'Not Started',
       number: notStarted,
     },
     {
-      id: 6,
       title: 'Completion Failed',
       number: completionFailed,
     },
@@ -320,8 +334,6 @@ const UserDashboard = ({ setLoading }) => {
       <Title level={2} className="user-dashboard-header" style={{ marginTop: 80 }} justify="start">
         Welcome {userName}
       </Title>
-
-      {/* Stats Cards + Donut Chart */}
       <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 12, }} >
         {dashData.map((data) => (
           <Card

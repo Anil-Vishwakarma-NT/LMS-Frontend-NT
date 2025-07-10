@@ -78,6 +78,7 @@ const AllGroup = ({ setLoading }) => {
     const handleViewGroupClick = (id, name) => {
         console.log("usersAdmin name ", id);
         navigate(`/group-history/${id}`, {
+            
             state: { name: name }
         });
     };

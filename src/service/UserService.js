@@ -11,7 +11,7 @@ export async function fetchUsers() {
 export async function userStats(userId) {
   try {  
     const response = await app.get(
-      `user/api/client-api/enrollments/${userId}/statistics`);
+      `user/api/service-api/users/${userId}/statistics`);
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -27,7 +27,7 @@ export async function userdeadlines() {
       'user/api/client-api/users/getDeadlines'
     );
     console.log("user deadlines response", response.data.data);
-    
+
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -43,7 +43,7 @@ export async function userdeadlines() {
 //       '/api/users/getDeadlines'
 //     );
 //     console.log("user deadlines response", response.data.data);
-    
+
 //     return response.data;
 //   } catch (error) {
 //     console.log("userStat error");

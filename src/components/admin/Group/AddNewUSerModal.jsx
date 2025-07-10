@@ -1,18 +1,20 @@
 import { addUser, updateGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Col, Row, DatePicker } from "antd";
+import { Modal, Form, Input, Select, Button, Checkbox, Col, Spin, Row, DatePicker, Space, Typography } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
-
+import { UserOutlined, TeamOutlined, BookOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 
 
 
-
+const { Option } = Select;
+const { Text } = Typography;
 
 const AddNewUserModal = (
     {
         isModalOpen,
         getUsers,
+        getCourses,
         existingUsers,
         courses,
         groupId,
@@ -21,6 +23,7 @@ const AddNewUserModal = (
         setToastType,
         setShowToast,
         setLoading,
+        loading
     }
 ) => {
     const [form] = Form.useForm();
@@ -115,6 +118,7 @@ const AddNewUserModal = (
             setToastType("success");
             setShowToast(true);
             getUsers();
+            getCourses();
             handleCloseModal();
 
         } catch (error) {
@@ -143,7 +147,7 @@ const AddNewUserModal = (
                         Reset Courses
                     </Button>
                     <Button key="submit" type="primary" onClick={handleAdd}>
-                        Add Group
+                        Add User
                     </Button>
                 </span>
             }
@@ -156,89 +160,86 @@ const AddNewUserModal = (
                 </Form.Item>
 
                 {/* EMPLOYEES */}
-                <Form.Item label="Employees">
-                    <Row gutter={8} style={{ marginBottom: 12 }}>
-                        <Col flex="80px">
-                            <Button onClick={handleSelectAllEmployees}>Add All</Button>
-                        </Col>
-                        <Col flex="auto">
-                            <Input.Search
-                                placeholder="Search by name or email"
-                                enterButton
-                                allowClear
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
-                            />
-                        </Col>
-                    </Row>
-                    <Form.Item
-                        name="employees"
-                        noStyle
-                        rules={[{ required: true, message: 'Please select at least one employee' }]}
+                <Form.Item
+                    name="employees"
+                    label={
+                        <Space>
+                            <UserOutlined />
+                            <Text strong>
+                                Select User(s) to add
+                            </Text>
+                        </Space>
+                    }
+                    rules={[{ required: true, message: `Please select a Employees` }]}
+                >
+                    <Select
+                        placeholder={`Select Employees`}
+                        showSearch
+                        mode="multiple"
+                        optionFilterProp="label"
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount="responsive"
+                        notFoundContent={
+                            loading ? <Spin size="small" /> :
+                                `No  users  available`
+                        }
                     >
-                        <Checkbox.Group style={{ width: '100%' }}>
-                            <div
-                                style={{
-                                    maxHeight: '200px',
-                                    overflowY: 'auto',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '8px',
-                                    paddingRight: '8px',
-                                }}
-                            >
-                                {filteredUsers?.map((user) => (
-                                    <Checkbox key={user.value} value={user.value}>
-                                        {user.label}
-                                    </Checkbox>
-                                ))}
-                                {filteredUsers?.length === 0 && (
-                                    <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                )}
-                            </div>
-                        </Checkbox.Group>
-                    </Form.Item>
-                </Form.Item>
 
-                {/* COURSES */}
-                <Form.Item label="Courses" >
-                    <Row gutter={8} style={{ marginBottom: 12 }}>
-                        <Col flex="80px">
-                            <Button onClick={handleSelectAllCourses}>Add All</Button>
-                        </Col>
-                        <Col flex="auto">
-                            <Input.Search
-                                placeholder="Search by course name"
-                                enterButton
-                                allowClear
-                                value={searchCourse}
-                                onChange={(e) => setSearchCourse(e.target.value)}
-                            />
-                        </Col>
-                    </Row>
-                    <Form.Item name="courses" noStyle>
-                        <Checkbox.Group style={{ width: '100%' }}>
-                            <div
-                                style={{
-                                    maxHeight: '200px',
-                                    overflowY: 'auto',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '8px',
-                                    paddingRight: '8px',
-                                }}
+                        {filteredUsers?.map(user => (
+                            <Option
+                                key={user.value}
+                                value={user.value}
+                                label={user.label}
                             >
-                                {filteredCourses?.map((course) => (
-                                    <Checkbox key={course.id} value={course.id}>
-                                        {course.name}
-                                    </Checkbox>
-                                ))}
-                                {filteredCourses?.length === 0 && (
-                                    <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                )}
-                            </div>
-                        </Checkbox.Group>
-                    </Form.Item>
+                                <div>
+                                    <Text strong>{user.label}</Text>
+                                    <br />
+                                </div>
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+                {/* COURSES */}
+                <Form.Item name="courses"
+                    label={
+                        <Space>
+                            <BookOutlined />
+                            <Text strong>
+                                Select Course(s) to add
+                            </Text>
+                        </Space>
+                    }
+                // rules={[{ required: true, message: `Please select a Em` }]}
+                >
+                    <Select placeholder={`Select course`}
+                        showSearch
+                        mode="multiple"
+                        optionFilterProp="label"
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount="responsive"
+                        notFoundContent={
+                            loading ? <Spin size="small" /> :
+                                `No courses available`
+                        }
+                    >
+                        {filteredCourses.map(course => (
+                            <Option
+                                key={course.id}
+                                value={course.id}
+                                label={course.name}
+                            >
+                                <div>
+                                    <Text strong>{course.name}</Text>
+                                    <br />
+                                </div>
+                            </Option>
+                        ))}
+
+                    </Select>
                 </Form.Item>
 
                 {/* DEADLINE + ASSIGNED AT */}

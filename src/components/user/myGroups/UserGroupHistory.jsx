@@ -1,24 +1,16 @@
 import { Layout, Typography, Divider } from 'antd';
-import { Table, Empty, Button, Space, Progress, Tooltip } from "antd";
+import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
 import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
-import AdminHOC from "../../shared/HOC/AdminHOC";
+import UserHOC from "../../shared/HOC/UserHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getUsersInGroup, getCourseDetails } from '../../../service/GroupService';
-import ConfirmDeletePopup from '../../shared/confirmDeletePopup/ConfirmDeletePopup';
 import { deleteSingleUser } from '../../../service/GroupService';
-import Toast from '../../shared/toast/Toast';
-import AddNewUserModal from './AddNewUSerModal';
-import EditGroupNameModal from './EditGroupNameModal';
-import AllocateCourseModal from './AllocateCourseModal';
 import { useSelector } from "react-redux";
-
-
-
 const { Content } = Layout;
 const { Title } = Typography;
 
-const GroupHistory = ({ setLoading }) => {
+const UserGroupHistory = ({ setLoading }) => {
 
 
     const location = useLocation();
@@ -48,6 +40,8 @@ const GroupHistory = ({ setLoading }) => {
             setUserList([]);
             return;
         }
+
+
         const users = response.map((user, index) => ({
             id: user.userId,
             srno: index + 1,
@@ -58,6 +52,7 @@ const GroupHistory = ({ setLoading }) => {
         }));
 
         setUserList(users);
+
     }
 
     async function getCourses() {
@@ -118,10 +113,12 @@ const GroupHistory = ({ setLoading }) => {
         setIsConfirmPopupOpen(true);
         setDeleteUser(user);
     };
-
     const handleEditGroup = () => {
         setEditPopOpen(prev => !prev);
     }
+
+
+
     const handleDeleteUser = async () => {
         try {
             setLoading(true)
@@ -147,6 +144,7 @@ const GroupHistory = ({ setLoading }) => {
     useEffect(() => {
         getUsers();
         getCourses();
+        // console.log("USERS RECEIVED in Group History!!", userList)
     }, [id]);
 
 
@@ -217,36 +215,6 @@ const GroupHistory = ({ setLoading }) => {
                 return <span style={{ color }}>{status}</span>;
             },
         },
-        {
-            title: "Actions",
-            key: "actions",
-            width: 250,
-            render: (text, record) => (
-                <>
-                    <Space >
-
-                        <Button
-                            icon={<DeleteOutlined />}
-                            style={{ marginRight: 8 }}
-                            onClick={() => handleOpenConfirmDeletePopup(record)}
-                        />
-                        <Button
-                            icon={<ExportOutlined />}
-                            onClick={() =>
-                                handleViewUserClick(record?.id, record?.name)
-                            }
-                        />
-                        {!showCourse && <Tooltip title="Allocate course">
-                            <Button
-                                icon={<FileAddOutlined />}
-                                onClick={() => handleAllocateCourse(record.id)}
-                            />
-                        </Tooltip>
-                        }
-                    </Space>
-                </>
-            )
-        }
     ];
 
     return (
@@ -256,23 +224,13 @@ const GroupHistory = ({ setLoading }) => {
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
                         {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
                         <Title level={2} style={{ margin: 0 }}>{groupName}   Details</Title>
-                        {/* </div>
-                    <div> */}
-                        <Button style={{ marginLeft: 30 }}
-                            icon={<EditOutlined />}
-                            onClick={handleEditGroup}
-                        >
-                        </Button>
+                    
+                      
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
 
-                        {!showCourse && <Button style={{ marginLeft: 30 }}
-                            icon={<UserAddOutlined />}
-                            onClick={handleAddNew}
-                        >
-                            Add new User
-                        </Button>}
+    
                         <Button style={{ marginLeft: 30 }}
                             icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
                             onClick={handleViewCourse}
@@ -296,49 +254,6 @@ const GroupHistory = ({ setLoading }) => {
                     )}
                 </div>
             </Content>
-            <AddNewUserModal isModalOpen={isModalOpen} getUsers={getUsers} handleCloseModal={handleCloseModal} setShowToast={setShowToast}
-                setToastMessage={setToastMessage}
-                setToastType={setToastType}
-                setLoading={setLoading}
-                groupId={id}
-                existingUsers={userList}
-                courses={courseList}
-                getCourses={getCourses} />
-            <Toast
-                message={toastMessage}
-                type={toastType}
-                show={showToast}
-                onClose={() => setShowToast(false)}
-            />
-            <ConfirmDeletePopup
-                isOpen={isConfirmPopupOpen}
-                onClose={() => setIsConfirmPopupOpen(false)}
-                onConfirm={handleDeleteUser}
-            />
-            <EditGroupNameModal
-                isModalOpen={EditPopOpen}
-                handleCloseModal={handleCloseEdit}
-                setToastMessage={setToastMessage}
-                setToastType={setToastType}
-                setShowToast={setShowToast}
-                setLoading={setLoading}
-                groupName={groupName}
-                groupId={id}
-                setGroupName={setGroupName}
-
-            />
-            <AllocateCourseModal
-                isModalOpen={allocatecourseModalOpen}
-                groupId={id}
-                userId={userId}
-                getUsers={getUsers}
-                getCourses={getCourses}
-                handleCloseModal={handleCloseAllocationModal}
-                setToastMessage={setToastMessage}
-                setToastType={setToastType}
-                setShowToast={setShowToast}
-                setLoading={setLoading}
-            />
         </div>
     );
 };
@@ -346,4 +261,4 @@ const GroupHistory = ({ setLoading }) => {
 
 
 
-export default AdminHOC(GroupHistory);
+export default UserHOC(UserGroupHistory);
