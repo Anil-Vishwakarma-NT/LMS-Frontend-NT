@@ -86,7 +86,9 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
    
       localStorage.setItem('authtoken', response.accessToken);
-    
+      localStorage.setItem("refreshToken", response.refreshToken);
+      console.log("roles", normalizedRoles)
+      // ✅ Navigate based on role
       if (normalizedRoles.includes("ADMIN")) {
         console.log("entered admin");
         navigate("/admin");

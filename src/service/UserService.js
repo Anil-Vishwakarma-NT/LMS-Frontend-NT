@@ -103,6 +103,7 @@ export async function userLogin(data) {
 export async function logoutUser() {
   const response = await app.post("/api/client-api/auth/logout");
   window.localStorage.removeItem("authtoken");
+  window.localStorage.removeItem("refreshToken");
 }
 
 export const previewUserReportPdf = async (options) => {
