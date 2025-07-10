@@ -75,6 +75,19 @@ export const getUsersInGroup = async (groupId) => {
 }
 
 
+export const getUsersNameInGroup = async (groupId) => {
+    try {
+        const response = await app.get(`user/api/client-api/group/emp/group-emps/${groupId}`)
+        console.log("Users in a group ", response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch users");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+
 export const deleteSingleUser = async (user) => {
     try {
         console.log(user);
@@ -93,7 +106,7 @@ export const deleteSingleUser = async (user) => {
 export const addUser = async (user) => {
     try {
         console.log(user);
-        const response = await app.post("user/api/service-api/group/add-user", user);
+        const response = await app.post("user/api/client-api/group/add-user", user);
         return response.data
     }
     catch (error) {
@@ -107,6 +120,18 @@ export const getCourseDetails = async (groupId) => {
     try {
         console.log("GroupIdin getcoursedetails api", groupId);
         const response = await app.get(`user/api/client-api/group/group-courses/${groupId}`);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch courses");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+export const getCourseNameDetails = async (groupId) => {
+    try {
+        console.log("GroupIdin getcoursedetails api", groupId);
+        const response = await app.get(`user/api/client-api/group/emp/group-courses/${groupId}`);
         return response.data.data;
     }
     catch (error) {
@@ -131,7 +156,7 @@ export const getUserCoursesInGroup = async (group) => {
 export const getUserGroups = async () => {
 
     try {
-        const response = await app.get('user/api/service-api/group/user-groups')
+        const response = await app.get('user/api/client-api/group/user-groups')
         console.log("GROUP DETAILS", response.data);
         return response.data.data;
     }

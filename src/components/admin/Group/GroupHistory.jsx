@@ -134,6 +134,7 @@ const GroupHistory = ({ setLoading }) => {
             setToastType("success");
             setShowToast(true);
             await getUsers();
+            await getCourses();
         } catch (error) {
             setToastMessage(error?.message || "Error occurred while deleting the User.");
             setToastType("error");

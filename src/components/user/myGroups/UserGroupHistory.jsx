@@ -1,12 +1,14 @@
 import { Layout, Typography, Divider } from 'antd';
-import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Empty, Button, Tag, Space, Progress, Tooltip, Row, Col } from "antd";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined, BookOutlined } from "@ant-design/icons";
 import UserHOC from "../../shared/HOC/UserHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getUsersInGroup, getCourseDetails } from '../../../service/GroupService';
+import { getUsersNameInGroup, getCourseNameDetails } from '../../../service/GroupService';
 import { deleteSingleUser } from '../../../service/GroupService';
 import { useSelector } from "react-redux";
+import { Card, Statistic } from 'antd';
+
 const { Content } = Layout;
 const { Title } = Typography;
 
@@ -31,10 +33,15 @@ const UserGroupHistory = ({ setLoading }) => {
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
     const [allocatecourseModalOpen, setAllocateCourseModalOpen] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [pageNumber, setPageNumber] = useState(0);
+    const [pageSize, setPageSize] = useState(() => (window.innerHeight >= 1024 ? 11 : 10));
+    const [totalPages, setTotalPages] = useState(0);
+
+
 
     async function getUsers() {
 
-        const response = await getUsersInGroup(id);
+        const response = await getUsersNameInGroup(id);
         if (!Array.isArray(response)) {
             console.error("Expected an array but got:", response);
             setUserList([]);
@@ -56,7 +63,7 @@ const UserGroupHistory = ({ setLoading }) => {
     }
 
     async function getCourses() {
-        const response = await getCourseDetails(id);
+        const response = await getCourseNameDetails(id);
         console.log("RESPONSE FOR COURSES", response)
         const users = response.map((user, index) => ({
             id: user.courseId,
@@ -144,7 +151,6 @@ const UserGroupHistory = ({ setLoading }) => {
     useEffect(() => {
         getUsers();
         getCourses();
-        // console.log("USERS RECEIVED in Group History!!", userList)
     }, [id]);
 
 
@@ -170,88 +176,70 @@ const UserGroupHistory = ({ setLoading }) => {
             title: !showCourse ? 'User Name' : 'Course Name',
             dataIndex: 'name',
             key: 'name',
-        }, {
-            title: 'Enrollments',
-            dataIndex: 'enrols',
-            key: 'enrols',
         },
-        {
-            title: 'Completion %',
-            dataIndex: 'progress',
-            render: (progress) => {
-                const rounded = Number(progress.toFixed(1));   // 1‑decimal‑place number
-                return (
-                    <Progress
-                        percent={rounded}
-                        size="small"
-                        type="circle"
-                        strokeColor={
-                            rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'
-                        }
-                        // ensures the label inside the circle also shows 1 decimal place
-                        format={(p) => `${p.toFixed(1)}%`}
-                    />
-                );
 
-            }
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            filters: [
-                { text: 'Completed', value: 'Completed' },
-                { text: 'In Progress', value: 'In Progress' },
-                { text: 'Not Started', value: 'Not Started' },
-                { text: 'Defaulter', value: 'Defaulter' },
-            ],
-            onFilter: (value, record) => record.status === value,
-            render: (status) => {
-                const color = {
-                    'completed': 'green',
-                    'in progress': 'orange',
-                    'not started': 'purple',
-                    'defaulter': 'red'
-                }[status?.toLowerCase()] || 'gray';
-                return <span style={{ color }}>{status}</span>;
-            },
-        },
+
     ];
 
     return (
-        <div className="admin-section">
+        <div className="admin-section" style={{ overflowY: "hidden" }}>
             <Content style={{ margin: '0 16px' }}>
-                <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+                <div className="site-layout-background" style={{ padding: 14, minHeight: 360, backgroundColor: '#f5f7fa' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 5 }}>
                         {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
                         <Title level={2} style={{ margin: 0 }}>{groupName}   Details</Title>
-                    
-                      
+
+
                     </div>
-
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
-
-    
-                        <Button style={{ marginLeft: 30 }}
-                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
-                            onClick={handleViewCourse}
-                        >
-                            {!showCourse ? "View Course" : "View Users"}
-                        </Button>
                     </div>
                     <Divider style={{ marginTop: 0 }} />
-                    {filteredList.length > 0 ? (
-                        <Table
-                            dataSource={filteredList}
-                            columns={columns}
-                            bordered
-                            scroll={{ x: "100%", y: "100%" }}
-                            locale={{ emptyText: "No users found." }}
-                            rowKey="id"
-                            pagination={{ position: 'bottomCenter' }}
-                        />
-                    ) : (
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                    )}
+                    <Row>
+
+                        <Card title={
+                            <span>
+                                <UserOutlined style={{ color: '#FF4D4F', marginRight: 16 }} />
+                                Members of the group
+                            </span>
+                        } bordered style={{ width: 600, margin: 5, marginRight: 30 }}>
+                            <Table
+                                dataSource={userList}
+                                columns={columns}
+                                pagination={{
+                                    current: pageNumber + 1,
+                                    pageSize,
+                                    total: totalPages * pageSize,
+                                    onChange: (page) => setPageNumber(page - 1),
+                                    showSizeChanger: false,
+                                }}
+                                scroll={{ x: '100%', y: '100%' }}
+                                locale={{ emptyText: 'No courses found for this user.' }}
+                                rowKey={(record) => record.courseId}
+                            />
+                        </Card>
+
+                        <Card title={
+                            <span>
+                                <BookOutlined style={{ color: '#FF4D4F', marginRight: 8 }} />
+                                courses of the group
+                            </span>
+                        } bordered style={{ width: 600, margin: 5 }}>
+                            <Table
+                                dataSource={courseList}
+                                columns={columns}
+                                pagination={{
+                                    current: pageNumber + 1,
+                                    pageSize,
+                                    total: totalPages * pageSize,
+                                    onChange: (page) => setPageNumber(page - 1),
+                                    showSizeChanger: false,
+                                }}
+                                scroll={{ x: '100%', y: '100%' }}
+                                locale={{ emptyText: 'No courses found for this user.' }}
+                                rowKey={(record) => record.courseId}
+                            />
+                        </Card>
+                    </Row>
                 </div>
             </Content>
         </div>

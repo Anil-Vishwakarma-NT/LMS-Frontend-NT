@@ -67,12 +67,7 @@ const UserGroup = ({ setLoading }) => {
             key: "groupName",
             width: 100
         },
-        {
-            dataIndex: "progress",
-            title: "Progress",
-            key: "progress",
-            width: 100
-        },
+
         {
             title: "Actions",
             key: "actions",

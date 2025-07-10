@@ -20,6 +20,7 @@ const DeadlineTable = () => {
     const getData = async () => {
         const response = await userdeadlines();
         console.log("Courses List fetched", response.data)
+        alert("deadlines fetched")
         setCourseList(response.data);
     }
 

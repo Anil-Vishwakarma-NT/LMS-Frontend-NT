@@ -1,16 +1,16 @@
 import axios from "axios";
 import { app } from "./serviceLMS";
-// export async function fetchUserEnrolledCourses() {
-//   try {
-//     const response = await app.get(
-//       `user/api/client-api/users/userCourses`);
-//     return response.data.data;
-//   } catch (error) {
-//     throw new Error(
-//       error?.response?.data?.message || "Failed to fetch enrolled courses."
-//     );
-//   }
-// }
+export async function fetchUserEnrolledCourses() {
+  try {
+    const response = await app.get(
+      `user/api/client-api/users/userCourses`);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch enrolled courses."
+    );
+  }
+}
 
 export async function fetchUserEnrolledCoursesById(userId) {
   try {
@@ -42,7 +42,7 @@ export async function fetchUserEnrolledCoursesById(userId) {
 export async function fetchUserEnrolledCoursesWithoutId() {
   try {
     const response = await app.get(
-      `user/api/service-api/users/userCourses`);
+      `user/api/client-api/users/userCourses`);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -103,7 +103,7 @@ export async function getCourseProgressWithMeta(userId, courseId) {
 export async function getCourseProgressWithMetaCourseId(courseId) {
   try {
     const response = await app.get(
-      `course/api/service-api/user-progress/meta-courseId?courseId=${courseId}`
+      `course/api/client-api/user-progress/meta-courseId?courseId=${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -112,16 +112,16 @@ export async function getCourseProgressWithMetaCourseId(courseId) {
 }
 
 
-export async function getCourseProgressWithMetaCourseId(courseId) {
-  try {
-    const response = await app.get(
-      `course/api/service-api/user-progress/meta-courseId?courseId=${courseId}`
-    );
-    return response.data;
-  } catch (error) {
-    return 0;
-  }
-}
+// export async function getCourseProgressWithMetaCourseId(courseId) {
+//   try {
+//     const response = await app.get(
+//       `course/api/service-api/user-progress/meta-courseId?courseId=${courseId}`
+//     ); 
+//     return response.data;
+//   } catch (error) {
+//     return 0;
+//   }
+// }
 
 export async function getUserEnrolledCourseDetails(userId) {
   try {

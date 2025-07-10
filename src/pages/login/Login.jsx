@@ -47,7 +47,6 @@ u/bvWV47VOzzM+ObAgMBAAE=
   const validateForm = () => {
     let formErrors = {};
     if (!password) formErrors.password = "Password is required!"
-    // if (!checkboxChecked) formErrors.checkbox = "You must agree!";
     if (!userName) {
       formErrors.userName = "Username is required!";
     } else if (!validateEmailOrMobile(userName)) {
@@ -79,19 +78,17 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
       const normalizedRoles = Array.isArray(roles) ? roles : [roles];
 
-      // Store auth info in Redux
-      dispatch(login({
+    dispatch(login({
         roles: normalizedRoles,
         email,
         accessToken: response.accessToken
       }));
 
-      // Store token in localStorage
+   
       localStorage.setItem('authtoken', response.accessToken);
-      console.log("roles", normalizedRoles)
-      // ✅ Navigate based on role
+    
       if (normalizedRoles.includes("ADMIN")) {
-        console.log("enered admin");
+        console.log("entered admin");
         navigate("/admin");
       } else if (normalizedRoles.includes("EMPLOYEE")) {
         navigate("/user", { state: { userId, name: fullName } });
