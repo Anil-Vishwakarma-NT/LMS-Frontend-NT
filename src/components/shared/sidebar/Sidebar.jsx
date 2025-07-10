@@ -18,7 +18,7 @@ const Sidebar = ({ items }) => {
   const auth = useSelector(state => state.auth);
 
   const handleLogout = () => {
-    logoutUser(auth.accessToken)
+    logoutUser()
     dispatch(logout())
     navigate('/')
   }

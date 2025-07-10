@@ -8,7 +8,7 @@ import AdminDashboard from "./components/admin/adminDashboard/AdminDashboard";
 import UserDashboard from "./components/user/userDashboard/UserDashboard";
 import Home from "./pages/homePage/Home";
 import Navbar from "./components/shared/navbar/Navbar";
-import BooksAdmin from "./components/admin/booksAdmin/BooksAdmin";
+import BooksAdmin from "./components/admin/booksAdmin/CoursesAdmin";
 import CategoriesAdmin from "./components/admin/categoriesAdmin/CategoriesAdmin";
 import UsersAdmin from "./components/admin/usersAdmin/UsersAdmin";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -31,7 +31,7 @@ import GroupHistory from "./components/admin/Group/GroupHistory";
 import QuizListPage from "./pages/quiz/QuizListPage";
 import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
-import UserGroup from "./components/user/myGroups/UserGroup";
+import UserGroup from "./components/user/myGroups/UserGroup";import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
 
 function App() {
   const dispatch = useDispatch();
@@ -130,7 +130,7 @@ function App() {
           path="/books"
           element={
             <AdminRoutes>
-              <BooksAdmin />
+              <CoursesAdmin />
             </AdminRoutes>
           }
         />

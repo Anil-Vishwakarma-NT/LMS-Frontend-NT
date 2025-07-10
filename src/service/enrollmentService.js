@@ -1,118 +1,8 @@
-import axios from 'axios';
-
-// Base URLs for different services
-const ENROLLMENT_BASE_URL = 'http://localhost:8081';
-const COURSE_BASE_URL = 'http://localhost:8080';
-
-// Create axios instance for enrollment API
-const enrollmentApi = axios.create({
-  baseURL: ENROLLMENT_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // For CORS with credentials
-});
-
-// Create axios instance for course/bundle API
-const courseApi = axios.create({
-  baseURL: COURSE_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // For CORS with credentials
-});
-
-// Request interceptor for adding auth tokens if needed (for both APIs)
-// const addAuthInterceptor = (apiInstance) => {
-//   apiInstance.interceptors.request.use(
-//     (config) => {
-//       // Add auth token if available
-//       const token = localStorage.getItem('authToken');
-//       if (token) {
-//         config.headers.Authorization = `Bearer ${token}`;
-//       }
-//       return config;
-//     },
-//     (error) => {
-//       return Promise.reject(error);
-//     }
-//   );
-// };
-const addAuthInterceptor = (apiInstance) => {
-  apiInstance.interceptors.request.use(
-    (config) => {
-      // Make sure you're using a valid token for an existing user
-      const token = localStorage.getItem('authtoken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        console.log('🔐 Using auth token:', token.substring(0, 20) + '...');
-      } else {
-        console.warn('⚠️ No auth token found in localStorage');
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-};
-// Response interceptor for handling common responses (for both APIs)
-const addResponseInterceptor = (apiInstance) => {
-  apiInstance.interceptors.response.use(
-    (response) => {
-      // Return the data directly from StandardResponseOutDTO
-      return response.data;
-    },
-    (error) => {
-      // Handle common error scenarios
-      if (error.response) {
-        // Server responded with error status
-        const errorData = error.response.data;
-        
-        // Check if it's the GlobalExceptionHandler ErrorResponse format
-        if (errorData && errorData.message && errorData.status && errorData.timestamp) {
-          // Backend error response format: { timestamp, status, message }
-          const customError = new Error(errorData.message);
-          customError.status = errorData.status;
-          customError.timestamp = errorData.timestamp;
-          customError.httpStatus = error.response.status;
-          throw customError;
-        }
-        
-        // Check if it's StandardResponseOutDTO error format
-        if (errorData && errorData.status === 'ERROR' && errorData.message) {
-          // StandardResponseOutDTO error format
-          const customError = new Error(errorData.message);
-          customError.status = 'ERROR';
-          customError.httpStatus = error.response.status;
-          throw customError;
-        }
-        
-        // Fallback for other error formats
-        const errorMessage = errorData?.message || 'An error occurred';
-        const customError = new Error(errorMessage);
-        customError.httpStatus = error.response.status;
-        throw customError;
-      } else if (error.request) {
-        // Request was made but no response received
-        throw new Error('Network error: Unable to connect to server');
-      } else {
-        // Something else happened
-        throw new Error('Request failed: ' + error.message);
-      }
-    }
-  );
-};
-
-// Apply interceptors to both API instances
-addAuthInterceptor(enrollmentApi);
-addAuthInterceptor(courseApi);
-addResponseInterceptor(enrollmentApi);
-addResponseInterceptor(courseApi);
-
+import {app} from './serviceLMS'; 
 /**
  * Enrollment Service
  * Provides methods to interact with enrollment-related API endpoints
+ * Uses the same axios instances and interceptors from serviceLMS
  */
 const enrollmentService = {
   
@@ -132,8 +22,8 @@ const enrollmentService = {
    */
   async enroll(enrollmentData) {
     try {
-      const response = await enrollmentApi.post('/api/enrollment/enroll', enrollmentData);
-      return response;
+      const response = await app.post('user/api/client-api/enrollment/enroll', enrollmentData);
+      return response.data;
     } catch (error) {
       console.error('Error enrolling users:', error);
       throw error;
@@ -146,8 +36,8 @@ const enrollmentService = {
    */
   async getEnrollmentStatistics() {
     try {
-      const response = await enrollmentApi.get('/api/enrollment/statistics');
-      return response;
+      const response = await app.get('user/api/client-api/enrollment/statistics');
+      return response.data;
     } catch (error) {
       console.error('Error fetching enrollment statistics:', error);
       throw error;
@@ -160,8 +50,8 @@ const enrollmentService = {
    */
   async getAllEmployees() {
     try {
-      const response = await enrollmentApi.get('/admin/active-employees');
-      return response;
+      const response = await app.get('user/api/client-api/admin/active-employees');
+      return response.data;
     } catch (error) {
       console.error('Error fetching all active employees:', error);
       throw error;
@@ -174,8 +64,8 @@ const enrollmentService = {
    */
   async getAllGroups() {
     try {
-      const response = await enrollmentApi.get('/group/Allgroups');
-      return response;
+      const response = await app.get('user/api/client-api/group/all-active-groups');
+      return response.data;
     } catch (error) {
       console.error('Error fetching all groups:', error);
       throw error;
@@ -189,8 +79,8 @@ const enrollmentService = {
    */
   async getUserEnrollmentsByUserId(userId) {
     try {
-      const response = await enrollmentApi.get(`/api/enrollment/user-enrollments/${userId}`);
-      return response;
+      const response = await app.get(`user/api/client-api/enrollment/user-enrollments/${userId}`);
+      return response.data;
     } catch (error) {
       console.error(`Error fetching enrollments for user ${userId}:`, error);
       throw error;
@@ -203,8 +93,8 @@ const enrollmentService = {
    */
   async getAllUserEnrollments() {
     try {
-      const response = await enrollmentApi.get('/api/enrollment/user-enrollments');
-      return response;
+      const response = await app.get('user/api/client-api/enrollment/user-enrollments');
+      return response.data;
     } catch (error) {
       console.error('Error fetching all user enrollments:', error);
       throw error;
@@ -217,8 +107,8 @@ const enrollmentService = {
    */
   async getUserCourseEnrollments() {
     try {
-      const response = await enrollmentApi.get('/api/enrollment/user-course-enrollments');
-      return response;
+      const response = await app.get('user/api/client-api/enrollment/user-course-enrollments');
+      return response.data;
     } catch (error) {
       console.error('Error fetching user course enrollments:', error);
       throw error;
@@ -231,8 +121,8 @@ const enrollmentService = {
    */
   async getUserBundleEnrollments() {
     try {
-      const response = await enrollmentApi.get('/api/enrollment/user-bundle-enrollments');
-      return response;
+      const response = await app.get('user/api/client-api/enrollment/user-bundle-enrollments');
+      return response.data;
     } catch (error) {
       console.error('Error fetching user bundle enrollments:', error);
       throw error;
@@ -246,8 +136,8 @@ const enrollmentService = {
    */
   async getEnrolledCoursesByUserId(userId) {
     try {
-      const response = await enrollmentApi.get(`/api/enrollment/userCourses/${userId}`);
-      return response;
+      const response = await app.get(`user/api/client-api/enrollment/userCourses/${userId}`);
+      return response.data;
     } catch (error) {
       console.error(`Error fetching enrolled courses for user ${userId}:`, error);
       throw error;
@@ -262,8 +152,8 @@ const enrollmentService = {
    */
   async getAllCourses() {
     try {
-      const response = await courseApi.get('/api/course');
-      return response;
+      const response = await app.get('course/api/client-api/course');
+      return response.data;
     } catch (error) {
       console.error('Error fetching all courses:', error);
       throw error;
@@ -276,8 +166,8 @@ const enrollmentService = {
    */
   async getAllBundles() {
     try {
-      const response = await courseApi.get('/api/bundles');
-      return response;
+      const response = await app.get('course/api/client-api/bundles');
+      return response.data;
     } catch (error) {
       console.error('Error fetching all bundles:', error);
       throw error;
@@ -291,8 +181,8 @@ const enrollmentService = {
    */
   async getCoursesByBundleId(bundleId) {
     try {
-      const response = await courseApi.get(`/api/bundles/course-bundles/${bundleId}`);
-      return response;
+      const response = await app.get(`course/api/client-api/bundles/course-bundles/${bundleId}`);
+      return response.data;
     } catch (error) {
       console.error(`Error fetching courses for bundle ${bundleId}:`, error);
       throw error;
@@ -307,7 +197,7 @@ const enrollmentService = {
    * @returns {boolean} True if it's a backend error with structured format
    */
   isBackendError(error) {
-    return error.status || error.timestamp || error.httpStatus;
+    return error.response && (error.response.status || error.response.data);
   },
 
   /**
@@ -316,15 +206,18 @@ const enrollmentService = {
    * @returns {Object} Error details object
    */
   getErrorDetails(error) {
+    const response = error.response;
+    const data = response?.data;
+    
     return {
-      message: error.message,
-      status: error.status || null,
-      httpStatus: error.httpStatus || null,
-      timestamp: error.timestamp || null,
-      isValidationError: error.httpStatus === 400,
-      isNotFound: error.httpStatus === 404,
-      isConflict: error.httpStatus === 409,
-      isUnauthorized: error.httpStatus === 401
+      message: data?.message || error.message || 'An error occurred',
+      status: data?.status || null,
+      httpStatus: response?.status || null,
+      timestamp: data?.timestamp || null,
+      isValidationError: response?.status === 400,
+      isNotFound: response?.status === 404,
+      isConflict: response?.status === 409,
+      isUnauthorized: response?.status === 401
     };
   },
 
@@ -459,23 +352,23 @@ const enrollmentService = {
 
   // Helper methods for course and bundle data
 
-/**
- * Filter active courses from course list
- * @param {Array} courses - Array of course objects
- * @returns {Array} Filtered array of active courses
- */
-filterActiveCourses(courses) {
-  return courses.filter(course => course.active); // Changed from isActive to active
-},
+  /**
+   * Filter active courses from course list
+   * @param {Array} courses - Array of course objects
+   * @returns {Array} Filtered array of active courses
+   */
+  filterActiveCourses(courses) {
+    return courses.filter(course => course.active);
+  },
 
-/**
- * Filter active bundles from bundle list
- * @param {Array} bundles - Array of bundle objects
- * @returns {Array} Filtered array of active bundles
- */
-filterActiveBundles(bundles) {
-  return bundles.filter(bundle => bundle.active); // Changed from isActive to active
-},
+  /**
+   * Filter active bundles from bundle list
+   * @param {Array} bundles - Array of bundle objects
+   * @returns {Array} Filtered array of active bundles
+   */
+  filterActiveBundles(bundles) {
+    return bundles.filter(bundle => bundle.active);
+  },
 
   /**
    * Group courses by level

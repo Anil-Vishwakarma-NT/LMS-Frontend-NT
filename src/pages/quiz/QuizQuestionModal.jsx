@@ -1,3 +1,4 @@
+import {app} from "../../service/serviceLMS";
 import React, { useState } from "react";
 import {
   Modal,
@@ -11,8 +12,7 @@ import {
   message,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import axios from "axios";
-
+ 
 const { Option } = Select;
 
 const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
@@ -90,7 +90,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
   console.log("📤 Final Payload:", payload);
 
   try {
-    await axios.post("http://localhost:8080/api/quiz-questions", payload);
+    await app.post("course/api/client-api/quiz-questions", payload);
     message.success("Question added successfully");
     form.resetFields();
     setStep(1);

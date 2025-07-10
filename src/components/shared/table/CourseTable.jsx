@@ -1,3 +1,4 @@
+import { app} from "../../../service/serviceLMS";
 import React, { useState, useEffect } from "react";
 import { Table, Tooltip, Space, Button, message } from "antd";
 import {
@@ -10,8 +11,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import QuizModal from "./QuizModal";
+import CourseReportOptionsModal from "../../admin/booksAdmin/CourseReportOptionsModal";
 import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
-import { previewCourseReportPdf, downloadCourseReportPdf } from "../../../service/BookService";
+import { previewCourseReportPdf, downloadCourseReportPdf, downloadCourseReportExcel} from "../../../service/BookService";
 
 const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   const navigate = useNavigate();
@@ -24,25 +26,42 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportBlobUrl, setReportBlobUrl] = useState("");
   const [reportingCourseId, setReportingCourseId] = useState(null);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [reportOptions, setReportOptions] = useState(null);
 
-  const handlePreviewReport = async (courseId) => {
+
+  const handleReportOptionsSubmit = async (options) => {
     try {
-      const blob = await previewCourseReportPdf(courseId);
+      setShowOptionsModal(false);
+      setReportOptions(options);  
+  
+      const blob = await previewCourseReportPdf(options);
       const blobUrl = URL.createObjectURL(blob);
       setReportBlobUrl(blobUrl);
       setIsReportModalOpen(true);
-    } catch (error) {
-      console.error("Failed to load report PDF:", error.message);
+    } catch (err) {
+      message.error("Failed to generate report");
     }
   };
 
-  const handleDownload = (courseId) => {
-    if (!courseId) {
-      message.warning("No course selected for download");
-      return;
+  const handleDownloadPdf = async () => {
+    try {
+      await downloadCourseReportPdf(reportOptions); 
+      message.success("PDF downloaded successfully");
+    } catch {
+      message.error("Failed to download PDF");
     }
-    downloadCourseReportPdf(courseId);
   };
+  
+  const handleDownloadExcel = async () => {
+    try {
+      await downloadCourseReportExcel(reportOptions);
+      message.success("Excel downloaded successfully");
+    } catch {
+      message.error("Failed to download Excel");
+    }
+  };
+  
 
   const handleAddQuizClick = (course, metadataOnly = false) => {
     setSelectedCourse(course);
@@ -58,7 +77,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
         createdBy: 1,
         parentType: "course",
       };
-      const response = await axios.post("http://localhost:8080/api/quizzes", payload);
+      const response = await app.post("course/api/client-api/quizzes", payload);
       const result = response?.data?.data;
       const messageText = response?.data?.message;
 
@@ -78,12 +97,12 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/course");
+      const response = await app.get("course/api/client-api/course");
 
       const coursesWithQuizStatus = await Promise.all(
         response.data.data.map(async (course) => {
           try {
-            const quizResponse = await axios.get(`http://localhost:8080/api/quizzes/course/${course.courseId}`);
+            const quizResponse = await app.get(`course/api/client-api/quizzes/course/${course.courseId}`);
             const quizzes = quizResponse?.data?.data || [];
             const latestQuiz = quizzes[0];
             return {
@@ -148,7 +167,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
               icon={<FilePdfOutlined />}
               onClick={() => {
                 setReportingCourseId(record.courseId);
-                handlePreviewReport(record.courseId);
+                setShowOptionsModal(true);  
               }}
               type="text"
             />
@@ -186,8 +205,17 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
         }}
         blockTime={0}
         showDownload={true}
-        onDownload={() => handleDownload(reportingCourseId)}
+        onDownloadPdf={handleDownloadPdf}
+        onDownloadExcel={handleDownloadExcel}
       />
+      {showOptionsModal && (
+      <CourseReportOptionsModal
+        isOpen={showOptionsModal}
+        onClose={() => setShowOptionsModal(false)}
+        onSubmit={(options) => handleReportOptionsSubmit(options)}
+        courseId={String(reportingCourseId)}
+      />
+        )}
       {selectedCourse && (
         <QuizModal
           open={quizModalOpen}

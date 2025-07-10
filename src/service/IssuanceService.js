@@ -2,7 +2,7 @@ import {app} from "./serviceLMS";
 
 export async function fetchAllIssuances(pageNumber, pageSize, search) {
     try {
-        const response = await app.get('/api/issuances', {
+        const response = await app.get('user/api/service/issuances', {
             params: {
                 pageNumber: Number(pageNumber),
                 pageSize: Number(pageSize),
