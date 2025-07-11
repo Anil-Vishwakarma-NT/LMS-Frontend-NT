@@ -26,11 +26,10 @@ const AllocateCourseModal = (
     const [form] = Form.useForm();
     const [searchCourse, setSearchCourse] = useState('');
     const [courses, setCourses] = useState([]);
-
+    const [courseMsg, setCourseMsg] = useState("");
 
     const filteredCourses = courses?.filter(user =>
         user.title.toLowerCase().includes(searchCourse.toLowerCase())
-        // user.email.toLowerCase().includes(searchValue.toLowerCase())
     );
 
 
@@ -42,13 +41,15 @@ const AllocateCourseModal = (
         }
         console.log("Payload", payload);
         const activeUsers = await getUserCoursesInGroup(payload);
-        const users = activeUsers?.map((user, index) => ({
+        const users = activeUsers.data?.map((user, index) => ({
             courseId: user.courseId,
             title: user.title,
             level: user.courseLevel,
         }));
         setCourses(users);
+        setCourseMsg(activeUsers.message);
         console.log("COURSES", users);
+        console.log("MESSAGE", activeUsers.message);
     }
 
 
@@ -66,8 +67,6 @@ const AllocateCourseModal = (
     const handleAdd = async () => {
         try {
             const values = await form.validateFields();
-
-            // Ensure proper structure
             const payload = {
                 groupId: Number(values.groupId),
                 employees: [userId], // ✅ Backend expects this
@@ -96,15 +95,26 @@ const AllocateCourseModal = (
         }
     };
 
-    const handleSelectAllCourses = () => {
-        const allFilteredCoursesIds = filteredCourses.map(course => course.courseId);
-        form.setFieldsValue({ courses: allFilteredCoursesIds });
+    const handleCoursesChange = (value) => {
+        if (value.includes("all")) {
+            const allCourseIds = filteredCourses.map(course => course.courseId);
+
+            // If all are already selected, deselect all:
+            if (selectedCourses?.length === allCourseIds.length) {
+                form.setFieldsValue({ courses: [] });
+            } else {
+                form.setFieldsValue({ courses: allCourseIds });
+            }
+        } else {
+            form.setFieldsValue({ courses: value });
+        }
     };
+
 
     const selectedCourses = Form.useWatch("courses", form);
 
     return (
-        (courses ? (courses.length > 0 ?
+        (courses?.length > 0 ?
             <Modal
                 title={`Allocate course to user`}
                 visible={isModalOpen}
@@ -117,9 +127,6 @@ const AllocateCourseModal = (
                     >
                         Add user
                     </Button>
-
-
-
                 }
                 bodyStyle={{ height: 500 }}
 
@@ -152,14 +159,21 @@ const AllocateCourseModal = (
                                     `No courses available`
                             }
                         >
+
+                            {/* <Option label="Select All" onClick={handleCoursesChange}>
+                                <div>
+                                    <Text strong>Select All</Text>
+                                </div>
+                            </Option> */}
+
                             {filteredCourses?.map(course => (
                                 <Option
                                     key={course.id}
                                     value={course.id}
-                                    label={course.name}
+                                    label={course.title}
                                 >
                                     <div>
-                                        <Text strong>{course.name}</Text>
+                                        <Text strong>{course.title}</Text>
                                         <br />
                                     </div>
                                 </Option>
@@ -196,16 +210,8 @@ const AllocateCourseModal = (
                 footer={
                     <Button onClick={handleCloseModal}>OK</Button>
                 }>
-                <span>All courses are already allocated to the user</span>
-            </Modal>) : <Modal
-                title={`Allocate course to user`}
-                visible={isModalOpen}
-                onCancel={handleCloseModal}
-                footer={
-                    <Button onClick={handleCloseModal}>OK</Button>
-                }>
-            <span>No course allocated to the group</span>
-        </Modal>)
+                <Text>{courseMsg}</Text>
+            </Modal>)
     );
 };
 export default AllocateCourseModal;

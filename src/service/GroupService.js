@@ -145,7 +145,7 @@ export const getUserCoursesInGroup = async (group) => {
         console.log("Group getcoursedetails api", group);
         const response = await app.post('user/api/client-api/group/user-courses', group);
         console.log("Courses details ", response.data.data);
-        return response.data.data;
+        return response.data;
     }
     catch (error) {
         alert("Couldn't fetch courses");

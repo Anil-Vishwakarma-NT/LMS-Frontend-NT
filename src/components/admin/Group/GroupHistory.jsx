@@ -191,7 +191,6 @@ const GroupHistory = ({ setLoading }) => {
                         strokeColor={
                             rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'
                         }
-                        // ensures the label inside the circle also shows 1 decimal place
                         format={(p) => `${p.toFixed(1)}%`}
                     />
                 );
@@ -267,19 +266,19 @@ const GroupHistory = ({ setLoading }) => {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
-
+                         <Button style={{ marginLeft: 30 }}
+                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
+                            onClick={handleViewCourse}
+                        >
+                            {!showCourse ? "View Course" : "View Users"}
+                        </Button>
                         {!showCourse && <Button style={{ marginLeft: 30 }}
                             icon={<UserAddOutlined />}
                             onClick={handleAddNew}
                         >
                             Add new User
                         </Button>}
-                        <Button style={{ marginLeft: 30 }}
-                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
-                            onClick={handleViewCourse}
-                        >
-                            {!showCourse ? "View Course" : "View Users"}
-                        </Button>
+                       
                     </div>
                     <Divider style={{ marginTop: 0 }} />
                     {filteredList.length > 0 ? (

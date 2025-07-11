@@ -58,7 +58,6 @@ const UserDashboard = ({ setLoading }) => {
     setLoading(true);
     try {
       const statsData = await userStats(id)
-      alert("getting data")
       console.log("userHIstory", statsData.data);
       setDashStatsData(statsData.data);
       const courses = await getUserEnrolledCourseDetails();
@@ -99,7 +98,6 @@ const UserDashboard = ({ setLoading }) => {
 
         setId(userId);
         setUserName(fullName);
-        alert("FETCHING USER DATA")
       } catch (err) {
         console.error(err);
       }
