@@ -75,6 +75,19 @@ export const getUsersInGroup = async (groupId) => {
 }
 
 
+export const getUsersNameInGroup = async (groupId) => {
+    try {
+        const response = await app.get(`user/api/client-api/group/emp/group-emps/${groupId}`)
+        console.log("Users in a group ", response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch users");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+
 export const deleteSingleUser = async (user) => {
     try {
         console.log(user);
@@ -94,7 +107,7 @@ export const addUser = async (user) => {
     try {
         console.log(user);
         const response = await app.post("user/api/client-api/group/add-user", user);
-        alert("USer added");
+        return response.data
     }
     catch (error) {
         alert("Couldn't fetch users");
@@ -115,11 +128,10 @@ export const getCourseDetails = async (groupId) => {
     }
 }
 
-export const getUserCoursesInGroup = async (group) => {
+export const getCourseNameDetails = async (groupId) => {
     try {
-        console.log("Group getcoursedetails api", group);
-        const response = await app.post('user/api/client-api/group/user-courses', group);
-        console.log("Courses details ", response.data.data);
+        console.log("GroupIdin getcoursedetails api", groupId);
+        const response = await app.get(`user/api/client-api/group/emp/group-courses/${groupId}`);
         return response.data.data;
     }
     catch (error) {
@@ -127,3 +139,30 @@ export const getUserCoursesInGroup = async (group) => {
         throw new Error(error?.response?.data?.message);
     }
 }
+
+export const getUserCoursesInGroup = async (group) => {
+    try {
+        console.log("Group getcoursedetails api", group);
+        const response = await app.post('user/api/client-api/group/user-courses', group);
+        console.log("Courses details ", response.data.data);
+        return response.data;
+    }
+    catch (error) {
+        alert("Couldn't fetch courses");
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+export const getUserGroups = async () => {
+
+    try {
+        const response = await app.get('user/api/client-api/group/user-groups')
+        console.log("GROUP DETAILS", response.data);
+        return response.data.data;
+    }
+    catch (error) {
+        alert("Error fetching groups");
+        throw new Error(error?.response?.data?.message);
+    }
+
+};

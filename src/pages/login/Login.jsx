@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import './Login.css';
-import image from "../../assets/login-image.jpeg";
+import image from "../../assets/login-image-trial.jpg";
 import Button from "../../components/shared/button/Button";
 import { userLogin } from "../../service/UserService";
 import { login } from "../../redux/authentication/authActions";
@@ -46,8 +46,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
   const validateForm = () => {
     let formErrors = {};
-    if (!password) formErrors.password = "Password is required!";
-    if (!checkboxChecked) formErrors.checkbox = "You must agree!";
+    if (!password) formErrors.password = "Password is required!"
     if (!userName) {
       formErrors.userName = "Username is required!";
     } else if (!validateEmailOrMobile(userName)) {
@@ -79,20 +78,19 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
       const normalizedRoles = Array.isArray(roles) ? roles : [roles];
 
-      // Store auth info in Redux
-      dispatch(login({
+    dispatch(login({
         roles: normalizedRoles,
         email,
         accessToken: response.accessToken
       }));
 
-      // Store token in localStorage
+   
       localStorage.setItem('authtoken', response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
       console.log("roles", normalizedRoles)
       // ✅ Navigate based on role
       if (normalizedRoles.includes("ADMIN")) {
-        console.log("enered admin");
+        console.log("entered admin");
         navigate("/admin");
       } else if (normalizedRoles.includes("EMPLOYEE")) {
         navigate("/user", { state: { userId, name: fullName } });
@@ -108,7 +106,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page" style={{ backgroundColor: '#ccdcfa' }}>
       <div className="login-container">
         <div className="login-img">
           <img src={image} alt="login-side-img" />
@@ -148,8 +146,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
             required
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
-
-          <div className='checkbox'>
+          {/* <div className='checkbox'>
             <input
               type="checkbox"
               checked={checkboxChecked}
@@ -159,8 +156,8 @@ u/bvWV47VOzzM+ObAgMBAAE=
               }}
             />
             <div className='checkbox-text'>Agree to all Terms and Conditions?</div>
-          </div>
-          {errors.checkbox && <div className="error-text">{errors.checkbox}</div>}
+          </div> */}
+          {/* {errors.checkbox && <div className="error-text">{errors.checkbox}</div>} */}
 
           <Button text="Login" type="submit" onClick={handleLoginClick} />
         </div>

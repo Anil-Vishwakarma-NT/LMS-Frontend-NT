@@ -31,8 +31,8 @@ import GroupHistory from "./components/admin/Group/GroupHistory";
 import QuizListPage from "./pages/quiz/QuizListPage";
 import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
-import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
-
+import UserGroup from "./components/user/myGroups/UserGroup"; import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
+import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,17 +57,17 @@ function App() {
 
   const getUser = async (token) => {
     try {
-      const decoded = jwtDecode(token); 
+      const decoded = jwtDecode(token);
       const { email, roles, exp } = decoded;
 
       // Check if token is expired
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (exp < currentTime) {
-          console.warn("Token expired!");
-          localStorage.removeItem("authtoken");
-          navigate("/");
-          return;
-        }
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (exp < currentTime) {
+        console.warn("Token expired!");
+        localStorage.removeItem("authtoken");
+        navigate("/");
+        return;
+      }
 
       dispatch(login({ email, roles, accessToken: token }));
 
@@ -104,6 +104,14 @@ function App() {
           element={
             <UserRoutes>
               <MyCourses />
+            </UserRoutes>
+          }
+        />
+        <Route
+          path="/my-groups"
+          element={
+            <UserRoutes>
+              <UserGroup />
             </UserRoutes>
           }
         />
@@ -183,12 +191,22 @@ function App() {
             </AdminRoutes>
           }
         />
-         <Route
+
+        <Route
           path="/group-history/:id"
           element={
             <AdminRoutes>
               <GroupHistory />
             </AdminRoutes>
+          }
+        />
+
+        <Route
+          path="/group-user-history/:id"
+          element={
+            <UserRoutes>
+              <UserGroupHistory />
+            </UserRoutes>
           }
         />
         <Route

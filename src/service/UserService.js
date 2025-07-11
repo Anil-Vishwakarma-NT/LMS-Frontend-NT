@@ -9,9 +9,9 @@ export async function fetchUsers() {
 }
 
 export async function userStats(userId) {
-  try {  
+  try {
     const response = await app.get(
-      `user/api/client-api/enrollments/${userId}/statistics`);
+      `user/api/client-api/users/${userId}/statistics`);
     return response.data;
   } catch (error) {
     console.log("userStat error");
@@ -27,29 +27,13 @@ export async function userdeadlines() {
       'user/api/client-api/users/getDeadlines'
     );
     console.log("user deadlines response", response.data.data);
-    
+
     return response.data;
   } catch (error) {
     console.log("userStat error");
     throw new Error(error?.response?.data?.message);
   }
 }
-
-
-// export async function userdeadlines() {
-//   try {
-
-//     const response = await app.get(
-//       '/api/users/getDeadlines'
-//     );
-//     console.log("user deadlines response", response.data.data);
-    
-//     return response.data;
-//   } catch (error) {
-//     console.log("userStat error");
-//     throw new Error(error?.response?.data?.message);
-//   }
-// }
 
 export async function deleteUsers(id) {
   try {
@@ -61,7 +45,7 @@ export async function deleteUsers(id) {
 }
 
 export async function fetchAllActiveUsers() {
-  try {  
+  try {
     const response = await app.get("user/api/client-api/admin/active-employees");
     return response.data;
   } catch (error) {
@@ -115,18 +99,6 @@ export async function userLogin(data) {
   }
 }
 
-// export async function getUserByToken(token) {
-//   try {
-//     const response = await app.get("/api/current-user", {
-//       headers: {
-//         Authorization: token,
-//       },
-//     });
-//     return response.data;
-//   } catch (error) {
-//     throw new Error(error?.response?.data?.message);
-//   }
-// }
 
 export async function logoutUser() {
   const response = await app.post("/api/client-api/auth/logout");
@@ -137,7 +109,7 @@ export async function logoutUser() {
 export const previewUserReportPdf = async (options) => {
   return app
     .post(`user/api/client-api/custom-user-report/preview-pdf`, options, {
-      responseType: "blob" 
+      responseType: "blob"
     })
     .then((res) => res.data);
 };
@@ -145,9 +117,9 @@ export const previewUserReportPdf = async (options) => {
 export async function downloadUserReportPdf(options) {
   try {
     const response = await app.post(
-      `user/api/client-api/custom-user-report/download-pdf`,options,
+      `user/api/client-api/custom-user-report/download-pdf`, options,
       {
-        responseType: "blob" 
+        responseType: "blob"
       }
     );
 
@@ -172,9 +144,9 @@ export async function downloadUserReportPdf(options) {
 export async function downloadUserReportExcel(options) {
   try {
     const response = await app.post(
-      `user/api/client-api/custom-user-report/download-excel`,options,
+      `user/api/client-api/custom-user-report/download-excel`, options,
       {
-        responseType: "blob" 
+        responseType: "blob"
       }
     );
 
