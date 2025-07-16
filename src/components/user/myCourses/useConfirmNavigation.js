@@ -1,31 +1,50 @@
 import { useBlocker } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "antd";
 
 export default function useConfirmNavigation(shouldBlock, onConfirm) {
-  const blocker = useBlocker(shouldBlock);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const shouldBlockRef = useRef(shouldBlock);
+  const blocker = useBlocker(() => shouldBlockRef.current);
+  const [isHandling, setIsHandling] = useState(false);
 
   useEffect(() => {
-    if (blocker.state === "blocked" && !isModalVisible) {
-      setIsModalVisible(true);
+    shouldBlockRef.current = shouldBlock;
+  }, [shouldBlock]);
+
+  useEffect(() => {
+    if (blocker.state === "blocked" && !isHandling) {
+      setIsHandling(true); // Prevent multiple modals
 
       Modal.confirm({
         title: "Leave Quiz?",
         content: "If you leave, your quiz will be auto-submitted.",
         okText: "Submit & Leave",
         cancelText: "Stay on Quiz",
+        centered: true,
         async onOk() {
-          await onConfirm();          // Submit quiz
-          blocker.proceed();          // Proceed with navigation
-          setIsModalVisible(false);   // Reset modal state
+          try {
+            await onConfirm();
+            blocker.proceed();
+          } catch (err) {
+            console.error("Auto-submit failed", err);
+          } finally {
+            Modal.destroyAll();
+            setIsHandling(false);
+          }
         },
         onCancel() {
-          blocker.reset();            // Cancel navigation
-          setIsModalVisible(false);   // Reset modal state
-        },
-        centered: true
+          blocker.reset();
+          setIsHandling(false);
+        }
       });
     }
-  }, [blocker, onConfirm, isModalVisible]);
+  }, [blocker, onConfirm, isHandling]);
+
+  useEffect(() => {
+    // Cleanup if unmounted or navigation completes
+    if (blocker.state === "unblocked") {
+      Modal.destroyAll();
+      setIsHandling(false);
+    }
+  }, [blocker.state]);
 }

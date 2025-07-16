@@ -1,6 +1,6 @@
 import { app, appCourse } from "../../../service/serviceLMS";
 import useConfirmNavigation  from "./useConfirmNavigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef} from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -34,6 +34,7 @@ const CourseQuizAttempt = () => {
   const [currentAttemptNumber, setAttempt] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const navigate = useNavigate();
+  const startRef = useRef(false);
 
 
   // Load quiz metadata
@@ -124,6 +125,7 @@ const CourseQuizAttempt = () => {
 
       // Start quiz
       setStart(true);
+      startRef.current = true;
       setTimeLeft(quiz.timeLimit * 60);
     } catch (err) {
       console.error(err);
@@ -163,6 +165,17 @@ const CourseQuizAttempt = () => {
       centered: true,
     });
   };
+
+const resetQuizState = () => {
+  setStart(false);
+  setUserAnswers({});
+  setMarkedForReview({});
+  setCurrentIndex(0);
+  setQuizAttemptId(null);
+  setAttempt(null);
+  setQuestions([]);
+  setTimeLeft(0);
+};
 
 const handleSubmit = async () => {
   if (!quizAttemptId || !quiz?.quizId) {
@@ -208,6 +221,9 @@ const handleSubmit = async () => {
     const res = await app.post(submitUrl, submissionPayload);
 
     message.success("Quiz submitted successfully!");
+    setStart(false); // Disable blocker BEFORE navigation
+    startRef.current = false;
+    
 
     const result = res.data?.data;
     const scoreDetails = result?.scoreDetails
@@ -217,25 +233,20 @@ const handleSubmit = async () => {
           percentageScore: result.percentageScore,
           totalScore: result.totalScore,
         };
-    navigate(`/course-content-user/${courseId}`, {
-      state: {
-        quizResult: {
-          correctAnswers: scoreDetails.correctAnswers,
-          percentageScore: scoreDetails.percentageScore,
-          totalScore: scoreDetails.totalScore,
-          passingScore: quiz.passingScore
+    // Allow React state to update before navigation
+    setTimeout(() => {
+      navigate(`/course-content-user/${courseId}`, {
+        state: {
+          quizResult: {
+            correctAnswers: scoreDetails.correctAnswers,
+            percentageScore: scoreDetails.percentageScore,
+            totalScore: scoreDetails.totalScore,
+            passingScore: quiz.passingScore
+          },
         },
-      },
-    });
-
-    setStart(false);
-    setUserAnswers({});
-    setMarkedForReview({});
-    setCurrentIndex(0);
-    setQuizAttemptId(null);
-    setAttempt(null);
-    setQuestions([]);
-    setTimeLeft(0);
+      });
+    }, 0);
+    // resetQuizState();
   } catch (error) {
     console.error("Quiz submission error:", error);
     message.error("Failed to submit quiz.");
