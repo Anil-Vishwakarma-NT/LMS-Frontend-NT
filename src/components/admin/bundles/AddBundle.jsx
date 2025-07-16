@@ -1,75 +1,82 @@
-import { addGroup, updateGroup } from "../../../service/GroupService";
-import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Row, Col, Spin, Typography, Space } from "antd";
-import { fetchAllActiveUsers } from "../../../service/UserService";
-import { UserOutlined } from "@ant-design/icons";
-import { useEffect, useState } from 'react';
 
+import { getCourses, createBundle } from "../../../service/BundleService";
+import { Modal, Form, Input, Select, Button, Checkbox, Row, Col, Spin, Typography, Space } from "antd";
+import { BookOutlined } from "@ant-design/icons";
+import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 const { Text } = Typography;
 
-const GroupModal = (
-    {
-        isModalOpen,
-        getGroups,
-        handleCloseModal,
-        setToastMessage,
-        setToastType,
-        setShowToast,
-        setLoading,
-        loading
-    }
-) => {
+const AddBundle = ({
+    isModalOpen,
+    getBundles,
+    handleCloseModal,
+    setToastMessage,
+    setToastType,
+    setShowToast,
+    setLoading,
+    loading
+}) => {
+
     const [form] = Form.useForm();
-    const [userList, setUserList] = useState([]);
+    const [courseList, setCourseList] = useState([]);
     const [searchValue, setSearchValue] = useState('');
 
-    const filteredUsers = userList?.filter(user =>
+    const filteredCourses = courseList?.filter(user =>
         user.label.toLowerCase().includes(searchValue.toLowerCase())
         // user.email.toLowerCase().includes(searchValue.toLowerCase())
     );
-    async function getUserList() {
-        const activeUsers = await fetchAllActiveUsers();
-        const users = activeUsers.data.map((user, index) => ({
-            value: user.userId,
-            label: `${user.firstName} ${user.lastName}`,
-        }));
-        setUserList(users);
-        console.log(users);
+
+    async function getCoursesList() {
+        try {
+            setLoading(true);
+            const courses = await getCourses();
+            const courselist = courses.data?.map((course, index) => ({
+                value: course.courseId,
+                label: course.title,
+                courselevel: course.courseLevel
+            }))
+
+            setCourseList(courselist);
+            setToastMessage(courses?.message);
+            setToastType("success");
+            setShowToast(true);
+
+        } catch (error) {
+            setShowToast(true);
+            setToastMessage("Error getting course list to add in bundle.")
+            setToastType("error")
+            throw new Error(error?.response?.data?.message);
+        } finally {
+            setLoading(false);
+        }
+
+
     }
 
-    const handleSelectAll = () => {
-        const allFilteredUserIds = filteredUsers.map(user => user.value);
-        form.setFieldsValue({ employees: allFilteredUserIds });
-    };
-    const handleReset = () => {
-        form.setFieldsValue({ employees: [] });
-    }
 
     useEffect(() => {
         form.setFieldsValue({
-            groupName: "",
-            employees: [],
-        });
-
-        getUserList()
+            bundleName: "",
+            courses: [],
+        })
+        getCoursesList();
     }, [isModalOpen])
 
     const handleAdd = async () => {
         try {
             const values = await form.validateFields();
-            if (!values.groupName) {
-                form.setFields("Group name required");
+            if (!values.bundleName) {
+                form.setFields("Bundle name required");
                 return;
             }
             setLoading(true);
-            const data = await addGroup(values);
+            const data = await createBundle(values);
             console.log(values);
             setToastMessage(data?.message);
             setToastType("success");
             setShowToast(true);
-            getGroups();
+            getBundles();
             handleCloseModal();
 
         } catch (error) {
@@ -81,20 +88,15 @@ const GroupModal = (
         }
     };
 
+
     return (
         <Modal
-            title={`Add new group`}
+            title={`Create new Bundle`}
             visible={isModalOpen}
             onCancel={handleCloseModal}
             footer={
                 <span>
-                    <Button
-                        key="reset"
-                        style={{ marginRight: 8 }}
-                        onClick={handleReset}
-                    >
-                        Reset
-                    </Button>
+
                     <Button
                         key="submit"
                         type="primary"
@@ -112,24 +114,24 @@ const GroupModal = (
         >
             <Form form={form} layout="vertical" name="group_form">
                 <Form.Item
-                    label="Group Name"
-                    name="groupName"
+                    label="bundle Name"
+                    name="bundleName"
                     rules={[{ required: true, message: "group name is required!" }]}
                 >
                     <Input autoComplete="off" />
                 </Form.Item>
 
 
-                <Form.Item name="employees"
+                <Form.Item name="courses"
                     label={
                         <Space>
-                            <UserOutlined />
+                            <BookOutlined />
                             <Text strong>
-                                Select User(s) to add
+                                Select Course(s) to add
                             </Text>
                         </Space>
                     }>
-                    <Select placeholder={`Select employees`}
+                    <Select placeholder={`Select Courses`}
                         showSearch
                         mode="multiple"
                         optionFilterProp="label"
@@ -142,7 +144,7 @@ const GroupModal = (
                                 `No users available`
                         }
                     >
-                        {filteredUsers?.map(user => (
+                        {filteredCourses?.map(user => (
                             <Option
                                 key={user.value}
                                 value={user.value}
@@ -151,10 +153,11 @@ const GroupModal = (
                                 <div>
                                     <Text strong>{user.label}</Text>
                                     <br />
+
                                 </div>
                             </Option>
                         ))}
-                        {filteredUsers?.length === 0 && (
+                        {filteredCourses?.length === 0 && (
                             <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
                         )}
                     </Select>
@@ -162,5 +165,9 @@ const GroupModal = (
             </Form>
         </Modal>
     );
+
+
+
 };
-export default GroupModal;
+
+export default AddBundle;

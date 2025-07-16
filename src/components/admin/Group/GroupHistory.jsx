@@ -1,5 +1,5 @@
 import { Layout, Typography, Divider } from 'antd';
-import { Table, Empty, Button, Space, Progress, Tooltip } from "antd";
+import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
 import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -12,17 +12,13 @@ import AddNewUserModal from './AddNewUSerModal';
 import EditGroupNameModal from './EditGroupNameModal';
 import AllocateCourseModal from './AllocateCourseModal';
 import { useSelector } from "react-redux";
-
-
-
 const { Content } = Layout;
 const { Title } = Typography;
 
 const GroupHistory = ({ setLoading }) => {
 
-
-    const location = useLocation();
     const { id } = useParams();
+    const location = useLocation();
     const [groupName, setGroupName] = useState(location.state?.name || 'N/A');
     const auth = useSelector((state) => state.auth);
     const navigate = useNavigate();
@@ -41,13 +37,13 @@ const GroupHistory = ({ setLoading }) => {
     const [userId, setUserId] = useState(null);
 
     async function getUsers() {
-
         const response = await getUsersInGroup(id);
         if (!Array.isArray(response)) {
             console.error("Expected an array but got:", response);
             setUserList([]);
             return;
         }
+
         const users = response.map((user, index) => ({
             id: user.userId,
             srno: index + 1,
@@ -58,6 +54,7 @@ const GroupHistory = ({ setLoading }) => {
         }));
 
         setUserList(users);
+
     }
 
     async function getCourses() {
@@ -118,10 +115,12 @@ const GroupHistory = ({ setLoading }) => {
         setIsConfirmPopupOpen(true);
         setDeleteUser(user);
     };
-
     const handleEditGroup = () => {
         setEditPopOpen(prev => !prev);
     }
+
+
+
     const handleDeleteUser = async () => {
         try {
             setLoading(true)
@@ -134,7 +133,6 @@ const GroupHistory = ({ setLoading }) => {
             setToastType("success");
             setShowToast(true);
             await getUsers();
-            await getCourses();
         } catch (error) {
             setToastMessage(error?.message || "Error occurred while deleting the User.");
             setToastType("error");
@@ -148,6 +146,7 @@ const GroupHistory = ({ setLoading }) => {
     useEffect(() => {
         getUsers();
         getCourses();
+        // console.log("USERS RECEIVED in Group History!!", userList)
     }, [id]);
 
 
@@ -191,6 +190,7 @@ const GroupHistory = ({ setLoading }) => {
                         strokeColor={
                             rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'
                         }
+                        // ensures the label inside the circle also shows 1 decimal place
                         format={(p) => `${p.toFixed(1)}%`}
                     />
                 );
@@ -225,7 +225,7 @@ const GroupHistory = ({ setLoading }) => {
                 <>
                     <Space >
 
-                        <Button
+                       <Button
                             icon={<DeleteOutlined />}
                             style={{ marginRight: 8 }}
                             onClick={() => handleOpenConfirmDeletePopup(record)}
@@ -236,7 +236,7 @@ const GroupHistory = ({ setLoading }) => {
                                 handleViewUserClick(record?.id, record?.name)
                             }
                         />
-                        {!showCourse && <Tooltip title="Allocate course">
+                       {!showCourse && <Tooltip title="Allocate course">
                             <Button
                                 icon={<FileAddOutlined />}
                                 onClick={() => handleAllocateCourse(record.id)}
@@ -254,10 +254,7 @@ const GroupHistory = ({ setLoading }) => {
             <Content style={{ margin: '0 16px' }}>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
                         <Title level={2} style={{ margin: 0 }}>{groupName}   Details</Title>
-                        {/* </div>
-                    <div> */}
                         <Button style={{ marginLeft: 30 }}
                             icon={<EditOutlined />}
                             onClick={handleEditGroup}
@@ -266,19 +263,19 @@ const GroupHistory = ({ setLoading }) => {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
-                         <Button style={{ marginLeft: 30 }}
-                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
-                            onClick={handleViewCourse}
-                        >
-                            {!showCourse ? "View Course" : "View Users"}
-                        </Button>
+
                         {!showCourse && <Button style={{ marginLeft: 30 }}
                             icon={<UserAddOutlined />}
                             onClick={handleAddNew}
                         >
                             Add new User
                         </Button>}
-                       
+                        <Button style={{ marginLeft: 30 }}
+                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
+                            onClick={handleViewCourse}
+                        >
+                            {!showCourse ? "View Course" : "View Users"}
+                        </Button>
                     </div>
                     <Divider style={{ marginTop: 0 }} />
                     {filteredList.length > 0 ? (
@@ -302,8 +299,7 @@ const GroupHistory = ({ setLoading }) => {
                 setLoading={setLoading}
                 groupId={id}
                 existingUsers={userList}
-                courses={courseList}
-                getCourses={getCourses} />
+                courses={courseList} />
             <Toast
                 message={toastMessage}
                 type={toastType}

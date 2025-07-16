@@ -23,7 +23,7 @@ const AllGroup = ({ setLoading }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState(null);
-    const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+    const [isConfirmPopupOpen,setIsConfirmPopupOpen] = useState(false);
     const [groupToDelete, setGroupToDelete] = useState(null);
 
     async function getGroups() {
@@ -78,7 +78,7 @@ const AllGroup = ({ setLoading }) => {
     const handleViewGroupClick = (id, name) => {
         console.log("usersAdmin name ", id);
         navigate(`/group-history/${id}`, {
-            
+
             state: { name: name }
         });
     };
@@ -126,8 +126,7 @@ const AllGroup = ({ setLoading }) => {
                 </>
             )
         }
-        //    : {}
-        // )
+
     ]
 
 
@@ -140,8 +139,7 @@ const AllGroup = ({ setLoading }) => {
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
                         {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
                         <Title level={2} style={{ margin: 0 }}>Groups Overview</Title>
-                        {/* </div>
-                    <div> */}
+                    
                         <Button style={{ marginLeft: 100 }}
                             icon={<UsergroupAddOutlined />}
                             onClick={handleAddNew}

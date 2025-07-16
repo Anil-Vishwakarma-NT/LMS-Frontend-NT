@@ -8,8 +8,7 @@ import AdminDashboard from "./components/admin/adminDashboard/AdminDashboard";
 import UserDashboard from "./components/user/userDashboard/UserDashboard";
 import Home from "./pages/homePage/Home";
 import Navbar from "./components/shared/navbar/Navbar";
-import BooksAdmin from "./components/admin/booksAdmin/CoursesAdmin";
-import CategoriesAdmin from "./components/admin/categoriesAdmin/CategoriesAdmin";
+import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
 import UsersAdmin from "./components/admin/usersAdmin/UsersAdmin";
 import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
@@ -33,6 +32,11 @@ import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
 import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
 import UserGroup from "./components/user/myGroups/UserGroup"; import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
 import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";
+import BundlesHistory from "./components/admin/bundles/BundlesHistory";
+
+
+
+
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -143,18 +147,18 @@ function App() {
           }
         />
         <Route
-          path="/categories"
+          path="/bundles"
           element={
             <AdminRoutes>
-              <CategoriesAdmin />
+              <BundlesAdmin />
             </AdminRoutes>
           }
         />
         <Route
-          path="/issuance"
+          path="/bundles-history/:id"
           element={
             <AdminRoutes>
-              <IssuanceAdmin />
+              <BundlesHistory />
             </AdminRoutes>
           }
         />
@@ -163,14 +167,6 @@ function App() {
           element={
             <AdminRoutes>
               <UserHistory />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/book-history/:id"
-          element={
-            <AdminRoutes>
-              <BookHistory />
             </AdminRoutes>
           }
         />
