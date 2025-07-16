@@ -179,7 +179,12 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
                   style={{ width: 300 }}
                 />
                 <MinusCircleOutlined
-                  onClick={() => setOptions(options.filter((_, i) => i !== idx))}
+                  onClick={() => {
+                    if (options.length <= 2) {
+                      return message.warning("At least 2 options are required.");
+                    }
+                    setOptions(options.filter((_, i) => i !== idx));
+                  }}
                   style={{ color: "#ff4d4f", cursor: "pointer" }}
                 />
               </Space>
@@ -188,6 +193,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
               icon={<PlusOutlined />}
               onClick={() => setOptions([...options, ""])}
               type="dashed"
+              disabled={options.length >= 5}
             >
               Add Option
             </Button>

@@ -1,4 +1,4 @@
-import { app} from "../../../service/serviceLMS";
+import { app } from "../../../service/serviceLMS";
 import React, { useState, useEffect } from "react";
 import { Table, Tooltip, Space, Button, message } from "antd";
 import {
@@ -7,13 +7,17 @@ import {
   EyeOutlined,
   FilePdfOutlined,
   UnorderedListOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import QuizModal from "./QuizModal";
 import CourseReportOptionsModal from "../../admin/booksAdmin/CourseReportOptionsModal";
 import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
-import { previewCourseReportPdf, downloadCourseReportPdf, downloadCourseReportExcel} from "../../../service/BookService";
+import {
+  previewCourseReportPdf,
+  downloadCourseReportPdf,
+  downloadCourseReportExcel,
+} from "../../../service/BookService";
 
 const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   const navigate = useNavigate();
@@ -22,19 +26,17 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [quizToEdit, setQuizToEdit] = useState(null);
   const [isMetadataOnly, setIsMetadataOnly] = useState(false);
-  const [latestQuizId, setLatestQuizId] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportBlobUrl, setReportBlobUrl] = useState("");
   const [reportingCourseId, setReportingCourseId] = useState(null);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [reportOptions, setReportOptions] = useState(null);
 
-
   const handleReportOptionsSubmit = async (options) => {
     try {
       setShowOptionsModal(false);
-      setReportOptions(options);  
-  
+      setReportOptions(options);
+
       const blob = await previewCourseReportPdf(options);
       const blobUrl = URL.createObjectURL(blob);
       setReportBlobUrl(blobUrl);
@@ -46,13 +48,13 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
 
   const handleDownloadPdf = async () => {
     try {
-      await downloadCourseReportPdf(reportOptions); 
+      await downloadCourseReportPdf(reportOptions);
       message.success("PDF downloaded successfully");
     } catch {
       message.error("Failed to download PDF");
     }
   };
-  
+
   const handleDownloadExcel = async () => {
     try {
       await downloadCourseReportExcel(reportOptions);
@@ -61,7 +63,6 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
       message.error("Failed to download Excel");
     }
   };
-  
 
   const handleAddQuizClick = (course, metadataOnly = false) => {
     setSelectedCourse(course);
@@ -105,6 +106,8 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
             const quizResponse = await app.get(`course/api/client-api/quizzes/course/${course.courseId}`);
             const quizzes = quizResponse?.data?.data || [];
             const latestQuiz = quizzes[0];
+            const quizCreated1 = quizzes.length > 0
+            console.log("quizCreated", quizCreated1, course.courseId)
             return {
               ...course,
               quizCreated: quizzes.length > 0,
@@ -121,6 +124,17 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
       message.error("Failed to load courses");
     }
   };
+
+  const finalData = entries
+  ? entries.map((entry) => {
+      const courseMatch = courses.find((c) => c.courseId === entry.courseId);
+      return {
+        ...entry,
+        quizCreated: courseMatch?.quizCreated || false,
+        quizId: courseMatch?.quizId || null,
+      };
+    })
+  : courses;
 
   useEffect(() => {
     fetchCourses();
@@ -140,7 +154,8 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
     {
       title: "Created At",
       dataIndex: "createdAt",
-      render: (createdAt) => createdAt ? new Date(createdAt.split(".")[0]).toLocaleDateString() : "N/A",
+      render: (createdAt) =>
+        createdAt ? new Date(createdAt.split(".")[0]).toLocaleDateString() : "N/A",
     },
     {
       title: "Updated At",
@@ -150,7 +165,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
     {
       title: "Actions",
       key: "actions",
-      width: 320,
+      width: 330,
       render: (_, record) => (
         <Space wrap>
           <Tooltip title="Edit">
@@ -167,34 +182,48 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
               icon={<FilePdfOutlined />}
               onClick={() => {
                 setReportingCourseId(record.courseId);
-                setShowOptionsModal(true);  
+                setShowOptionsModal(true);
               }}
               type="text"
             />
           </Tooltip>
-          <Tooltip title="Manage Quiz">
-            <Button
-              type="primary"
-              icon={<UnorderedListOutlined />}
-              onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
-            >
-              Manage Quiz
-            </Button>
-          </Tooltip>
+
+          {record.quizCreated ? (
+            <Tooltip title="Manage Quiz">
+              <Button
+                type="primary"
+                icon={<UnorderedListOutlined />}
+                onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
+              >
+                Manage Quiz
+              </Button>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Add Quiz">
+              <Button
+                type="dashed"
+                icon={<UnorderedListOutlined />}
+                onClick={() => navigate(`/course-content/${record.courseId}/quizzes`)}
+              >
+                Add Quiz
+              </Button>
+            </Tooltip>
+          )}
         </Space>
       ),
-    },
+    }
   ];
 
   return (
     <div style={{ padding: "16px", marginLeft: "35px", marginRight: "25px" }}>
       <Table
         columns={columns}
-        dataSource={entries || courses}
+        dataSource={finalData}
         rowKey="courseId"
         bordered
         pagination={{ pageSize: 10 }}
       />
+
       <PDFReaderModal
         isOpen={isReportModalOpen}
         pdfUrl={reportBlobUrl}
@@ -208,14 +237,16 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
         onDownloadPdf={handleDownloadPdf}
         onDownloadExcel={handleDownloadExcel}
       />
+
       {showOptionsModal && (
-      <CourseReportOptionsModal
-        isOpen={showOptionsModal}
-        onClose={() => setShowOptionsModal(false)}
-        onSubmit={(options) => handleReportOptionsSubmit(options)}
-        courseId={String(reportingCourseId)}
-      />
-        )}
+        <CourseReportOptionsModal
+          isOpen={showOptionsModal}
+          onClose={() => setShowOptionsModal(false)}
+          onSubmit={handleReportOptionsSubmit}
+          courseId={String(reportingCourseId)}
+        />
+      )}
+
       {selectedCourse && (
         <QuizModal
           open={quizModalOpen}
