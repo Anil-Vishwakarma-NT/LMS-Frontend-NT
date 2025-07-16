@@ -75,17 +75,17 @@ export const getUsersInGroup = async (groupId) => {
 }
 
 
-export const getUsersNameInGroup = async (groupId) => {
-    try {
-        const response = await app.get(`user/api/client-api/group/emp/group-emps/${groupId}`)
-        console.log("Users in a group ", response.data.data);
-        return response.data.data;
-    }
-    catch (error) {
-        alert("Couldn't fetch users");
-        throw new Error(error?.response?.data?.message);
-    }
-}
+// export const getUsersNameInGroup = async (groupId) => {
+//     try {
+//         const response = await app.get(`user/api/client-api/group/emp/group-emps/${groupId}`)
+//         console.log("Users in a group ", response.data.data);
+//         return response.data.data;
+//     }
+//     catch (error) {
+//         alert("Couldn't fetch users");
+//         throw new Error(error?.response?.data?.message);
+//     }
+// }
 
 
 export const deleteSingleUser = async (user) => {

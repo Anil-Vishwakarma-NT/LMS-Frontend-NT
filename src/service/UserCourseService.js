@@ -12,18 +12,18 @@ export async function fetchUserEnrolledCourses() {
   }
 }
 
-export async function fetchUserEnrolledCoursesById(userId) {
-  try {
-    const response = await app.get(
-      `user/api/client-api/enrollment/userCourses/${userId}`);
-      console.log("Response of fetchUserEnrolledCoursesById", response.data.data)
-    return response.data.data;
-  } catch (error) {
-    throw new Error(
-      error?.response?.data?.message || "Failed to fetch enrolled courses."
-    );
-  }
-}
+// export async function fetchUserEnrolledCoursesById(userId) {
+//   try {
+//     const response = await app.get(
+//       `user/api/client-api/enrollment/userCourses/${userId}`);
+//       console.log("Response of fetchUserEnrolledCoursesById", response.data.data)
+//     return response.data.data;
+//   } catch (error) {
+//     throw new Error(
+//       error?.response?.data?.message || "Failed to fetch enrolled courses."
+//     );
+//   }
+// }
 
 
 // export async function fetchUserEnrolledCoursesWithoutId() {
@@ -127,10 +127,12 @@ export async function getUserEnrolledCourseDetails(userId) {
   try {
     let enrollments = null;
     if (userId != null || userId != undefined) {
+      //admin 
       enrollments = await fetchUserEnrolledCourses(userId);
       console.log("Enrolled courses fetched ", enrollments);
     }
     else {
+      //employee without userId
       enrollments = await fetchUserEnrolledCoursesWithoutId();
     }
     if (enrollments != null) {
