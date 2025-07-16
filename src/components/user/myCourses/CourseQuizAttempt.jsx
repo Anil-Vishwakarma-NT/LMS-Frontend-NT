@@ -1,11 +1,12 @@
 import { app, appCourse } from "../../../service/serviceLMS";
+import useConfirmNavigation  from "./useConfirmNavigation";
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+
 import {
   Typography, Spin, Alert, Card, Tag,
   Button, Input, Radio, Checkbox, Space, message, Modal 
 } from "antd";
-import axios from "axios";
 import {
   InfoCircleOutlined,
   ClockCircleOutlined,
@@ -31,7 +32,9 @@ const CourseQuizAttempt = () => {
   const [error, setError] = useState("");
   const [quizAttemptId, setQuizAttemptId] = useState(null);
   const [currentAttemptNumber, setAttempt] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const navigate = useNavigate();
+
 
   // Load quiz metadata
   useEffect(() => {
@@ -75,6 +78,19 @@ const CourseQuizAttempt = () => {
 
     return () => clearInterval(interval);
   }, [start, timeLeft]);
+
+  useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (start) {
+      e.preventDefault();
+      e.returnValue = "Are you sure you want to leave? Your quiz will be auto-submitted.";
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+}, [start]);
+
 
   const handleStartQuiz = async () => {
     try {
@@ -225,6 +241,9 @@ const handleSubmit = async () => {
     message.error("Failed to submit quiz.");
   }
 };
+
+useConfirmNavigation(start, handleSubmit);
+
 
 
   const formatTime = (seconds) => {
