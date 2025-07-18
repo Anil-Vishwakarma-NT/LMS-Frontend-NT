@@ -11,7 +11,11 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <ul className="navbar-menu">
-        <li className="navbar-logo"><Link to={auth?.roles.includes("ADMIN")?"/admin" : "/user"}><img src={logo} alt="logo" className='logo' style={{ width: '70px', height: 'auto' }} ></img></Link></li>
+        <li className="navbar-logo">
+            <Link to={auth?.roles?.includes("ADMIN") ? "/admin" : "/user"}>
+               <img src={logo} alt="logo" className='logo' style={{ width: '70px', height: 'auto' }} />
+            </Link>
+        </li>
         <li className="nav-link">
           {auth?.role === "ROLE_ADMIN" ? (
             <>
