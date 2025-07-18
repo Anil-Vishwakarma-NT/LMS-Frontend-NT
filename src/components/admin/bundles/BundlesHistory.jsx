@@ -10,7 +10,7 @@ import { deleteSingleUser } from '../../../service/GroupService';
 import Toast from '../../shared/toast/Toast';
 import { useSelector } from "react-redux";
 import AddNewCourseModal from './AddNewCourseModal';
-import { getAllBundleCourses } from '../../../service/BundleService';
+import { getAllBundleCourses, deleteCourseFromBundle } from '../../../service/BundleService';
 import EditBundleNameModal from './EditBundleNameModal';
 const { Content } = Layout;
 const { Title } = Typography;
@@ -23,7 +23,7 @@ const GroupHistory = ({ setLoading }) => {
     const auth = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const [userList, setUserList] = useState([]);
-    const [deleteUser, setDeleteUser] = useState([]);
+    const [deleteCourse, setDeleteCourse] = useState([]);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState(null);
@@ -42,7 +42,8 @@ const GroupHistory = ({ setLoading }) => {
         const users = response.map((user, index) => ({
             id: user.courseId,
             srno: index + 1,
-            name: user.courseName,
+            name: user.title,
+            status: user.active ? "Active" : "Removed"
         }));
         setCourseList(users);
     }
@@ -67,9 +68,9 @@ const GroupHistory = ({ setLoading }) => {
         setIsModalOpen(prev => !prev);
     };
 
-    const handleOpenConfirmDeletePopup = (user) => {
+    const handleOpenConfirmDeletePopup = (course) => {
         setIsConfirmPopupOpen(true);
-        setDeleteUser(user);
+        setDeleteCourse(course);
     };
     const handleEditBundle = () => {
         setEditPopOpen(prev => !prev);
@@ -77,22 +78,18 @@ const GroupHistory = ({ setLoading }) => {
     const handleDeleteCourse = async () => {
         try {
             setLoading(true)
-            const groupdetails = {
-                groupId: id,
-                userId: deleteUser.id
-            }
-            const data = await deleteSingleUser(groupdetails);
+            const data = await deleteCourseFromBundle(id, deleteCourse.id);
             setToastMessage(data?.message || "User removed successfully!");
             setToastType("success");
             setShowToast(true);
-
+            getCourses();
         } catch (error) {
             setToastMessage(error?.message || "Error occurred while deleting the User.");
             setToastType("error");
             setShowToast(true);
         } finally {
             setIsConfirmPopupOpen(false);
-            setDeleteUser(null);
+            setDeleteCourse(null);
             setLoading(false)
         }
     };
@@ -117,6 +114,11 @@ const GroupHistory = ({ setLoading }) => {
             title: 'Course Name',
             dataIndex: 'name',
             key: 'name',
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
         },
         {
             title: "Actions",
@@ -190,13 +192,13 @@ const GroupHistory = ({ setLoading }) => {
                     )}
                 </div>
             </Content>
-            <AddNewCourseModal isModalOpen={isModalOpen}  handleCloseModal={handleCloseModal} setShowToast={setShowToast}
+            <AddNewCourseModal isModalOpen={isModalOpen} handleCloseModal={handleCloseModal} setShowToast={setShowToast}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
                 setLoading={setLoading}
                 bundleId={id}
-                getCourses ={getCourses}
-                 />
+                getCourses={getCourses}
+            />
             <Toast
                 message={toastMessage}
                 type={toastType}

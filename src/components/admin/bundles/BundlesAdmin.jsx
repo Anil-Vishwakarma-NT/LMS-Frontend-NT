@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import Paginate from "../../shared/pagination/Paginate";
-import {
-  createCategory,
-  deleteCategory,
-  fetchAllCategories,
-} from "../../../service/CategoryService";
 import searchLogo from "../../../assets/magnifying-glass.png";
 import Toast from "../../shared/toast/Toast";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
@@ -13,7 +8,7 @@ import { Table, Empty, Button, Tag, Space, Layout, Typography, Divider } from "a
 import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getAllBundles } from "../../../service/BundleService";
+import { getAllBundles, deleteBundle } from "../../../service/BundleService";
 import AddBundle from "./AddBundle";
 
 const { Content } = Layout;
@@ -52,12 +47,12 @@ const BundlesAdmin = ({ setLoading }) => {
     setIsModalOpen(prev => !prev);
   };
 
-  const handleDeleteGroup = async () => {
+  const handleDeleteBundle = async () => {
     try {
       setLoading(true)
       const data = [];
 
-      // await deleteBundle(bundleToDelete?.id);
+      await deleteBundle(bundleToDelete?.id);
       setToastMessage(data?.message || "Bundle deleted successfully!");
       setToastType("success");
       setShowToast(true);
@@ -81,9 +76,9 @@ const BundlesAdmin = ({ setLoading }) => {
     });
   };
 
-  const handleOpenConfirmDeletePopup = (group) => {
+  const handleOpenConfirmDeletePopup = (bundle) => {
     setIsConfirmPopupOpen(true);
-    setBundleToDelete(group);
+    setBundleToDelete(bundle);
   };
 
   const handleCloseModal = () => {
@@ -181,7 +176,7 @@ const BundlesAdmin = ({ setLoading }) => {
       <ConfirmDeletePopup
         isOpen={isConfirmPopupOpen}
         onClose={() => setIsConfirmPopupOpen(false)}
-        onConfirm={handleDeleteGroup}
+        onConfirm={handleDeleteBundle}
       />
     </div>
   )

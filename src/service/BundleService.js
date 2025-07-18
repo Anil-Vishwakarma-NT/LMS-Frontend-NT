@@ -18,7 +18,7 @@ export const getAllBundles = async () => {
 export const getAllBundleCourses = async (bundleId) => {
 
     try {
-        const response = await app.get(`course/api/client-api/course-bundles/bundle/${bundleId}`)
+        const response = await app.get(`course/api/client-api/course-bundles/bundle/bundlecourses?bundleId=${bundleId}`)
         console.log("Course DETAILS", response.data.data);
         return response.data.data;
     } catch (error) {
@@ -31,7 +31,7 @@ export const getAllBundleCourses = async (bundleId) => {
 export const CoursesToAdd = async (bundleId) => {
 
     try {
-        const response = await app.get(`course/api/client-api/course-bundles/bundle/courses/${bundleId}`)
+        const response = await app.get(`course/api/client-api/course-bundles/bundle/courses?bundleId=${bundleId}`)
         console.log("Course DETAILS", response.data.data);
         return response.data.data;
     } catch (error) {
@@ -55,6 +55,17 @@ export const addCourseToBundle = async (bundle) => {
     }
 
 };
+
+
+export const deleteCourseFromBundle = async (bundleId, courseId) => {
+    try {
+        const response = await app.delete(`course/api/client-api/course-bundles/bundle/removeCourse?bundleId=${bundleId}&courseId=${courseId}`)
+        return response.data;
+    } catch (error) {
+
+        throw new Error(error?.response?.data?.message);
+    }
+}
 
 
 
@@ -107,3 +118,25 @@ export const createBundle = async (bundle) => {
     }
 };
 
+
+
+export const deleteBundle = async (bundleId) => {
+    try {
+
+        const response = await app.delete(`user/api/client-api/admin/bundle?bundleId=${bundleId}`);
+
+        return response.data;
+    } catch (error) {
+        throw new Error(error?.response?.data?.message || "Server error while creating bundle");
+    }
+};
+
+
+export const bundlesOfGroup = async (groupId) => {
+    try {
+        const response = await app.get(`user/api/client-api/group/bundles?groupId=${groupId}`);
+        return response.data.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message);
+    }
+}

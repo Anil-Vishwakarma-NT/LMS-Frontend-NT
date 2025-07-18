@@ -17,6 +17,7 @@ const AddNewUserModal = (
         getCourses,
         existingUsers,
         courses,
+        bundles,
         groupId,
         handleCloseModal,
         setToastMessage,
@@ -32,7 +33,7 @@ const AddNewUserModal = (
     const [notAddedUsers, setNotAddedUSers] = useState([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchCourse, setSearchCourse] = useState('');
-
+    
     const filteredUsers = notAddedUsers?.filter(user =>
         user.label.toLowerCase().includes(searchValue.toLowerCase())
         // user.email.toLowerCase().includes(searchValue.toLowerCase())
@@ -75,14 +76,13 @@ const AddNewUserModal = (
             groupId: groupId,
             employees: [],
             courses: [],
-
+            bundles :[],
         });
 
         getUserList();
 
     }, [isModalOpen]);
 
-    // ✅ New useEffect for filtering users
     useEffect(() => {
         if (userList.length > 0 && existingUsers.length > 0) {
             const usr = userList.filter(
