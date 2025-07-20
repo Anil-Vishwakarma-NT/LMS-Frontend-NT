@@ -1,10 +1,10 @@
-import { addUser, updateGroup, getUserCoursesInGroup } from "../../../service/GroupService";
+import { addUser, updateGroup, getUserCoursesInGroup, getUserBundlesInGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { Modal, Form, Input, Select, Button, Row, Checkbox, Col, DatePicker, Typography, Space, Spin } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 import { BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
-
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -27,21 +27,28 @@ const AllocateCourseModal = (
     const [searchCourse, setSearchCourse] = useState('');
     const [courses, setCourses] = useState([]);
     const [courseMsg, setCourseMsg] = useState("");
+    const [bundles, setBundles] = useState([])
+
 
     const filteredCourses = courses?.filter(user =>
         user.title.toLowerCase().includes(searchCourse.toLowerCase())
     );
 
 
-    async function getCourseList() {
+    const filteredBundles = bundles?.filter(user =>
+        user.title.toLowerCase().includes(searchCourse.toLowerCase())
+    );
 
+
+    async function getCourseList() {
+        alert(userId);
         const payload = {
             groupId: Number(groupId),
-            userId: userId,
+            userId: Number(userId),
         }
         console.log("Payload", payload);
         const activeUsers = await getUserCoursesInGroup(payload);
-        const users = activeUsers.data?.map((user, index) => ({
+        const users = activeUsers?.data?.map((user, index) => ({
             courseId: user.courseId,
             title: user.title,
             level: user.courseLevel,
@@ -53,11 +60,31 @@ const AllocateCourseModal = (
     }
 
 
+    async function getBundleList() {
+
+        const payload = {
+            groupId: Number(groupId),
+            userId: userId,
+        }
+        console.log("Payload", payload);
+        const activeUsers = await getUserBundlesInGroup(payload);
+        const users = activeUsers.data?.map((user, index) => ({
+            courseId: user.bundleId,
+            title: user.bundleName,
+        }));
+        setBundles(users);
+        setCourseMsg(activeUsers.message);
+        console.log("BUNDLES", users);
+        console.log("MESSAGE", activeUsers.message);
+    }
+
+
     useEffect(() => {
         form.setFieldsValue({
             groupId: groupId,
             employees: [userId],
             courses: [],
+            bundles: []
         });
 
         getCourseList();
@@ -72,7 +99,7 @@ const AllocateCourseModal = (
                 employees: [userId], // ✅ Backend expects this
                 courses: values.courses,
                 deadline: values.deadline,
-                assignedAt: values.assignedAt,
+                assignedAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
             };
 
             setLoading(true);
@@ -81,6 +108,7 @@ const AllocateCourseModal = (
             const data = await addUser(payload);
             getUsers();
             getCourses();
+            
             setToastMessage(data?.message);
             setToastType("success");
             setShowToast(true);
@@ -112,7 +140,7 @@ const AllocateCourseModal = (
 
 
     const selectedCourses = Form.useWatch("courses", form);
-
+    const selectedBundles = Form.useWatch("bundles", form);
     return (
         (courses?.length > 0 ?
             <Modal
@@ -186,22 +214,65 @@ const AllocateCourseModal = (
                         </Select>
                     </Form.Item>
 
-                    {selectedCourses?.length > 0 && <Form.Item
+
+
+
+
+
+                    <Form.Item label={
+                        <Space>
+                            <BookOutlined />
+                            <Text strong>
+                                Select Bundle(s) to add
+                            </Text>
+                        </Space>
+                    } name="bundles">
+
+
+                        <Select placeholder={`Select bundle`}
+                            showSearch
+                            mode="multiple"
+                            optionFilterProp="label"
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            maxTagCount="responsive"
+                            notFoundContent={
+                                loading ? <Spin size="small" /> :
+                                    `No bundles available`
+                            }
+                        >
+
+
+
+                            {filteredBundles?.map(course => (
+                                <Option
+                                    key={course.id}
+                                    value={course.id}
+                                    label={course.title}
+                                >
+                                    <div>
+                                        <Text strong>{course.title}</Text>
+                                        <br />
+                                    </div>
+                                </Option>
+                            ))}
+                            {filteredBundles?.length === 0 && (
+                                <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
+                            )}
+
+
+                        </Select>
+                    </Form.Item>
+
+                    {(selectedCourses?.length > 0 || selectedBundles?.length > 0) && <Form.Item
                         name="deadline"
                         label="Deadline"
                         rules={[{ required: true, message: 'Please select a deadline!' }]}
                     >
                         <DatePicker style={{ width: '100%' }} />
                     </Form.Item>}
-                    {selectedCourses?.length > 0 &&
-                        <Form.Item
-                            name="assignedAt"
-                            label="assignedAt"
-                            rules={[{ required: true, message: 'Please select a assignment date!' }]}
-                        >
-                            <DatePicker style={{ width: '100%' }} />
-                        </Form.Item>
-                    }
+
                 </Form>
             </Modal> : <Modal
                 title={`Allocate course to user`}
