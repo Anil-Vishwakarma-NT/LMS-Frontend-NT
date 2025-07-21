@@ -1,10 +1,13 @@
 import { addUser, updateGroup, getUserCoursesInGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Row, Checkbox, Col, DatePicker } from "antd";
+import { Modal, Form, Input, Select, Button, Row, Checkbox, Col, DatePicker, Typography, Space, Spin } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
-
+import { BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
+
+const { Option } = Select;
+const { Text } = Typography;
 const AllocateCourseModal = (
     {
         isModalOpen,
@@ -17,16 +20,16 @@ const AllocateCourseModal = (
         setToastType,
         setShowToast,
         setLoading,
+        loading
     }
 ) => {
     const [form] = Form.useForm();
     const [searchCourse, setSearchCourse] = useState('');
     const [courses, setCourses] = useState([]);
-
+    const [courseMsg, setCourseMsg] = useState("");
 
     const filteredCourses = courses?.filter(user =>
         user.title.toLowerCase().includes(searchCourse.toLowerCase())
-        // user.email.toLowerCase().includes(searchValue.toLowerCase())
     );
 
 
@@ -38,13 +41,15 @@ const AllocateCourseModal = (
         }
         console.log("Payload", payload);
         const activeUsers = await getUserCoursesInGroup(payload);
-        const users = activeUsers.map((user, index) => ({
+        const users = activeUsers.data?.map((user, index) => ({
             courseId: user.courseId,
             title: user.title,
             level: user.courseLevel,
         }));
         setCourses(users);
-        console.log(users);
+        setCourseMsg(activeUsers.message);
+        console.log("COURSES", users);
+        console.log("MESSAGE", activeUsers.message);
     }
 
 
@@ -62,8 +67,6 @@ const AllocateCourseModal = (
     const handleAdd = async () => {
         try {
             const values = await form.validateFields();
-
-            // Ensure proper structure
             const payload = {
                 groupId: Number(values.groupId),
                 employees: [userId], // ✅ Backend expects this
@@ -92,10 +95,21 @@ const AllocateCourseModal = (
         }
     };
 
-    const handleSelectAllCourses = () => {
-        const allFilteredCoursesIds = filteredCourses.map(course => course.courseId);
-        form.setFieldsValue({ courses: allFilteredCoursesIds });
+    const handleCoursesChange = (value) => {
+        if (value.includes("all")) {
+            const allCourseIds = filteredCourses.map(course => course.courseId);
+
+            // If all are already selected, deselect all:
+            if (selectedCourses?.length === allCourseIds.length) {
+                form.setFieldsValue({ courses: [] });
+            } else {
+                form.setFieldsValue({ courses: allCourseIds });
+            }
+        } else {
+            form.setFieldsValue({ courses: value });
+        }
     };
+
 
     const selectedCourses = Form.useWatch("courses", form);
 
@@ -113,9 +127,6 @@ const AllocateCourseModal = (
                     >
                         Add user
                     </Button>
-
-
-
                 }
                 bodyStyle={{ height: 500 }}
 
@@ -125,60 +136,54 @@ const AllocateCourseModal = (
                         <Input type="hidden" />
                     </Form.Item>
 
-                    <Form.Item label="Courses" >
-                        <Row gutter={8} style={{ marginBottom: 12 }}>
-                            <Col flex="80px">
-                                <Button onClick={handleSelectAllCourses}>Add All</Button>
-                            </Col>
-                            <Col flex="auto">
-                                <Input.Search
-                                    placeholder="Search by course name"
-                                    enterButton
-                                    allowClear
-                                    value={searchCourse}
-                                    onChange={(e) => setSearchCourse(e.target.value)}
-                                />
-                            </Col>
-                        </Row>
-                        <Form.Item
-                            name="courses"
-                            noStyle
-                            rules={[{ required: true, message: 'Please select at least one Course' }]}
+                    <Form.Item label={
+                        <Space>
+                            <BookOutlined />
+                            <Text strong>
+                                Select Course(s) to add
+                            </Text>
+                        </Space>
+                    } name="courses">
+
+
+                        <Select placeholder={`Select course`}
+                            showSearch
+                            mode="multiple"
+                            optionFilterProp="label"
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            maxTagCount="responsive"
+                            notFoundContent={
+                                loading ? <Spin size="small" /> :
+                                    `No courses available`
+                            }
                         >
-                            <Checkbox.Group style={{ width: '100%' }}>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        maxHeight: '350px',
-                                        overflowY: 'auto',
-                                        paddingRight: '55px',
-                                        gap: '10px',
-                                    }}
-                                >
-                                    {filteredCourses?.map((user) => (
-                                        <Checkbox
-                                            key={user.courseId}
-                                            value={user.courseId}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                padding: '6px 8px',
-                                                borderRadius: '4px',
-                                                transition: 'background 0.5s',
-                                            }}
-                                        >
-                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontWeight: 500 }}>{user.title}</span>
-                                            </div>
-                                        </Checkbox>
-                                    ))}
-                                    {filteredCourses?.length === 0 && (
-                                        <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                    )}
+
+                            {/* <Option label="Select All" onClick={handleCoursesChange}>
+                                <div>
+                                    <Text strong>Select All</Text>
                                 </div>
-                            </Checkbox.Group>
-                        </Form.Item>
+                            </Option> */}
+
+                            {filteredCourses?.map(course => (
+                                <Option
+                                    key={course.id}
+                                    value={course.id}
+                                    label={course.title}
+                                >
+                                    <div>
+                                        <Text strong>{course.title}</Text>
+                                        <br />
+                                    </div>
+                                </Option>
+                            ))}
+                            {filteredCourses?.length === 0 && (
+                                <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
+                            )}
+
+
+                        </Select>
                     </Form.Item>
 
                     {selectedCourses?.length > 0 && <Form.Item
@@ -205,7 +210,7 @@ const AllocateCourseModal = (
                 footer={
                     <Button onClick={handleCloseModal}>OK</Button>
                 }>
-                <span>All courses are already allocated to the user</span>
+                <Text>{courseMsg}</Text>
             </Modal>)
     );
 };

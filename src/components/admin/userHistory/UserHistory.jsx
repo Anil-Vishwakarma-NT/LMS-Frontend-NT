@@ -13,7 +13,7 @@ import {
 import AdminHOC from '../../shared/HOC/AdminHOC';
 import { userHistory } from '../../../service/IssuanceService';
 import { userStats } from '../../../service/UserService';
-import { getUserEnrolledCourseDetails } from '../../../service/UserCourseService';
+import { fetchUserEnrolledCoursesById } from '../../../service/AdminService';
 import './UserHistory.css';
 
 const { Text, Title } = Typography;
@@ -54,7 +54,7 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await getUserEnrolledCourseDetails(id);
+        const courses = await fetchUserEnrolledCoursesById(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
