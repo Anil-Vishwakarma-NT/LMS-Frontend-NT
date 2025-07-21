@@ -1,4 +1,4 @@
-import { app, appCourse } from "../../../service/serviceLMS";
+import { app } from "../../../service/serviceLMS";
 import useConfirmNavigation  from "./useConfirmNavigation";
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +32,7 @@ const CourseQuizAttempt = () => {
   const [error, setError] = useState("");
   const [quizAttemptId, setQuizAttemptId] = useState(null);
   const [currentAttemptNumber, setAttempt] = useState(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
 
@@ -169,34 +169,52 @@ const handleSubmit = async () => {
     message.error("Missing quiz attempt information.");
     return;
   }
+  setIsSubmitting(true);
 
   try {
     const now = new Date().toISOString().split(".")[0]; 
 
-    const userResponses = questions.map((question) => {
-      let userAnswer = userAnswers[question.questionId] || [];
+    // const userResponses = questions.map((question) => {
+    //   let userAnswer = userAnswers[question.questionId] || [];
       
-      // Normalize all answers to array format
-      if (question.questionType === "MCQ_MULTIPLE") {
-        // Already an array, keep as is
-        userAnswer = userAnswer;
-      } else if (question.questionType === "MCQ_SINGLE") {
-        // Convert single value to array
-        userAnswer = userAnswer ? [userAnswer] : [];
-      } else if (question.questionType === "SHORT_ANSWER") {
-        // Convert string to array
-        userAnswer = userAnswer ? [userAnswer] : [];
-      }
+    //   // Normalize all answers to array format
+    //   if (question.questionType === "MCQ_MULTIPLE") {
+    //     // Already an array, keep as is
+    //     userAnswer = userAnswer;
+    //   } else if (question.questionType === "MCQ_SINGLE") {
+    //     // Convert single value to array
+    //     userAnswer = userAnswer ? [userAnswer] : [];
+    //   } else if (question.questionType === "SHORT_ANSWER") {
+    //     // Convert string to array
+    //     userAnswer = userAnswer ? [userAnswer] : [];
+    //   }
 
-      return {
-        userId,
-        quizId: quiz.quizId,
-        questionId: question.questionId,
-        attempt: currentAttemptNumber, 
-        userAnswer: JSON.stringify(userAnswer), // Now always an array
-        answeredAt: now,
-      };
-    });
+    //   return {
+    //     userId,
+    //     quizId: quiz.quizId,
+    //     questionId: question.questionId,
+    //     attempt: currentAttemptNumber, 
+    //     userAnswer: JSON.stringify(userAnswer), // Now always an array
+    //     answeredAt: now,
+    //   };
+    // });
+    const userResponses = questions.map((question) => {
+  let userAnswer = userAnswers[question.questionId] || [];
+
+  if (question.questionType === "MCQ_SINGLE" || question.questionType === "SHORT_ANSWER") {
+    userAnswer = userAnswer ? [userAnswer] : [];
+  }
+  // For MCQ_MULTIPLE: Keep as-is (no change needed)
+
+  return {
+    userId,
+    quizId: quiz.quizId,
+    questionId: question.questionId,
+    attempt: currentAttemptNumber, 
+    userAnswer: JSON.stringify(userAnswer),
+    answeredAt: now,
+  };
+});
 
     const submissionPayload = {
       userResponses,
@@ -239,10 +257,12 @@ const handleSubmit = async () => {
   } catch (error) {
     console.error("Quiz submission error:", error);
     message.error("Failed to submit quiz.");
+  }finally {
+    setIsSubmitting(false);
   }
 };
 
-useConfirmNavigation(start, handleSubmit);
+useConfirmNavigation(start, handleSubmit, isSubmitting);
 
 
 
