@@ -18,7 +18,7 @@ const App = () => {
         refreshToken,
       });
 
-      console.log("🔄 Token refreshed successfully from App.js:", res.data);
+      console.log("?? Token refreshed successfully from App.js:", res.data);
 
       const { accessToken } = res.data;
       localStorage.setItem("authtoken", accessToken);

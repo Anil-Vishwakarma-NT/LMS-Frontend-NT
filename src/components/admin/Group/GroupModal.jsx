@@ -1,12 +1,13 @@
 import { addGroup, updateGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
-import { Modal, Form, Input, Select, Button, Checkbox, Row, Col } from "antd";
+import { Modal, Form, Input, Select, Button, Checkbox, Row, Col, Spin, Typography, Space } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
-
+import { UserOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 
-
+const { Option } = Select;
+const { Text } = Typography;
 
 const GroupModal = (
     {
@@ -17,6 +18,7 @@ const GroupModal = (
         setToastType,
         setShowToast,
         setLoading,
+        loading
     }
 ) => {
     const [form] = Form.useForm();
@@ -79,32 +81,6 @@ const GroupModal = (
         }
     };
 
-    // const handleEdit = async () => {
-    //     try {
-
-    //         const values = await form.validateFields();
-    //         if (!values.groupName) {
-    //             form.setFields("Group name required");
-    //             return;
-    //         }
-
-    //         setLoading(true);
-    //         const data = updateGroup(values);
-    //         setToastMessage(data?.message);
-    //         setToastType("success");
-    //         setShowToast(true);
-    //         getGroups();
-    //         handleCloseModal();
-    //     } catch (error) {
-    //         setToastMessage(error?.message || "Error occurred while adding group");
-    //         setToastType("error");
-    //         setShowToast(true);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
-
     return (
         <Modal
             title={`Add new group`}
@@ -144,63 +120,45 @@ const GroupModal = (
                 </Form.Item>
 
 
-                <Form.Item label="Employees" >
-                    <Row gutter={8} style={{ marginBottom: 16 }}>
-                        <Col flex="80px">
-                            <Button onClick={handleSelectAll}>Add All</Button>
-                        </Col>
-                        <Col flex="auto">
-                            <Input.Search
-                                placeholder="Search by name or email..."
-                                enterButton
-                                allowClear
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Form.Item
-                        name="employees"
-                        noStyle
-                        rules={[{ required: true, message: 'Please select at least one employee' }]}
+                <Form.Item name="employees"
+                    label={
+                        <Space>
+                            <UserOutlined />
+                            <Text strong>
+                                Select User(s) to add
+                            </Text>
+                        </Space>
+                    }>
+                    <Select placeholder={`Select employees`}
+                        showSearch
+                        mode="multiple"
+                        optionFilterProp="label"
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount="responsive"
+                        notFoundContent={
+                            loading ? <Spin size="small" /> :
+                                `No users available`
+                        }
                     >
-                        <Checkbox.Group style={{ width: '100%' }}>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    maxHeight: '350px',
-                                    overflowY: 'auto',
-                                    paddingRight: '55px',
-                                    gap: '10px',
-                                }}
+                        {filteredUsers?.map(user => (
+                            <Option
+                                key={user.value}
+                                value={user.value}
+                                label={user.label}
                             >
-                                {filteredUsers?.map((user) => (
-                                    <Checkbox
-                                        key={user.value}
-                                        value={user.value}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '6px 8px',
-                                            borderRadius: '4px',
-                                            transition: 'background 0.5s',
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{user.label}</span>
-                                        </div>
-                                    </Checkbox>
-                                ))}
-                                {filteredUsers?.length === 0 && (
-                                    <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
-                                )}
-                            </div>
-                        </Checkbox.Group>
-                    </Form.Item>
+                                <div>
+                                    <Text strong>{user.label}</Text>
+                                    <br />
+                                </div>
+                            </Option>
+                        ))}
+                        {filteredUsers?.length === 0 && (
+                            <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
+                        )}
+                    </Select>
                 </Form.Item>
-
             </Form>
         </Modal>
     );

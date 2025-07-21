@@ -30,8 +30,10 @@ const Sidebar = ({ items }) => {
     <div className="sidebar">
       {items && items.length && items.map((item) => (
         <NavLink key={item.path} to={item.path} className={({ isActive }) => (isActive ? "sidebar-item-active" : "sidebar-item")}>
+          {/* <div style={{ alignSelf: 'center' }}> */}
           <img className="side-logo" src={item.img} />
           <div className="sidebar-text">{item.label}</div>
+          {/* </div> */}
         </NavLink>
       ))}
       <div className="sidebar-logout-btn">
