@@ -84,9 +84,14 @@ const AddNewCourseModal = (
             handleCloseModal();
 
         } catch (error) {
-            setToastMessage(error?.message || "Error occurred while adding group");
+         if (error?.response?.data?.message) {
+            setToastMessage(error.response.data.message);
             setToastType("error");
             setShowToast(true);
+        }
+
+        console.error("Error during adding course:", error);
+
         } finally {
             setLoading(false);
         }
@@ -124,7 +129,7 @@ const AddNewCourseModal = (
                             </Text>
                         </Space>
                     }
-                    rules={[{ required: true, message: `Please select a course` }]}
+                    rules={[{ required: true, message: `Please select atleast one course` }]}
                 >
                     <Select placeholder={`Select course`}
                         showSearch

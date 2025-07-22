@@ -38,10 +38,6 @@ const AddBundle = ({
             }))
 
             setCourseList(courselist);
-            setToastMessage(courses?.message);
-            setToastType("success");
-            setShowToast(true);
-
         } catch (error) {
             setShowToast(true);
             setToastMessage("Error getting course list to add in bundle.")
@@ -66,23 +62,25 @@ const AddBundle = ({
     const handleAdd = async () => {
         try {
             const values = await form.validateFields();
-            if (!values.bundleName) {
-                form.setFields("Bundle name required");
-                return;
+            if (values.bundleName) {
+                setLoading(true);
+                const data = await createBundle(values);
+                console.log(values);
+                setToastMessage(data?.message);
+                setToastType("success");
+                setShowToast(true);
+                getBundles();
+                handleCloseModal();
             }
-            setLoading(true);
-            const data = await createBundle(values);
-            console.log(values);
-            setToastMessage(data?.message);
-            setToastType("success");
-            setShowToast(true);
-            getBundles();
-            handleCloseModal();
 
         } catch (error) {
-            setToastMessage(error?.message || "Error occurred while adding group");
-            setToastType("error");
-            setShowToast(true);
+            if (error?.response?.data?.message) {
+                setToastMessage(error.response.data.message);
+                setToastType("error");
+                setShowToast(true);
+            }
+
+            console.error("Error during bundle creation:", error);
         } finally {
             setLoading(false);
         }
@@ -91,12 +89,11 @@ const AddBundle = ({
 
     return (
         <Modal
-            title={`Create new Bundle`}
+            title={`Create New Bundle`}
             visible={isModalOpen}
             onCancel={handleCloseModal}
             footer={
                 <span>
-
                     <Button
                         key="submit"
                         type="primary"
@@ -116,8 +113,13 @@ const AddBundle = ({
                 <Form.Item
                     label="bundle Name"
                     name="bundleName"
-                    rules={[{ required: true, message: "group name is required!" }]}
-                >
+                    rules={[
+                        { required: true, message: "Bundle name is required!" },
+                        {
+                            pattern: /^(?!\d)(?!\s)[A-Za-z][A-Za-z0-9 ]*(?<!\s)$/,
+                            message: "Invalid name. Must start with a letter, not start/end with space, and contain only letters, digits, and spaces."
+                        }
+                    ]} >
                     <Input autoComplete="off" />
                 </Form.Item>
 

@@ -291,6 +291,7 @@ const GroupHistory = ({ setLoading }) => {
                 userId={userId}
                 getUsers={getUsers}
                 getCourses={getCourses}
+                getBundles={getBundles}
                 handleCloseModal={handleCloseAllocationModal}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}

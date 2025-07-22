@@ -59,7 +59,7 @@ export const addCourseToBundle = async (bundle) => {
 
 export const deleteCourseFromBundle = async (bundleId, courseId) => {
     try {
-        const response = await app.delete(`course/api/client-api/course-bundles/bundle/removeCourse?bundleId=${bundleId}&courseId=${courseId}`)
+        const response = await app.delete(`user/api/client-api/admin/bundle/removecourse?bundleId=${bundleId}&courseId=${courseId}`)
         return response.data;
     } catch (error) {
 

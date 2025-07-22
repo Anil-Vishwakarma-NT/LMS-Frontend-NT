@@ -15,6 +15,7 @@ const AllocateCourseModal = (
         userId,
         getUsers,
         getCourses,
+        getBundles,
         handleCloseModal,
         setToastMessage,
         setToastType,
@@ -28,7 +29,7 @@ const AllocateCourseModal = (
     const [courses, setCourses] = useState([]);
     const [courseMsg, setCourseMsg] = useState("");
     const [bundles, setBundles] = useState([])
-
+    const [bundleMsg, setBundleMsg] = useState("");
 
     const filteredCourses = courses?.filter(user =>
         user.title.toLowerCase().includes(searchCourse.toLowerCase())
@@ -41,7 +42,7 @@ const AllocateCourseModal = (
 
 
     async function getCourseList() {
-        alert(userId);
+
         const payload = {
             groupId: Number(groupId),
             userId: Number(userId),
@@ -64,16 +65,16 @@ const AllocateCourseModal = (
 
         const payload = {
             groupId: Number(groupId),
-            userId: userId,
+            userId: Number(userId),
         }
         console.log("Payload", payload);
         const activeUsers = await getUserBundlesInGroup(payload);
-        const users = activeUsers.data?.map((user, index) => ({
-            courseId: user.bundleId,
+        const users = activeUsers?.data?.map((user, index) => ({
+            bundleId: user.bundleId,
             title: user.bundleName,
         }));
         setBundles(users);
-        setCourseMsg(activeUsers.message);
+        setBundleMsg(activeUsers.message);
         console.log("BUNDLES", users);
         console.log("MESSAGE", activeUsers.message);
     }
@@ -88,6 +89,7 @@ const AllocateCourseModal = (
         });
 
         getCourseList();
+        getBundleList();
 
     }, [isModalOpen]);
 
@@ -99,6 +101,7 @@ const AllocateCourseModal = (
                 employees: [userId], // ✅ Backend expects this
                 courses: values.courses,
                 deadline: values.deadline,
+                bundles: values.bundles,
                 assignedAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
             };
 
@@ -108,7 +111,7 @@ const AllocateCourseModal = (
             const data = await addUser(payload);
             getUsers();
             getCourses();
-            
+            getBundles();
             setToastMessage(data?.message);
             setToastType("success");
             setShowToast(true);
@@ -142,7 +145,7 @@ const AllocateCourseModal = (
     const selectedCourses = Form.useWatch("courses", form);
     const selectedBundles = Form.useWatch("bundles", form);
     return (
-        (courses?.length > 0 ?
+        ((courses?.length > 0 || bundles?.length > 0) ?
             <Modal
                 title={`Allocate course to user`}
                 visible={isModalOpen}
@@ -187,17 +190,10 @@ const AllocateCourseModal = (
                                     `No courses available`
                             }
                         >
-
-                            {/* <Option label="Select All" onClick={handleCoursesChange}>
-                                <div>
-                                    <Text strong>Select All</Text>
-                                </div>
-                            </Option> */}
-
                             {filteredCourses?.map(course => (
                                 <Option
-                                    key={course.id}
-                                    value={course.id}
+                                    key={course.courseId}
+                                    value={course.courseId}
                                     label={course.title}
                                 >
                                     <div>
@@ -213,12 +209,6 @@ const AllocateCourseModal = (
 
                         </Select>
                     </Form.Item>
-
-
-
-
-
-
                     <Form.Item label={
                         <Space>
                             <BookOutlined />
@@ -242,13 +232,10 @@ const AllocateCourseModal = (
                                     `No bundles available`
                             }
                         >
-
-
-
                             {filteredBundles?.map(course => (
                                 <Option
-                                    key={course.id}
-                                    value={course.id}
+                                    key={course.bundled}
+                                    value={course.bundleId}
                                     label={course.title}
                                 >
                                     <div>
@@ -272,7 +259,6 @@ const AllocateCourseModal = (
                     >
                         <DatePicker style={{ width: '100%' }} />
                     </Form.Item>}
-
                 </Form>
             </Modal> : <Modal
                 title={`Allocate course to user`}
@@ -282,6 +268,7 @@ const AllocateCourseModal = (
                     <Button onClick={handleCloseModal}>OK</Button>
                 }>
                 <Text>{courseMsg}</Text>
+                <Text>{bundleMsg}</Text>
             </Modal>)
     );
 };

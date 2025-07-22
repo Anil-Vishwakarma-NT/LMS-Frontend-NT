@@ -156,13 +156,13 @@ export const getUserCoursesInGroup = async (group) => {
 
 export const getUserBundlesInGroup = async (group) => {
     try {
-        console.log("Group getcoursedetails api", group);
+        console.log("Group getbundledetails api", group);
         const response = await app.post('user/api/client-api/group/user-bundles', group);
         console.log("Bundles details ", response.data.data);
         return response.data;
     }
     catch (error) {
-        alert("Couldn't fetch courses");
+        alert("Couldn't fetch bundles");
         throw new Error(error?.response?.data?.message);
     }
 }

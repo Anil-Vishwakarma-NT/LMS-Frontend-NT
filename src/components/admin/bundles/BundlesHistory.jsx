@@ -22,19 +22,15 @@ const GroupHistory = ({ setLoading }) => {
     const [bundleName, setBundleName] = useState(location.state?.name || 'N/A');
     const auth = useSelector((state) => state.auth);
     const navigate = useNavigate();
-    const [userList, setUserList] = useState([]);
     const [deleteCourse, setDeleteCourse] = useState([]);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState(null);
-    const [showCourse, setShowCourse] = useState(false);
     const [courseList, setCourseList] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filteredList, setFilteredList] = useState([]);
     const [EditPopOpen, setEditPopOpen] = useState(false)
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
-    const [allocatecourseModalOpen, setAllocateCourseModalOpen] = useState(false);
-    const [userId, setUserId] = useState(null);
 
     async function getCourses() {
         const response = await getAllBundleCourses(id);
@@ -43,6 +39,7 @@ const GroupHistory = ({ setLoading }) => {
             id: user.courseId,
             srno: index + 1,
             name: user.title,
+            level: user.courseLevel,
             status: user.active ? "Active" : "Removed"
         }));
         setCourseList(users);
@@ -93,6 +90,7 @@ const GroupHistory = ({ setLoading }) => {
             setLoading(false)
         }
     };
+
     useEffect(() => {
         getCourses();
     }, [id]);
@@ -121,12 +119,19 @@ const GroupHistory = ({ setLoading }) => {
             key: 'status',
         },
         {
+            title: 'Level',
+            dataIndex: 'level',
+            key: 'level',
+
+        },
+        {
             title: "Actions",
             key: "actions",
             width: 250,
-            render: (text, record) => (
-                <>
-                    <Space >
+            render: (text, record) => {
+                console.log("STATUS       .................................................", record.status)
+                return record.status === "Active" ? (
+                    <Space>
                         <Tooltip title="Remove Course from bundle">
                             <Button
                                 icon={<DeleteOutlined />}
@@ -143,8 +148,8 @@ const GroupHistory = ({ setLoading }) => {
                             />
                         </Tooltip>
                     </Space>
-                </>
-            )
+                ) : null;
+            }
         }
     ];
 
