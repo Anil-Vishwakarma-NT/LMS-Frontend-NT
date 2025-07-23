@@ -66,7 +66,7 @@ const AddBundle = ({
                 setLoading(true);
                 const data = await createBundle(values);
                 console.log(values);
-                setToastMessage(data?.message);
+                setToastMessage(data?.data?.message);
                 setToastType("success");
                 setShowToast(true);
                 getBundles();
@@ -74,16 +74,24 @@ const AddBundle = ({
             }
 
         } catch (error) {
-            if (error?.response?.data?.message) {
-                setToastMessage(error.response.data.message);
+            const backendMessage = error?.response?.data?.message || error?.message || "Something went wrong";
+
+            if (backendMessage.includes("already exists")) {
+                form.setFields([
+                    {
+                        name: "bundleName",
+                        errors: [backendMessage],
+                    },
+                ]);
+            } else {
+                setToastMessage(backendMessage);
                 setToastType("error");
                 setShowToast(true);
             }
-
-            console.error("Error during bundle creation:", error);
         } finally {
             setLoading(false);
         }
+
     };
 
 

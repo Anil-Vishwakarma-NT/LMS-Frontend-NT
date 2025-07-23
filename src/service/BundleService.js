@@ -103,6 +103,10 @@ export const createBundle = async (bundle) => {
         };
 
         const bundleResponse = await app.post('course/api/client-api/bundles', bundleInDTO);
+          if (bundleResponse?.data?.message?.includes("already exists")) {
+               return bundleResponse;
+            }
+
 
         const bundleCourseInDTO = {
             bundleId: bundleResponse.data.data.bundleId,
