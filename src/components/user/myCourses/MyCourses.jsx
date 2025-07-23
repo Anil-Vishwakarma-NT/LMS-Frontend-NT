@@ -28,7 +28,6 @@ const MyCourses = () => {
         if (id) {
           setUserId(id);
           dispatch(setUserIdAction(id));
-          localStorage.setItem("userId", id);
         } else {
           console.warn("⚠️ userId not found in token payload.");
         }

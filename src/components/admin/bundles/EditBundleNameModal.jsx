@@ -50,7 +50,7 @@ const EditBundleNameModal = ({ isModalOpen,
 
     return (
         <Modal
-            title={'Edit group name'}
+            title={'Edit Bundle name'}
             onCancel={handleCloseModal}
             visible={isModalOpen}
             footer={

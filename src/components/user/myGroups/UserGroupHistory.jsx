@@ -4,7 +4,7 @@ import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOp
 import UserHOC from "../../shared/HOC/UserHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getUsersNameInGroup, getCourseNameDetails } from '../../../service/GroupService';
+import { getUsersInGroup, getCourseNameDetails } from '../../../service/GroupService';
 import { deleteSingleUser } from '../../../service/GroupService';
 import { useSelector } from "react-redux";
 import { Card, Statistic } from 'antd';
@@ -41,7 +41,7 @@ const UserGroupHistory = ({ setLoading }) => {
 
     async function getUsers() {
 
-        const response = await getUsersNameInGroup(id);
+        const response = await getUsersInGroup(id);
         if (!Array.isArray(response)) {
             console.error("Expected an array but got:", response);
             setUserList([]);

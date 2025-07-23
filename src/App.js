@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import React, { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 
 import "./App.css";
@@ -14,214 +14,66 @@ import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import IssuanceAdmin from "./components/admin/issuanceAdmin/IssuanceAdmin";
 import { login } from "./redux/authentication/authActions";
-import { getUserByToken } from "./service/UserService";
-import UserHistory from "./components/admin/userHistory/UserHistory";
-import BookHistory from "./components/admin/bookHistory/BookHistory";
-import ContactUs from "./components/shared/contactUs/ContactUs";
-import AboutUs from "./components/shared/aboutUs/AboutUs";
-import Loader from "./components/shared/loader/Loader";
-import NotFound from "./pages/notFound/NotFound";
-import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboard";
-import CourseContentAdmin from "./components/admin/booksAdmin/CourseContentAdmin";
-import MyCourses from "./components/user/myCourses/MyCourses";
-import CourseContentUser from "./components/user/myCourses/CourseContentUser";
-import AllGroup from "./components/admin/Group/AllGroup";
-import GroupHistory from "./components/admin/Group/GroupHistory";
-import QuizListPage from "./pages/quiz/QuizListPage";
-import QuizQuestionEditPage from "./pages/quiz/QuizQuestionEditPage";
-import CourseQuizAttempt from "./components/user/myCourses/CourseQuizAttempt";
-import UserGroup from "./components/user/myGroups/UserGroup"; import CoursesAdmin from "./components/admin/booksAdmin/CoursesAdmin";
-import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";
-import BundlesHistory from "./components/admin/bundles/BundlesHistory";
+import axios from "axios";
 
-
-
-
-function App() {
+const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [loading, setLoading] = useState(false);
+  const auth = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    const token = window.localStorage.getItem("authtoken");
-    if (token) {
-      getUser(token);
-    } else {
-      navigate("/");
-    }
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    const timeOut = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, [location]);
-
-  const getUser = async (token) => {
+  const refreshTokenApi = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
     try {
-      const decoded = jwtDecode(token);
-      const { email, roles, exp } = decoded;
+      const res = await axios.post(`http://localhost:8091/lms/api/client-api/auth/refresh`, {
+        refreshToken,
+      });
 
-      // Check if token is expired
-      const currentTime = Math.floor(Date.now() / 1000);
-      if (exp < currentTime) {
-        console.warn("Token expired!");
-        localStorage.removeItem("authtoken");
-        navigate("/");
-        return;
-      }
+      console.log("?? Token refreshed successfully from App.js:", res.data);
 
-      dispatch(login({ email, roles, accessToken: token }));
+      const { accessToken } = res.data;
+      localStorage.setItem("authtoken", accessToken);
 
-      window.localStorage.setItem("authtoken", token);
-    } catch (error) {
-      navigate("/");
+      const { email, roles } = jwtDecode(accessToken);
+      dispatch(login({ email, roles, accessToken }));
+
+    } catch (err) {
+      console.error("Refresh token failed:", err);
+      localStorage.clear();
+      navigate("/login");
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("authtoken");
+
+    if (token && !auth.accessToken) {
+      try {
+        const decoded = jwtDecode(token);
+        const { email, roles, exp } = decoded;
+
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        if (exp < currentTime) {
+          console.log("Access token expired. Trying refresh token...");
+          refreshTokenApi();
+        } else {
+          dispatch(login({ email, roles, accessToken: token }));
+        }
+
+      } catch (err) {
+        console.error("Invalid token format. Clearing storage.");
+        localStorage.clear();
+        navigate("/login");
+      }
+    }
+  }, [auth.accessToken, dispatch, navigate]);
+
   return (
     <>
-      {loading && <Loader />}
       <Navbar />
-      <Routes>
-        <Route
-          path="/admin"
-          element={
-            <AdminRoutes>
-              {" "}
-              <AdminDashboard />{" "}
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/user"
-          element={
-            <UserRoutes>
-              <UserDashboard />
-            </UserRoutes>
-          }
-        />
-        <Route
-          path="/my-courses"
-          element={
-            <UserRoutes>
-              <MyCourses />
-            </UserRoutes>
-          }
-        />
-        <Route
-          path="/my-groups"
-          element={
-            <UserRoutes>
-              <UserGroup />
-            </UserRoutes>
-          }
-        />
-        <Route
-          path="/course-content-user/:courseId"
-          element={
-            <UserRoutes>
-              <CourseContentUser />
-            </UserRoutes>
-          }
-        ></Route>
-        <Route path="/" element={<Home />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route
-          path="/books"
-          element={
-            <AdminRoutes>
-              <CoursesAdmin />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <AdminRoutes>
-              <UsersAdmin />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/bundles"
-          element={
-            <AdminRoutes>
-              <BundlesAdmin />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/bundles-history/:id"
-          element={
-            <AdminRoutes>
-              <BundlesHistory />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/user-history/:id"
-          element={
-            <AdminRoutes>
-              <UserHistory />
-            </AdminRoutes>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-        <Route
-          path="/enroll"
-          element={
-            <AdminRoutes>
-              <EnrollmentDashboard />
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path="/group"
-          element={
-            <AdminRoutes>
-              <AllGroup />
-            </AdminRoutes>
-          }
-        />
-
-        <Route
-          path="/group-history/:id"
-          element={
-            <AdminRoutes>
-              <GroupHistory />
-            </AdminRoutes>
-          }
-        />
-
-        <Route
-          path="/group-user-history/:id"
-          element={
-            <UserRoutes>
-              <UserGroupHistory />
-            </UserRoutes>
-          }
-        />
-        <Route
-          path="/course-content/:courseId"
-          element={
-            <AdminRoutes>
-              <CourseContentAdmin />
-            </AdminRoutes>
-          }
-        ></Route>
-        <Route path="/course-content/:courseId/quizzes" element={<QuizListPage />} />
-        <Route
-          path="/course-content/:courseId/quizzes/edit-question/:questionId"
-          element={<QuizQuestionEditPage />}
-        />
-        <Route path="/quiz/:courseId" element={<CourseQuizAttempt />} />
-      </Routes>
+      <Outlet />
     </>
   );
-}
+};
 
 export default App;

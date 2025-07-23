@@ -6,6 +6,7 @@ import { userLogin } from "../../service/UserService";
 import { login } from "../../redux/authentication/authActions";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   validateEmailOrMobile,
 } from "../../utility/validation";
@@ -24,7 +25,7 @@ const Login = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
-
+  const auth = useSelector((state) => state.auth);
   const publicKey = `-----BEGIN PUBLIC KEY-----
 MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
 W9/SyLNzJgBujCmOe49QnJNKD79eM/VUFHAGPLO5f1Krh9J1PoOZAEeimzdOnkFf
@@ -90,7 +91,7 @@ u/bvWV47VOzzM+ObAgMBAAE=
       console.log("roles", normalizedRoles)
       // ✅ Navigate based on role
       if (normalizedRoles.includes("ADMIN")) {
-        console.log("entered admin");
+        console.log(auth.roles);
         navigate("/admin");
       } else if (normalizedRoles.includes("EMPLOYEE")) {
         navigate("/user", { state: { userId, name: fullName } });

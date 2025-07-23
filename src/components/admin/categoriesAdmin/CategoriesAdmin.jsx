@@ -5,7 +5,7 @@ import { bookHistory } from '../../../service/IssuanceService';
 import { useParams } from 'react-router-dom';
 import Paginate from '../../shared/pagination/Paginate';
 
-const BookHistory = ({setLoading}) => {
+const CategoriesAdmin = ({setLoading}) => {
   
   const {id} = useParams();
 
@@ -104,4 +104,4 @@ const BookHistory = ({setLoading}) => {
   )
 }
 
-export default AdminHOC(BookHistory)
+export default AdminHOC(CategoriesAdmin);
