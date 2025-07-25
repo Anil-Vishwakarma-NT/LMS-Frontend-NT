@@ -136,7 +136,21 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
 
         {["SINGLE_SELECT", "MULTI_SELECT"].includes(currentAnswerType) && (
           <>
-            <Form.List name="options">
+            <Form.List
+              name="options"
+              rules={[
+                {
+                  validator: async (_, options) => {
+                    if (!options || options.length < 2) {
+                      return Promise.reject(new Error("At least 2 options are required"));
+                    }
+                    if (options.length > 5) {
+                      return Promise.reject(new Error("Maximum 5 options are allowed"));
+                    }
+                  },
+                },
+              ]}
+            >
               {(fields, { add, remove }) => (
                 <>
                   <label><b>Options</b></label>
@@ -149,7 +163,7 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
                       >
                         <Input placeholder={`Option ${name + 1}`} />
                       </Form.Item>
-                      {fields.length > 1 && (
+                      {fields.length > 2 && (
                         <Button onClick={() => remove(name)} danger type="link">
                           Remove
                         </Button>
@@ -157,13 +171,24 @@ const EditQuizQuestionModal = ({ open, onClose, quizId, questionId, onUpdate }) 
                     </Space>
                   ))}
                   <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block>
+                    <Button
+                      type="dashed"
+                      onClick={() => {
+                        if (fields.length < 5) {
+                          add();
+                        } else {
+                          message.warning("You can add maximum 5 options");
+                        }
+                      }}
+                      block
+                    >
                       Add Option
                     </Button>
                   </Form.Item>
                 </>
               )}
             </Form.List>
+
 
             <Form.Item
               label="Correct Answer"

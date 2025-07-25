@@ -13,7 +13,7 @@ import {
 import AdminHOC from '../../shared/HOC/AdminHOC';
 import { userHistory } from '../../../service/IssuanceService';
 import { userStats } from '../../../service/UserService';
-import { getUserEnrolledCourseDetails } from '../../../service/UserCourseService';
+import { fetchUserEnrolledCoursesById } from '../../../service/AdminService';
 import './UserHistory.css';
 
 const { Text, Title } = Typography;
@@ -36,6 +36,9 @@ const UserHistory = ({ setLoading }) => {
   const [inprogress, setInprogress] = useState(0);
   const [defaulters, setDefaulters] = useState(0);
   const [notStarted, setNotStarted] = useState(0);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [coursesByBundle, setCoursesByBundle] = useState({});
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -54,25 +57,34 @@ const UserHistory = ({ setLoading }) => {
 
         console.log("userHIstory", statsData.data);
         setDashStatsData(statsData.data);
-        const courses = await getUserEnrolledCourseDetails(id);
+        const courses = await fetchUserEnrolledCoursesById(id);
         console.log("COURSES HISTORY", courses)
         setCourseList(courses);
         setFilteredCourses(courses);
         console.log(Array.isArray(courses))
         setCompleted(courses.filter(course => course.status === "Completed").length);
-        console.log("COMPLETED", completed);
         setInprogress(courses.filter(course => course.status === "In Progress").length);
-        console.log("Inprogress", inprogress);
         setDefaulters(courses.filter(course => course.status === "Defaulter").length);
-        console.log("defaulter", courses.filter(course => course.status === "Defaulter").length);
         setNotStarted(courses.filter(course => course.status === "Not Started").length);
-        console.log("NotStarted", notStarted)
+
+        {/*Bundle data*/ }
+        // const bundles = 
+
+
+
+
+
+
+
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
         setLoading(false);
       }
     };
+
+
+
     loadData();
   }, [id, auth.accessToken, setLoading]);
 

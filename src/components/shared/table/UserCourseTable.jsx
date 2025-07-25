@@ -16,7 +16,7 @@ const UserCourseTable = ({ entries, showViewAction }) => {
     },
     {
       title: "Level",
-      dataIndex: "level",
+      dataIndex: "courseLevel",
       key: "level",
     },
     {

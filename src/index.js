@@ -30,7 +30,7 @@ import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import BundlesHistory from "./components/admin/bundles/BundlesHistory";
 import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
-import UserGroup from "./components/user/myGroups/UserGroup";
+
 
 
 
@@ -116,10 +116,6 @@ const router = createBrowserRouter([
         element: <UserRoutes><MyCourses /></UserRoutes>
       },
       {
-        path: "my-groups",
-        element: <UserRoutes><UserGroup /></UserRoutes>
-      },
-      {
         path: "course-content-user/:courseId",
         element: <UserRoutes><CourseContentUser /></UserRoutes>
       },
@@ -132,9 +128,7 @@ const router = createBrowserRouter([
 ]);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <Router>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
 );

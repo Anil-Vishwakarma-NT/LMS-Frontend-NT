@@ -22,13 +22,12 @@ const MyCourses = () => {
 
     if (token) {
       try {
-       const decoded = jwtDecode(token);
+        const decoded = jwtDecode(token);
         const id = decoded?.userId;
 
         if (id) {
           setUserId(id);
           dispatch(setUserIdAction(id));
-          localStorage.setItem("userId", id);
         } else {
           console.warn("⚠️ userId not found in token payload.");
         }
@@ -43,7 +42,7 @@ const MyCourses = () => {
       try {
         if (!userId) return;
 
-        const data = await getUserEnrolledCourseDetails(userId);
+        const data = await getUserEnrolledCourseDetails();
         setCourseList(data);
         setFilteredCourses(data);
       } catch (error) {

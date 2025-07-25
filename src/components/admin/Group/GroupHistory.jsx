@@ -1,4 +1,4 @@
-import { Layout, Typography, Divider } from 'antd';
+import { Layout, Typography, Divider, Radio } from 'antd';
 import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
 import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import AdminHOC from "../../shared/HOC/AdminHOC";
@@ -11,16 +11,17 @@ import Toast from '../../shared/toast/Toast';
 import AddNewUserModal from './AddNewUSerModal';
 import EditGroupNameModal from './EditGroupNameModal';
 import AllocateCourseModal from './AllocateCourseModal';
+import { useSelector } from "react-redux";
+import { bundlesOfGroup } from '../../../service/BundleService';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 const GroupHistory = ({ setLoading }) => {
-
     const { id } = useParams();
     const location = useLocation();
     const [groupName, setGroupName] = useState(location.state?.name || 'N/A');
-
+    const auth = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [deleteUser, setDeleteUser] = useState([]);
@@ -28,13 +29,16 @@ const GroupHistory = ({ setLoading }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState(null);
     const [showCourse, setShowCourse] = useState(false);
-    const [courseList, setCourseList] = useState([])
+    const [courseList, setCourseList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filteredList, setFilteredList] = useState([]);
-    const [EditPopOpen, setEditPopOpen] = useState(false)
+    const [EditPopOpen, setEditPopOpen] = useState(false);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
     const [allocatecourseModalOpen, setAllocateCourseModalOpen] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [bundleList, setBundleList] = useState([]);
+    const [courseFilter, setCourseFilter] = useState("all");
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     async function getUsers() {
         const response = await getUsersInGroup(id);
@@ -43,91 +47,85 @@ const GroupHistory = ({ setLoading }) => {
             setUserList([]);
             return;
         }
-
         const users = response.map((user, index) => ({
             id: user.userId,
-            srno: index + 1,
             name: `${user.firstName} ${user.lastName}`,
             progress: user.progress,
             enrols: user.enrols,
-            status: (user.progress > 95 ? 'Completed' : user.progress > 0 ? 'In progress' : 'Not started')
+            srno: index + 1
         }));
-
         setUserList(users);
-
     }
 
     async function getCourses() {
         const response = await getCourseDetails(id);
-        console.log("RESPONSE FOR COURSES", response)
-        const users = response.map((user, index) => ({
+        const users = response.map((user) => ({
             id: user.courseId,
-            srno: index + 1,
             name: user.courseName,
             progress: user.progress,
             enrols: user.enrols,
-            status: (user.progress > 95 ? 'Completed' : user.progress > 0 ? 'In progress' : 'Not started')
-
+            type: "Course"
         }));
         setCourseList(users);
     }
 
-    const handleViewUserClick = (id, name) => {
-        console.log("usersAdmin name ", id);
+    async function getBundles() {
+        const response = await bundlesOfGroup(id);
+        const bundles = response?.map((bundle) => ({
+            id: bundle.bundleId,
+            name: bundle.bundleName,
+            progress: bundle.progress,
+            enrols: bundle.enrols,
+            type: "Bundle"
+        }));
+        setBundleList(bundles);
+    }
+
+    const handleViewUserClick = (record) => {
         if (!showCourse) {
-            navigate(`/user-history/${id}`, {
-                state: { name: name }
-            });
+            navigate(`/user-history/${record.id}`, { state: { name: record.name } });
+        } else {
+            if (record.type === "Course") {
+                navigate(`/course-content/${record.id}`);
+            }
+            if (record.type === "Bundle") {
+                navigate(`/bundles-history/${record.id}`, { state: { name: record.name } });
+            }
         }
-        else {
-            navigate(`/course-content/${id}`)
+    };
+
+    const handleCloseModal = () => setIsModalOpen(false);
+    const handleCloseEdit = () => setEditPopOpen(false);
+    const handleCloseAllocationModal = () => setAllocateCourseModalOpen(false);
+
+    const handleAddNew = () => setIsModalOpen(prev => !prev);
+    const handleViewCourse = () => setShowCourse(prev => !prev);
+
+    useEffect(() => {
+        async function fetchAllData() {
+            await Promise.all([getUsers(), getCourses(), getBundles()]);
+            setDataLoaded(true);
         }
-    };
+        fetchAllData();
+    }, [id]);
 
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleCloseEdit = () => {
-        setEditPopOpen(false);
-
-    };
-
-    const handleCloseAllocationModal = () => {
-        setAllocateCourseModalOpen(false);
-    }
-
-    const handleAddNew = () => {
-        setIsModalOpen(prev => !prev);
-    };
-
-    const handleViewCourse = () => {
-        setShowCourse(prev => !prev);
-    }
-
-    const handleAllocateCourse = (userId) => {
-        setUserId(userId);
+    const handleAllocateCourse = (record) => {
+        console.log("USER ID GROUP HISTORY", record.id)
+        setUserId(record.id);
         setAllocateCourseModalOpen(true);
-    }
+    };
 
     const handleOpenConfirmDeletePopup = (user) => {
         setIsConfirmPopupOpen(true);
         setDeleteUser(user);
     };
-    const handleEditGroup = () => {
-        setEditPopOpen(prev => !prev);
-    }
-
-
+    const handleEditGroup = () => setEditPopOpen(prev => !prev);
 
     const handleDeleteUser = async () => {
         try {
-            setLoading(true)
-            const groupdetails = {
-                groupId: id,
-                userId: deleteUser.id
-            }
+            setLoading(true);
+            const groupdetails = { groupId: id, userId: deleteUser.id };
             const data = await deleteSingleUser(groupdetails);
             setToastMessage(data?.message || "User removed successfully!");
             setToastType("success");
@@ -140,183 +138,144 @@ const GroupHistory = ({ setLoading }) => {
         } finally {
             setIsConfirmPopupOpen(false);
             setDeleteUser(null);
-            setLoading(false)
+            setLoading(false);
         }
     };
-    useEffect(() => {
-        getUsers();
-        getCourses();
-        // console.log("USERS RECEIVED in Group History!!", userList)
-    }, [id]);
+
 
 
     useEffect(() => {
         if (showCourse) {
-            setFilteredList(courseList);
+            let combined = [];
+            if (courseFilter === "all") {
+                combined = [...bundleList, ...courseList].map((item, index) => ({ ...item, srno: index + 1 }));
+            } else if (courseFilter === "bundle") {
+                combined = bundleList.map((item, index) => ({ ...item, srno: index + 1 }));
+            } else if (courseFilter === "standalone") {
+                combined = courseList.map((item, index) => ({ ...item, srno: index + 1 }));
+            }
+            setFilteredList(combined);
+        } else {
+            setFilteredList(userList);
         }
-        else {
-            setFilteredList(userList)
-        }
-
-        console.log("FilteredList ", filteredList);
-    }, [showCourse, userList, courseList])
-
+    }, [showCourse, courseFilter, userList, courseList, bundleList]);
 
     const columns = [
-        {
-            title: 'Sr No.',
-            dataIndex: 'srno',
-
-        },
-        {
-            title: !showCourse ? 'User Name' : 'Course Name',
-            dataIndex: 'name',
-            key: 'name',
-        }, {
-            title: 'Enrollments',
-            dataIndex: 'enrols',
-            key: 'enrols',
-        },
+        { title: 'Sr No.', dataIndex: 'srno' },
+        { title: !showCourse ? 'User Name' : 'Name', dataIndex: 'name', key: 'name' },
+        { title: 'Enrollments', dataIndex: 'enrols', key: 'enrols' },
         {
             title: 'Completion %',
             dataIndex: 'progress',
             render: (progress) => {
-                const rounded = Number(progress.toFixed(1));   // 1‑decimal‑place number
+                const rounded = Number(progress?.toFixed(1));
                 return (
-                    <Progress
-                        percent={rounded}
-                        size="small"
-                        type="circle"
-                        strokeColor={
-                            rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'
-                        }
-                        // ensures the label inside the circle also shows 1 decimal place
-                        format={(p) => `${p.toFixed(1)}%`}
-                    />
+                    <Progress percent={rounded} size="small" type="circle"
+                        strokeColor={rounded >= 95 ? '#52c41a' : rounded >= 50 ? '#1890ff' : '#69c0ff'}
+                        format={(p) => `${p?.toFixed(1)}%`} />
                 );
-
             }
         },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            filters: [
-                { text: 'Completed', value: 'Completed' },
-                { text: 'In Progress', value: 'In Progress' },
-                { text: 'Not Started', value: 'Not Started' },
-                { text: 'Defaulter', value: 'Defaulter' },
-            ],
-            onFilter: (value, record) => record.status === value,
-            render: (status) => {
-                const color = {
-                    'completed': 'green',
-                    'in progress': 'orange',
-                    'not started': 'purple',
-                    'defaulter': 'red'
-                }[status?.toLowerCase()] || 'gray';
-                return <span style={{ color }}>{status}</span>;
-            },
-        },
+        showCourse && courseFilter === "all" ? {
+            title: 'Type',
+            dataIndex: 'type',
+            render: (type) => (
+                <Tag color={type === "Bundle" ? "green" : "blue"}>{type}</Tag>
+            )
+        } : null,
         {
             title: "Actions",
             key: "actions",
-            width: 250,
             render: (text, record) => (
-                <>
-                    <Space >
-
-                        <Button
-                            icon={<DeleteOutlined />}
-                            style={{ marginRight: 8 }}
-                            onClick={() => handleOpenConfirmDeletePopup(record)}
-                        />
-                        <Button
-                            icon={<ExportOutlined />}
-                            onClick={() =>
-                                handleViewUserClick(record?.id, record?.name)
-                            }
-                        />
-                        {!showCourse && <Tooltip title="Allocate course">
-                            <Button
-                                icon={<FileAddOutlined />}
-                                onClick={() => handleAllocateCourse(record.id)}
-                            />
-                        </Tooltip>
-                        }
-                    </Space>
-                </>
+                <Space>
+                    {!showCourse && <Button icon={<DeleteOutlined />} onClick={() => handleOpenConfirmDeletePopup(record)} />}
+                    <Button icon={<ExportOutlined />} onClick={() => handleViewUserClick(record)} />
+                    {!showCourse && <Tooltip title="Allocate course">
+                        <Button icon={<FileAddOutlined />} onClick={() => handleAllocateCourse(record)} />
+                    </Tooltip>}
+                </Space>
             )
         }
-    ];
+    ].filter(Boolean);
 
     return (
         <div className="admin-section">
             <Content style={{ margin: '0 16px' }}>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
-                        <Title level={2} style={{ margin: 0 }}>{groupName}   Details</Title>
-                        {/* </div>
-                    <div> */}
-                        <Button style={{ marginLeft: 30 }}
-                            icon={<EditOutlined />}
-                            onClick={handleEditGroup}
-                        >
-
-                        </Button>
+                        <Title level={2} style={{ margin: 0 }}>{groupName} Details</Title>
+                        <Button style={{ marginLeft: 30 }} icon={<EditOutlined />} onClick={handleEditGroup} />
                     </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
-
-                        {!showCourse && <Button style={{ marginLeft: 30 }}
-                            icon={<UserAddOutlined />}
-                            onClick={handleAddNew}
-                        >
-                            Add new User
-                        </Button>}
-                        <Button style={{ marginLeft: 30 }}
-                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
-                            onClick={handleViewCourse}
-                        >
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+                        {!showCourse && <Button style={{ marginLeft: 30 }} icon={<UserAddOutlined />} onClick={handleAddNew}>Add new User</Button>}
+                        <Button style={{ marginLeft: 30 }} icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />} onClick={handleViewCourse}>
                             {!showCourse ? "View Course" : "View Users"}
                         </Button>
+                        {showCourse && <Radio.Group value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} style={{ marginLeft: 30 }}>
+                            <Radio.Button value="all">All Allocations</Radio.Button>
+                            <Radio.Button value="bundle">Bundles</Radio.Button>
+                            <Radio.Button value="standalone">Courses</Radio.Button>
+                        </Radio.Group>}
                     </div>
-                    <Divider style={{ marginTop: 0 }} />
-                    {filteredList.length > 0 ? (
-                        <Table
-                            dataSource={filteredList}
-                            columns={columns}
-                            bordered
-                            scroll={{ x: "100%", y: "100%" }}
-                            locale={{ emptyText: "No users found." }}
-                            rowKey="id"
-                            pagination={{ position: 'bottomCenter' }}
-                        />
+                    <Divider style={{ marginTop: 0 }} >
+                        <span style={{
+                            display: 'block',
+                            padding: '12px 24px',
+                            fontWeight: 600,
+                            fontSize: '18px',
+                            background: '#e9e7e74',
+                            // border: '1px solid  #e9e7e74',
+                            borderRadius: '8px',
+                            marginBottom: '16px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                        }}>
+                            {showCourse
+                                ? courseFilter === "all"
+                                    ? "Courses and bundles allocated to the group"
+                                    : courseFilter === "bundle"
+                                        ? "All Bundles allocated to the group"
+                                        : "All Courses allocated to the group"
+                                : "Users in the group"}
+                        </span>
+                    </Divider>
+                    {(filteredList.length > 0 &&
+                        dataLoaded) ? (<Table dataSource={filteredList} columns={columns} bordered scroll={{ x: "100%", y: "100%" }}
+                            locale={{ emptyText: "No data found." }} rowKey="id"
+                            pagination={{ position: 'bottomCenter' }} />
                     ) : (
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     )}
                 </div>
             </Content>
-            <AddNewUserModal isModalOpen={isModalOpen} getUsers={getUsers} handleCloseModal={handleCloseModal} setShowToast={setShowToast}
+            <AddNewUserModal isModalOpen={isModalOpen}
+                getUsers={getUsers}
+                handleCloseModal={handleCloseModal}
+                setShowToast={setShowToast}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
                 setLoading={setLoading}
                 groupId={id}
                 existingUsers={userList}
-                courses={courseList} />
-            <Toast
-                message={toastMessage}
+                courses={courseList}
+                bundles={bundleList}
+                getBundles={getBundles}
+                getCourses={getCourses}
+            />
+
+
+
+            <Toast message={toastMessage}
                 type={toastType}
                 show={showToast}
-                onClose={() => setShowToast(false)}
-            />
-            <ConfirmDeletePopup
-                isOpen={isConfirmPopupOpen}
+                onClose={() => setShowToast(false)} />
+
+
+            <ConfirmDeletePopup isOpen={isConfirmPopupOpen}
                 onClose={() => setIsConfirmPopupOpen(false)}
-                onConfirm={handleDeleteUser}
-            />
-            <EditGroupNameModal
-                isModalOpen={EditPopOpen}
+                onConfirm={handleDeleteUser} />
+
+
+            <EditGroupNameModal isModalOpen={EditPopOpen}
                 handleCloseModal={handleCloseEdit}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
@@ -324,26 +283,22 @@ const GroupHistory = ({ setLoading }) => {
                 setLoading={setLoading}
                 groupName={groupName}
                 groupId={id}
-                setGroupName={setGroupName}
+                setGroupName={setGroupName} />
 
-            />
-            <AllocateCourseModal
-                isModalOpen={allocatecourseModalOpen}
+
+            <AllocateCourseModal isModalOpen={allocatecourseModalOpen}
                 groupId={id}
                 userId={userId}
                 getUsers={getUsers}
                 getCourses={getCourses}
+                getBundles={getBundles}
                 handleCloseModal={handleCloseAllocationModal}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
                 setShowToast={setShowToast}
-                setLoading={setLoading}
-            />
+                setLoading={setLoading} />
         </div>
     );
 };
-
-
-
 
 export default AdminHOC(GroupHistory);
