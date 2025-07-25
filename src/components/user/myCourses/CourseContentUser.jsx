@@ -4,7 +4,6 @@ import { app } from "../../../service/serviceLMS";
 import UserHOC from "../../shared/HOC/UserHOC";
 import "../../admin/booksAdmin/BooksAdmin.css";
 import { BarChartOutlined } from "@ant-design/icons";
-
 import {
   Button,
   Input,
@@ -14,7 +13,6 @@ import {
   Select,
   Tag,
   Tooltip,
-  message,
   Divider,
   Progress
 } from "antd";
@@ -49,11 +47,8 @@ const CourseContent = () => {
   const auth = useSelector((state) => state.auth);
   const userId = auth?.userId || Number(localStorage.getItem("userId"));
 
-  // Show result modal on first load if quizResult is passed from previous screen
   useEffect(() => {
-    if (quizResult) {
-      setShowResultModal(true);
-    }
+    if (quizResult) setShowResultModal(true);
   }, [quizResult]);
 
   useEffect(() => {
@@ -93,7 +88,6 @@ const CourseContent = () => {
         console.error("Error fetching content:", error);
       }
     };
-
     loadCourseContent();
   }, [courseId]);
 
@@ -119,7 +113,6 @@ const CourseContent = () => {
         setAllAttempts([]);
       }
     };
-
     fetchAllAttempts();
   }, [courseId, userId]);
 
@@ -129,12 +122,10 @@ const CourseContent = () => {
         `/course/api/client-api/quiz-attempt/user/${userId}/quiz/course/${courseId}`
       );
       const sorted = response.data.data.sort((a, b) => b.quizAttempt.attempt - a.quizAttempt.attempt);
-
       const enriched = sorted.map((item) => ({
         ...item,
         parsedScoreDetails: JSON.parse(item.quizAttempt.scoreDetails),
       }));
-
       setAttempts(enriched);
       setSelectedAttemptIndex(0);
       setShowDetailedResult(true);
@@ -143,15 +134,18 @@ const CourseContent = () => {
     }
   };
 
-
   const selectedAttempt = attempts[selectedAttemptIndex];
   const score = selectedAttempt?.parsedScoreDetails;
+
   const tryParseJSON = (value) => {
+    if (!value || value === "null") return [];
     try {
       const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [parsed];
+      if (Array.isArray(parsed)) return parsed;
+      if (typeof parsed === "string") return [parsed];
+      return [JSON.stringify(parsed)];
     } catch {
-      return value ? [value] : [];
+      return [value];
     }
   };
 
@@ -305,7 +299,7 @@ const CourseContent = () => {
           {(selectedAttempt?.userResponses || []).map((response, index) => {
             const userAnswers = tryParseJSON(response.userAnswer);
             const correctAnswers = tryParseJSON(response.correctAnswer);
-            const allOptions = tryParseJSON(response.options || []);
+            const allOptions = tryParseJSON(response.options || "");
             const isCorrect = response.isCorrect;
 
             return (
@@ -373,46 +367,35 @@ const CourseContent = () => {
                         marginBottom: "10px",
                       }}
                     >
-                      <Text>
-                        <b>Your Answer:</b>{" "}
-                        {userAnswers?.[0] ? (
-                          <span>{userAnswers[0]}</span>
-                        ) : (
-                          <i>(No answer provided)</i>
-                        )}
-                      </Text>
+                      <Text><b>Your Answer:</b> </Text>
+                      {userAnswers?.[0] ? (
+                        <Text>{userAnswers[0]}</Text>
+                      ) : (
+                        <Text type="secondary"><i>(No answer provided)</i></Text>
+                      )}
+
                       <div
                         style={{
                           backgroundColor: isCorrect ? "#f6ffed" : "#fff1f0",
                           border: `1px solid ${isCorrect ? "#b7eb8f" : "#ffa39e"}`,
                           borderRadius: "6px",
                           padding: "12px 16px",
-                          marginBottom: "10px",
+                          marginTop: 10,
                         }}
                       >
-                        <Text>
-                          {isCorrect ? (
-                            <>
-                              ✅ <b>Correct Answer:</b> {userAnswers?.[0] || <i>(No answer provided)</i>}
-                            </>
-                          ) : (
-                            <>
-                              ❌ <b>Your Answer:</b> {userAnswers?.[0] || <i>(No answer provided)</i>}
-                              <br />
-                              ✔ <b>Correct Answer:</b> {correctAnswers?.[0]}
-                            </>
-                          )}
-                        </Text>
+                        {isCorrect ? (
+                          <Text type="success">✅ <b>Correct Answer!</b></Text>
+                        ) : (
+                          <>
+                            <Text type="danger">❌ <b>Your Answer:</b> {userAnswers?.[0]}</Text>
+                            <br />
+                            <Text type="secondary">✔ <b>Correct Answer:</b> {correctAnswers?.[0]}</Text>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
                 </div>
-
-                {isCorrect && (
-                  <div style={{ marginTop: 12 }}>
-                    <Text type="success">✅ <b>Correct Answer!</b></Text>
-                  </div>
-                )}
               </div>
             );
           })}
