@@ -1,10 +1,10 @@
-import { addUser, updateGroup, getUserCoursesInGroup } from "../../../service/GroupService";
+import { addUser, updateGroup, getUserCoursesInGroup, getUserBundlesInGroup } from "../../../service/GroupService";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { Modal, Form, Input, Select, Button, Row, Checkbox, Col, DatePicker, Typography, Space, Spin } from "antd";
 import { fetchAllActiveUsers } from "../../../service/UserService";
 import { BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
-
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -15,6 +15,7 @@ const AllocateCourseModal = (
         userId,
         getUsers,
         getCourses,
+        getBundles,
         handleCloseModal,
         setToastMessage,
         setToastType,
@@ -27,8 +28,15 @@ const AllocateCourseModal = (
     const [searchCourse, setSearchCourse] = useState('');
     const [courses, setCourses] = useState([]);
     const [courseMsg, setCourseMsg] = useState("");
+    const [bundles, setBundles] = useState([])
+    const [bundleMsg, setBundleMsg] = useState("");
 
     const filteredCourses = courses?.filter(user =>
+        user.title.toLowerCase().includes(searchCourse.toLowerCase())
+    );
+
+
+    const filteredBundles = bundles?.filter(user =>
         user.title.toLowerCase().includes(searchCourse.toLowerCase())
     );
 
@@ -37,11 +45,11 @@ const AllocateCourseModal = (
 
         const payload = {
             groupId: Number(groupId),
-            userId: userId,
+            userId: Number(userId),
         }
         console.log("Payload", payload);
         const activeUsers = await getUserCoursesInGroup(payload);
-        const users = activeUsers.data?.map((user, index) => ({
+        const users = activeUsers?.data?.map((user, index) => ({
             courseId: user.courseId,
             title: user.title,
             level: user.courseLevel,
@@ -53,14 +61,35 @@ const AllocateCourseModal = (
     }
 
 
+    async function getBundleList() {
+
+        const payload = {
+            groupId: Number(groupId),
+            userId: Number(userId),
+        }
+        console.log("Payload", payload);
+        const activeUsers = await getUserBundlesInGroup(payload);
+        const users = activeUsers?.data?.map((user, index) => ({
+            bundleId: user.bundleId,
+            title: user.bundleName,
+        }));
+        setBundles(users);
+        setBundleMsg(activeUsers.message);
+        console.log("BUNDLES", users);
+        console.log("MESSAGE", activeUsers.message);
+    }
+
+
     useEffect(() => {
         form.setFieldsValue({
             groupId: groupId,
             employees: [userId],
             courses: [],
+            bundles: []
         });
 
         getCourseList();
+        getBundleList();
 
     }, [isModalOpen]);
 
@@ -72,7 +101,8 @@ const AllocateCourseModal = (
                 employees: [userId], // ✅ Backend expects this
                 courses: values.courses,
                 deadline: values.deadline,
-                assignedAt: values.assignedAt,
+                bundles: values.bundles,
+                assignedAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
             };
 
             setLoading(true);
@@ -81,6 +111,7 @@ const AllocateCourseModal = (
             const data = await addUser(payload);
             getUsers();
             getCourses();
+            getBundles();
             setToastMessage(data?.message);
             setToastType("success");
             setShowToast(true);
@@ -112,9 +143,9 @@ const AllocateCourseModal = (
 
 
     const selectedCourses = Form.useWatch("courses", form);
-
+    const selectedBundles = Form.useWatch("bundles", form);
     return (
-        (courses?.length > 0 ?
+        ((courses?.length > 0 || bundles?.length > 0) ?
             <Modal
                 title={`Allocate course to user`}
                 visible={isModalOpen}
@@ -159,17 +190,10 @@ const AllocateCourseModal = (
                                     `No courses available`
                             }
                         >
-
-                            {/* <Option label="Select All" onClick={handleCoursesChange}>
-                                <div>
-                                    <Text strong>Select All</Text>
-                                </div>
-                            </Option> */}
-
                             {filteredCourses?.map(course => (
                                 <Option
-                                    key={course.id}
-                                    value={course.id}
+                                    key={course.courseId}
+                                    value={course.courseId}
                                     label={course.title}
                                 >
                                     <div>
@@ -185,23 +209,56 @@ const AllocateCourseModal = (
 
                         </Select>
                     </Form.Item>
+                    <Form.Item label={
+                        <Space>
+                            <BookOutlined />
+                            <Text strong>
+                                Select Bundle(s) to add
+                            </Text>
+                        </Space>
+                    } name="bundles">
 
-                    {selectedCourses?.length > 0 && <Form.Item
+
+                        <Select placeholder={`Select bundle`}
+                            showSearch
+                            mode="multiple"
+                            optionFilterProp="label"
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            maxTagCount="responsive"
+                            notFoundContent={
+                                loading ? <Spin size="small" /> :
+                                    `No bundles available`
+                            }
+                        >
+                            {filteredBundles?.map(course => (
+                                <Option
+                                    key={course.bundled}
+                                    value={course.bundleId}
+                                    label={course.title}
+                                >
+                                    <div>
+                                        <Text strong>{course.title}</Text>
+                                        <br />
+                                    </div>
+                                </Option>
+                            ))}
+                            {filteredBundles?.length === 0 && (
+                                <div style={{ color: '#999', textAlign: 'center' }}>No matches found</div>
+                            )}
+
+
+                        </Select>
+                    </Form.Item>
+
+                    {(selectedCourses?.length > 0 || selectedBundles?.length > 0) && <Form.Item
                         name="deadline"
                         label="Deadline"
                         rules={[{ required: true, message: 'Please select a deadline!' }]}
                     >
                         <DatePicker style={{ width: '100%' }} />
                     </Form.Item>}
-                    {selectedCourses?.length > 0 &&
-                        <Form.Item
-                            name="assignedAt"
-                            label="assignedAt"
-                            rules={[{ required: true, message: 'Please select a assignment date!' }]}
-                        >
-                            <DatePicker style={{ width: '100%' }} />
-                        </Form.Item>
-                    }
                 </Form>
             </Modal> : <Modal
                 title={`Allocate course to user`}
@@ -211,6 +268,7 @@ const AllocateCourseModal = (
                     <Button onClick={handleCloseModal}>OK</Button>
                 }>
                 <Text>{courseMsg}</Text>
+                <Text>{bundleMsg}</Text>
             </Modal>)
     );
 };

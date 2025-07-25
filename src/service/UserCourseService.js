@@ -167,7 +167,7 @@ export async function getUserEnrolledCourseDetails(userId) {
             ? new Date(enrollment.deadline).toISOString().split("T")[0]
             : null;
 
-          console.log("📅 Deadline:", deadlineISO || "None");
+          console.log("Deadline:", deadlineISO || "None");
 
           let status = "Not Started";
           let adherence = "N/A";

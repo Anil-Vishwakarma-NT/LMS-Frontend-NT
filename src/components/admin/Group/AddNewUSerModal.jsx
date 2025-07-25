@@ -4,7 +4,8 @@ import { Modal, Form, Input, Select, Button, Checkbox, Col, Spin, Row, DatePicke
 import { fetchAllActiveUsers } from "../../../service/UserService";
 import { UserOutlined, TeamOutlined, BookOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-
+import dayjs from 'dayjs';
+import { useSelector } from "react-redux";
 
 
 const { Option } = Select;
@@ -17,6 +18,8 @@ const AddNewUserModal = (
         getCourses,
         existingUsers,
         courses,
+        bundles,
+        getBundles,
         groupId,
         handleCloseModal,
         setToastMessage,
@@ -32,15 +35,20 @@ const AddNewUserModal = (
     const [notAddedUsers, setNotAddedUSers] = useState([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchCourse, setSearchCourse] = useState('');
-
+    const auth = useSelector((state) => state.auth)
     const filteredUsers = notAddedUsers?.filter(user =>
         user.label.toLowerCase().includes(searchValue.toLowerCase())
         // user.email.toLowerCase().includes(searchValue.toLowerCase())
     );
 
+
     const filteredCourses = courses?.filter(user =>
         user.name.toLowerCase().includes(searchCourse.toLowerCase())
-        // user.email.toLowerCase().includes(searchValue.toLowerCase())
+
+    );
+    const filteredBundles = bundles?.filter(user =>
+        user.name.toLowerCase().includes(searchCourse.toLowerCase())
+
     );
 
 
@@ -75,14 +83,13 @@ const AddNewUserModal = (
             groupId: groupId,
             employees: [],
             courses: [],
-
+            bundles: [],
         });
 
         getUserList();
 
     }, [isModalOpen]);
 
-    // ✅ New useEffect for filtering users
     useEffect(() => {
         if (userList.length > 0 && existingUsers.length > 0) {
             const usr = userList.filter(
@@ -106,7 +113,7 @@ const AddNewUserModal = (
             const values = await form.validateFields();
             values.groupId = Number(values.groupId);
             values.deadline = values.deadline ? values.deadline.format('YYYY-MM-DDThh:mm:ss') : null;
-            values.assignedAt = values.assignedAt ? values.assignedAt.format('YYYY-MM-DDThh:mm:ss') : null;
+            values.assignedAt = dayjs().format('YYYY-MM-DDTHH:mm:ss');
 
 
             setLoading(true);
@@ -119,6 +126,7 @@ const AddNewUserModal = (
             setShowToast(true);
             getUsers();
             getCourses();
+            getBundles();
             handleCloseModal();
 
         } catch (error) {
@@ -132,7 +140,7 @@ const AddNewUserModal = (
 
 
     const selectedCourses = Form.useWatch("courses", form);
-
+    const selectedBundles = Form.useWatch("bundles", form);
     return ((notAddedUsers?.length > 0 ?
         <Modal
             title={`Add New User`}
@@ -201,6 +209,8 @@ const AddNewUserModal = (
                         ))}
                     </Select>
                 </Form.Item>
+
+
                 {/* COURSES */}
                 <Form.Item name="courses"
                     label={
@@ -242,18 +252,55 @@ const AddNewUserModal = (
                     </Select>
                 </Form.Item>
 
+
+
+
+                {/* BUNDLES */}
+                <Form.Item name="bundles"
+                    label={
+                        <Space>
+                            <BookOutlined />
+                            <Text strong>
+                                Select bundle(s) to add
+                            </Text>
+                        </Space>
+                    }
+                // rules={[{ required: true, message: `Please select a Em` }]}
+                >
+                    <Select placeholder={`Select bundle`}
+                        showSearch
+                        mode="multiple"
+                        optionFilterProp="label"
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount="responsive"
+                        notFoundContent={
+                            loading ? <Spin size="small" /> :
+                                `No bundles available`
+                        }
+                    >
+                        {filteredBundles.map(bundle => (
+                            <Option
+                                key={bundle.id}
+                                value={bundle.id}
+                                label={bundle.name}
+                            >
+                                <div>
+                                    <Text strong>{bundle.name}</Text>
+                                    <br />
+                                </div>
+                            </Option>
+                        ))}
+
+                    </Select>
+                </Form.Item>
+
                 {/* DEADLINE + ASSIGNED AT */}
-                {selectedCourses?.length > 0 && <Form.Item
+                {(selectedCourses?.length > 0 || selectedBundles?.length > 0) && <Form.Item
                     name="deadline"
                     label="Deadline"
                     rules={[{ required: true, message: 'Please select a deadline!' }]}
-                >
-                    <DatePicker style={{ width: '100%' }} />
-                </Form.Item>}
-                {selectedCourses?.length > 0 && <Form.Item
-                    name="assignedAt"
-                    label="Assigned At"
-                    rules={[{ required: true, message: 'Please select assignment date!' }]}
                 >
                     <DatePicker style={{ width: '100%' }} />
                 </Form.Item>}
