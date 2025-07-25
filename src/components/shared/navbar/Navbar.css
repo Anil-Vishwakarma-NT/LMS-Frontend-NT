@@ -15,7 +15,7 @@
   .navbar-item:hover{
     text-decoration: none;
     transform: scale(1.1);
-    color: #006F5E;
+    color: #5959b4;
     transition: .3s;
     border: none;
     border-radius: 3px;
@@ -49,6 +49,7 @@
     min-width: 200px;
   }
 
+<<<<<<< Updated upstream
 .nav-link {
   display: flex;
   justify-content: center;
@@ -56,6 +57,15 @@
   gap: 1rem;
   padding-right: 3rem;
 }
+=======
+  .nav-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+    padding-right: 0.5rem;
+  }
+>>>>>>> Stashed changes
 
 .search {
   margin-left: auto;
@@ -92,8 +102,13 @@
   font-size: larger;
 }
 
+<<<<<<< Updated upstream
 nav {
     background-color: #fff;
+=======
+  nav {
+    background-color: #fefefe;
+>>>>>>> Stashed changes
     padding: 1.5rem 0;
     border-radius: 0px;
     position: fixed;
@@ -102,7 +117,11 @@ nav {
     z-index: 10;
     left: 0;
     right: 0;
+<<<<<<< Updated upstream
     box-shadow: 0 1px 3px #006F5E;
+=======
+    box-shadow: 0 1px 3px #181230;
+>>>>>>> Stashed changes
   }
   
   nav ul {

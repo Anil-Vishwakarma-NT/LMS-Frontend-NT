@@ -11,7 +11,7 @@ const AdminRoutes = ({ children }) => {
         if (auth && auth.accessToken) {
             try {
                 if (auth.roles.includes("ADMIN")) {
-                    console.log('Admin access granted')
+                    console.log("AUTH IN ADMIN ROUTES", auth);
                     setIsVerified(true)
                 } else {
                     navigate('/')

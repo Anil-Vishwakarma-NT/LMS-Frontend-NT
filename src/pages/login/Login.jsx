@@ -79,18 +79,18 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
       const normalizedRoles = Array.isArray(roles) ? roles : [roles];
 
-      // Store auth info in Redux
       dispatch(login({
         roles: normalizedRoles,
         email,
         accessToken: response.accessToken
       }));
+      // dispatch({ userName: fullName });
 
-      // Store token in localStorage
+      console.log("AUTH VALUES", auth);
+
       localStorage.setItem('authtoken', response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
       console.log("roles", normalizedRoles)
-      // ✅ Navigate based on role
       if (normalizedRoles.includes("ADMIN")) {
         console.log("enered admin");
         navigate("/admin");
@@ -148,19 +148,6 @@ u/bvWV47VOzzM+ObAgMBAAE=
             required
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
-
-          <div className='checkbox'>
-            <input
-              type="checkbox"
-              checked={checkboxChecked}
-              onChange={() => {
-                setCheckboxChecked(!checkboxChecked);
-                setErrors({ ...errors, checkbox: '' });
-              }}
-            />
-            <div className='checkbox-text'>Agree to all Terms and Conditions?</div>
-          </div>
-          {errors.checkbox && <div className="error-text">{errors.checkbox}</div>}
 
           <Button text="Login" type="submit" onClick={handleLoginClick} />
         </div>
