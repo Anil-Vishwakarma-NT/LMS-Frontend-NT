@@ -11,13 +11,14 @@ import {
   Typography,
   Modal,
   Space,
-  Divider,
-  Progress,
   Select,
-  Table,
   Tag,
-  
+  Tooltip,
+  message,
+  Divider,
+  Progress
 } from "antd";
+
 import UserCourseContentTable from "../../shared/table/UserCourseContentTable";
 import { fetchCourseContentByCourseId, fetchCourseById } from "../../../service/BookService";
 import { fetchContentProgress } from "../../../service/UserCourseService";
@@ -31,10 +32,12 @@ const CourseContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const quizResult = location.state?.quizResult;
-  const [showResultModal, setShowResultModal] = useState(true);
+
+  const [showResultModal, setShowResultModal] = useState(false);
   const [showDetailedResult, setShowDetailedResult] = useState(false);
   const [attempts, setAttempts] = useState([]);
   const [selectedAttemptIndex, setSelectedAttemptIndex] = useState(0);
+  const [allAttempts, setAllAttempts] = useState([]);
 
   const [courseContent, setCourseContent] = useState([]);
   const [filteredContent, setFilteredContent] = useState([]);
@@ -45,6 +48,13 @@ const CourseContent = () => {
 
   const auth = useSelector((state) => state.auth);
   const userId = auth?.userId || Number(localStorage.getItem("userId"));
+
+  // Show result modal on first load if quizResult is passed from previous screen
+  useEffect(() => {
+    if (quizResult) {
+      setShowResultModal(true);
+    }
+  }, [quizResult]);
 
   useEffect(() => {
     const loadCourseName = async () => {
@@ -63,7 +73,6 @@ const CourseContent = () => {
     const loadCourseContent = async () => {
       try {
         const contentData = await fetchCourseContentByCourseId(courseId);
-
         const enrichedData = await Promise.all(
           contentData.map(async (item) => {
             const completion = await fetchContentProgress(userId, courseId, item.courseContentId);
@@ -76,7 +85,6 @@ const CourseContent = () => {
             };
           })
         );
-
         setCourseContent(enrichedData);
         setFilteredContent(enrichedData);
         setContentIds(enrichedData.map((item) => item.contentId));
@@ -99,6 +107,22 @@ const CourseContent = () => {
     setFilteredContent(filtered);
   }, [searchTerm, courseContent]);
 
+  useEffect(() => {
+    const fetchAllAttempts = async () => {
+      try {
+        const response = await app.get(
+          `/course/api/client-api/quiz-attempt/user/${userId}/quiz/course/${courseId}`
+        );
+        setAllAttempts(response?.data?.data || []);
+      } catch (err) {
+        console.error("Error fetching previous attempts:", err);
+        setAllAttempts([]);
+      }
+    };
+
+    fetchAllAttempts();
+  }, [courseId, userId]);
+
   const fetchDetailedAttempts = async () => {
     try {
       const response = await app.get(
@@ -119,86 +143,17 @@ const CourseContent = () => {
     }
   };
 
+
   const selectedAttempt = attempts[selectedAttemptIndex];
-  const overallResponse = selectedAttempt?.overallResponse;
   const score = selectedAttempt?.parsedScoreDetails;
-
-  const columns = [
-    {
-      title: "Question ID",
-      dataIndex: "questionId",
-      key: "questionId",
-    },
-    {
-      title: "Question",
-      dataIndex: "questionText",
-      key: "questionText",
-      render: (text) => <Text>{text}</Text>,
-    },
-    {
-  title: "Your Answer",
-  dataIndex: "userAnswer",
-  key: "userAnswer",
-  render: (val, record) => {
-    const answers = JSON.parse(val);
-    const isCorrect = record.pointsEarned > 0;
-
-    const backgroundColor = isCorrect ? "#f6ffed" : "#fff1f0";
-    const borderColor = isCorrect ? "#b7eb8f" : "#ffa39e";
-    const icon = isCorrect ? "✔" : "✖";
-    const tooltipText = isCorrect ? "Correct" : "Wrong";
-
-    return (
-      <span>
-        {answers.map((ans, idx) => (
-          <span key={idx} title={tooltipText}>
-            <Tag
-              style={{
-                backgroundColor,
-                borderColor,
-                color: "rgba(0, 0, 0, 0.85)",
-                marginBottom: "4px",
-              }}
-            >
-              {icon} {ans}
-            </Tag>
-          </span>
-        ))}
-      </span>
-    );
-  },
-},
-{
-  title: "Correct Answer",
-  dataIndex: "correctAnswer",
-  key: "correctAnswer",
-  render: (val) => {
+  const tryParseJSON = (value) => {
     try {
-      const parsed = JSON.parse(val);
-      return parsed.map((ans, idx) => (
-        <Tag
-          key={idx}
-          style={{
-            backgroundColor: "transparent",
-            border: "1px solid #d9d9d9",
-            color: "rgba(0, 0, 0, 0.85)",
-            marginBottom: "4px",
-          }}
-        >
-          {ans}
-        </Tag>
-      ));
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [parsed];
     } catch {
-      return val;
+      return value ? [value] : [];
     }
-  },
-},
-    {
-      title: "Points Earned",
-      dataIndex: "pointsEarned",
-      key: "pointsEarned",
-    },
-  ];
+  };
 
   return (
     <div className="admin-section">
@@ -223,15 +178,15 @@ const CourseContent = () => {
           >
             Attempt Quiz
           </Button>
-          <Button
-            onClick={() => {
-              fetchDetailedAttempts();     // fetch data if not already
-              setShowDetailedResult(true); // open modal
-            }}
-            icon={<BarChartOutlined />}
-          >
-          View Attempts
-        </Button>
+          <Tooltip title={allAttempts.length === 0 ? "No attempts yet" : "View previous attempts"}>
+            <Button
+              onClick={fetchDetailedAttempts}
+              icon={<BarChartOutlined />}
+              disabled={allAttempts.length === 0}
+            >
+              View Attempts
+            </Button>
+          </Tooltip>
         </div>
       </div>
 
@@ -249,6 +204,7 @@ const CourseContent = () => {
         />
       )}
 
+      {/* ✅ Quiz Result Modal */}
       {quizResult && showResultModal && (
         <Modal
           open={true}
@@ -300,12 +256,13 @@ const CourseContent = () => {
         </Modal>
       )}
 
+      {/* ✅ Attempt Details Modal */}
       <Modal
         open={showDetailedResult}
         onCancel={() => setShowDetailedResult(false)}
         title={`Detailed Result - Attempt ${selectedAttempt?.quizAttempt?.attempt || ""}`}
         footer={null}
-        width="90vw"
+        width={800}
         centered
       >
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -320,7 +277,6 @@ const CourseContent = () => {
               </Option>
             ))}
           </Select>
-
           {score && (
             <div>
               <Space direction="vertical" size="small">
@@ -340,18 +296,126 @@ const CourseContent = () => {
             </div>
           )}
 
-          {overallResponse && (
-            <div>
-              <Text strong>Overall Feedback:</Text> <Text>{overallResponse}</Text>
-            </div>
-          )}
+          <Space wrap size="middle" style={{ marginBottom: 16, marginTop: 16 }}>
+            <Tag color="#52c41a">✅ Selected & Correct</Tag>
+            <Tag color="#ff4d4f">❌ Selected & Incorrect</Tag>
+            <Tag color="#1890ff">✔ Missed Correct</Tag>
+          </Space>
 
-          <Table
-            columns={columns}
-            dataSource={selectedAttempt?.userResponses || []}
-            pagination={false}
-            rowKey="responseId"
-          />
+          {(selectedAttempt?.userResponses || []).map((response, index) => {
+            const userAnswers = tryParseJSON(response.userAnswer);
+            const correctAnswers = tryParseJSON(response.correctAnswer);
+            const allOptions = tryParseJSON(response.options || []);
+            const isCorrect = response.isCorrect;
+
+            return (
+              <div
+                key={response.responseId}
+                style={{
+                  marginBottom: "24px",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  backgroundColor: "#fff",
+                  border: "1px solid #f0f0f0",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                }}
+              >
+                <Title level={5} style={{ marginBottom: 16 }}>
+                  {`${index + 1}. ${response.questionText}`}
+                </Title>
+
+                <div>
+                  {allOptions.length > 0 ? (
+                    allOptions.map((option, idx) => {
+                      const selected = userAnswers.includes(option);
+                      const isCorrectAnswer = correctAnswers.includes(option);
+
+                      let bgColor = "#f9f9f9";
+                      let borderColor = "#d9d9d9";
+                      let icon = null;
+                      let fontWeight = 400;
+
+                      if (selected && isCorrectAnswer) {
+                        bgColor = "#f6ffed"; borderColor = "#b7eb8f"; icon = "✅"; fontWeight = 600;
+                      } else if (selected && !isCorrectAnswer) {
+                        bgColor = "#fff1f0"; borderColor = "#ffa39e"; icon = "❌"; fontWeight = 600;
+                      } else if (!selected && isCorrectAnswer) {
+                        bgColor = "#e6f7ff"; borderColor = "#91d5ff"; icon = "✔"; fontWeight = 600;
+                      }
+
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            backgroundColor: bgColor,
+                            border: `1px solid ${borderColor}`,
+                            borderRadius: "6px",
+                            padding: "10px 16px",
+                            marginBottom: "10px",
+                            display: "flex",
+                            alignItems: "center",
+                            fontSize: "15px",
+                            fontWeight: fontWeight,
+                          }}
+                        >
+                          {icon && <span style={{ marginRight: 8 }}>{icon}</span>}
+                          {option}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #f0f0f0",
+                        borderRadius: "6px",
+                        padding: "12px 16px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <Text>
+                        <b>Your Answer:</b>{" "}
+                        {userAnswers?.[0] ? (
+                          <span>{userAnswers[0]}</span>
+                        ) : (
+                          <i>(No answer provided)</i>
+                        )}
+                      </Text>
+                      <div
+                        style={{
+                          backgroundColor: isCorrect ? "#f6ffed" : "#fff1f0",
+                          border: `1px solid ${isCorrect ? "#b7eb8f" : "#ffa39e"}`,
+                          borderRadius: "6px",
+                          padding: "12px 16px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <Text>
+                          {isCorrect ? (
+                            <>
+                              ✅ <b>Correct Answer:</b> {userAnswers?.[0] || <i>(No answer provided)</i>}
+                            </>
+                          ) : (
+                            <>
+                              ❌ <b>Your Answer:</b> {userAnswers?.[0] || <i>(No answer provided)</i>}
+                              <br />
+                              ✔ <b>Correct Answer:</b> {correctAnswers?.[0]}
+                            </>
+                          )}
+                        </Text>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {isCorrect && (
+                  <div style={{ marginTop: 12 }}>
+                    <Text type="success">✅ <b>Correct Answer!</b></Text>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </Space>
       </Modal>
     </div>
