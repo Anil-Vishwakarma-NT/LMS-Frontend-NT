@@ -28,7 +28,13 @@ import AboutUs from "./components/shared/aboutUs/AboutUs";
 import Login from "./pages/login/Login";
 import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
+import AdminHOC from "./components/shared/HOC/AdminHOC"; 
+import QuizReportDashboard from "./components/admin/quizReport/QuizReportDashboard";
 import "./App.css";
+
+
+const QuizReportWithHOC = AdminHOC(QuizReportDashboard);
+
 const router = createBrowserRouter([
   {
     path: "/login",    // :large_green_circle: Login route explicitly defined
@@ -73,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "enroll",
         element: <AdminRoutes><EnrollmentDashboard /></AdminRoutes>
+      },
+      {
+        path: "quiz-report",
+        element: <AdminRoutes><QuizReportWithHOC /></AdminRoutes>
       },
       {
         path: "group",
