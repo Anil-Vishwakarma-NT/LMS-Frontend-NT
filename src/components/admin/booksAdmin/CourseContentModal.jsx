@@ -18,6 +18,8 @@ const CourseContentModal = ({
 }) => {
   const [form] = Form.useForm();
   const [courseName, setCourseName] = useState("");
+  const [contentType, setContentType] = useState("");
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const loadCourseName = async () => {
@@ -43,11 +45,13 @@ const CourseContentModal = ({
         form.setFieldsValue({
           title: selectedContent.title || "",
           description: selectedContent.description || "",
-          resourceLink: selectedContent.resourceLink || "",
           isActive: selectedContent.active ? "true" : "false",
         });
+        setContentType(selectedContent.contentType || "");
       } else {
         form.resetFields();
+        setFile(null);
+        setContentType("");
       }
     }
   }, [isModalOpen, selectedContent, form]);
@@ -57,19 +61,22 @@ const CourseContentModal = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      const requestData = {
-        courseId: courseId,
-        title: values.title,
-        description: values.description,
-        resourceLink: values.resourceLink,
-        active: values.isActive === "true",
-      };
+      const formData = new FormData();
+      formData.append("courseId", courseId);
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("active", values.isActive === "true");
+      formData.append("contentType", contentType);
+      if (file) {
+        console.log("FILE ADDED", file)
+        formData.append("file", file);
+      }
 
       if (selectedContent?.courseContentId) {
-        await updateCourseContent(selectedContent.courseContentId, requestData);
+        await updateCourseContent(selectedContent.courseContentId, formData);
         message.success("Course content updated successfully!");
       } else {
-        await createCourseContent(requestData);
+        await createCourseContent(formData);
         message.success("New course content added successfully!");
       }
 
@@ -125,20 +132,6 @@ const CourseContentModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Resource Link"
-          name="resourceLink"
-          rules={[
-            { required: true, message: "Resource Link is required!" },
-            {
-              pattern: /^https?:\/\/.*$/,
-              message: "Invalid Resource Link format!",
-            },
-          ]}
-        >
-          <Input autoComplete="off" type="url" />
-        </Form.Item>
-
-        <Form.Item
           label="Is Active"
           name="isActive"
           rules={[{ required: true, message: "Status is required!" }]}
@@ -148,10 +141,45 @@ const CourseContentModal = ({
             <Option value="false">Inactive</Option>
           </Select>
         </Form.Item>
+
+        <Form.Item
+          label="Content Type"
+          required
+          tooltip="Choose the type of file to upload"
+        >
+          <Select
+            placeholder="Select content type"
+            value={contentType}
+            onChange={(value) => setContentType(value)}
+          >
+            <Option value="video">Video</Option>
+            <Option value="pdf">PDF</Option>
+            <Option value="document">Document</Option>
+          </Select>
+        </Form.Item>
+
+        {contentType && (
+          <Form.Item
+            label={`Upload ${contentType.charAt(0).toUpperCase() + contentType.slice(1)
+              }`}
+            required={!selectedContent} // Only required for new content
+          >
+            <Input
+              type="file"
+              accept={
+                contentType === "video"
+                  ? "video/*"
+                  : contentType === "pdf"
+                    ? "application/pdf"
+                    : ".doc,.docx,.ppt,.pptx,.txt"
+              }
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );
 };
 
 export default CourseContentModal;
-
