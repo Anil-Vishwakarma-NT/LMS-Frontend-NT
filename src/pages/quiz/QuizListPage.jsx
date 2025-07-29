@@ -62,14 +62,20 @@ const QuizListPage = () => {
     }
   };
 
-  const fetchQuestions = async (quizId) => {
-    try {
-      const res = await app.get(`course/api/client-api/quiz-questions/quiz/${quizId}`);
-      setQuizQuestions(res.data?.data || []);
-    } catch (err) {
+ const fetchQuestions = async (quizId) => {
+  try {
+    const res = await app.get(`/course/api/client-api/quiz-questions/quiz/${quizId}`);
+    setQuizQuestions(res.data?.data || []);
+  } catch (err) {
+    if (err?.response?.status === 404) {
+      console.warn("No quiz questions yet, quizId:", quizId);
+      setQuizQuestions([]); // Initialize empty state
+    } else {
+      console.error("❌ Failed to fetch quiz questions:", err);
       message.error("Failed to load quiz questions");
     }
-  };
+  }
+};
 
   useEffect(() => {
     const load = async () => {

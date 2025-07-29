@@ -7,6 +7,7 @@ import sideCategory from "../../../assets/bundle.svg";
 import sideBook from "../../../assets/course.svg";
 import sideIssuance from "../../../assets/group.svg";
 import enrollment from "../../../assets/enrollment.svg"
+import quiz from "../../../assets/quiz.png"
 import Loader from '../loader/Loader';
 
 const AdminHOC = (Component) => function HOC() {
@@ -18,7 +19,8 @@ const AdminHOC = (Component) => function HOC() {
     { path: '/books', label: 'Courses', img: sideBook },
     { path: '/group', label: 'Groups', img: sideIssuance },
     { path: '/users', label: 'Users', img: sideUsers },
-    { path: '/enroll', label: 'Enrollments', img: enrollment }
+    { path: '/enroll', label: 'Enrollments', img: enrollment },
+    { path: '/quiz-report', label: 'Quiz Report', img: quiz },
   ];
 
   return (
