@@ -265,6 +265,12 @@ const UsersAdmin = ({ setLoading }) => {
             >
               {isInactive ? "Active Users" : "Inactive Users"}
             </Button>
+            <Button
+                icon={<ExportOutlined />}
+                onClick={() => navigate("/user-report")}
+              >
+            Report
+          </Button>
           </div>
         </div>
 

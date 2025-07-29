@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { Input, Button, Typography, Modal, message } from "antd";
+import { ExportOutlined} from "@ant-design/icons";
 import CourseTable from "../../shared/table/CourseTable";
 import CoursesModal from "./BooksModal";
 import {
@@ -9,6 +10,7 @@ import {
   updateCourse,
 } from "../../../service/BookService";
 import handleCreateCourse from "./BooksModal";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -20,6 +22,8 @@ const CoursesAdmin = ({ setLoading }) => {
   const [editingCourse, setEditingCourse] = useState(null);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [filterType, setFilterType] = useState("all");
+
+  const navigate = useNavigate();
 
   const loadCourses = async () => {
     try {
@@ -165,6 +169,12 @@ const CoursesAdmin = ({ setLoading }) => {
               : filterType === "active"
               ? "Show Inactive Courses"
               : "Show All Courses"}
+          </Button>
+          <Button
+                icon={<ExportOutlined />}
+                onClick={() => navigate("/course-report")}
+              >
+            Report
           </Button>
         </div>
       </div>

@@ -146,6 +146,12 @@ const AllGroup = ({ setLoading }) => {
                         >
                             Add new Group
                         </Button>
+                        <Button
+                                icon={<ExportOutlined />}
+                                onClick={() => navigate("/group-report")}
+                            >
+                            Report
+                        </Button>
                     </div>
                     <Divider style={{ marginTop: 0 }} />
                     <div className="user-table">
