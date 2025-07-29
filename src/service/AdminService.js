@@ -1,6 +1,17 @@
 import {app}from "./serviceLMS"
 import {fetchCourseDetails, getCourseProgressWithMeta, getCourseProgressWithMetaCourseId , fetchUserNameById} from "./UserCourseService";
 
+export const getDashboardStats = async () => {
+    try {
+        console.log("getting dashboard stats");
+        const response = await app.get('user/api/client-api/admin/admin-dashboard-stats')
+        console.log("dashboard stats response", response.data);
+        return response.data.data
+    } catch (error) {
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
 export const getTotalUsers = async () => {
     try {
         console.log("getting total users");
@@ -164,6 +175,20 @@ export const getTotalGroups = async () => {
         throw new Error(error?.response?.data?.message);
     }
 }
+
+export const getRecentCoursesAndBundles = async () => {
+    try {
+        console.log("fetching recent courses and bundles");
+        const response = await app.get('/course/api/client-api/course/recent-course-and-bundle')
+        console.log("recent courses and bundles response", response.data);
+        return response.data
+    } catch (error) {
+        console.error("Error fetching recent courses and bundles:", error);
+        throw new Error(error?.response?.data?.message);
+    }
+}
+
+// Keep existing individual methods for backward compatibility
 export const getRecentUser = async () => {
     
     try {
