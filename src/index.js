@@ -30,7 +30,8 @@ import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import BundlesHistory from "./components/admin/bundles/BundlesHistory";
 import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
-
+import UserGroup from "./components/user/myGroups/UserGroup";
+import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";
 
 
 
@@ -38,6 +39,7 @@ import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
 
 
 import "./App.css";
+import { UsergroupAddOutlined } from "@ant-design/icons";
 const router = createBrowserRouter([
   {
     path: "/login",    // :large_green_circle: Login route explicitly defined
@@ -114,10 +116,16 @@ const router = createBrowserRouter([
       {
         path: "my-courses",
         element: <UserRoutes><MyCourses /></UserRoutes>
+      }, {
+        path: "my-groups",
+        element: <UserRoutes><UserGroup /></UserRoutes>
       },
       {
         path: "course-content-user/:courseId",
         element: <UserRoutes><CourseContentUser /></UserRoutes>
+      }, {
+        path: "group-user-history/:id",
+        element: <UserRoutes><UserGroupHistory /></UserRoutes>
       },
       // Quiz Attempt (no guard)
       { path: "quiz/:courseId", element: <CourseQuizAttempt /> },

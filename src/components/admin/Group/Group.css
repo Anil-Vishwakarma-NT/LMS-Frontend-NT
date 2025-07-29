@@ -1,4 +1,4 @@
-.user-container {
+.group-container {
     background-color: #ffffff;
     padding: 80px 24px 24px;
     /* Top padding accounts for navbar height */
@@ -7,8 +7,14 @@
     box-sizing: border-box;
 }
 
+.group-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16px;
+}
 
-.user-title {
+.group-title {
     grid-column: 2;
     /* center */
     justify-self: left;
@@ -32,28 +38,37 @@
     border: none;
 }
 
-.user-add-btn:hover {
+
+.group-add-btn:hover {
     background-color: #40a9ff;
     color: white;
 }
 
-.user-table {
-    flex: 1;
-    overflow: auto;
-    background: #fff;
-    padding: 24px;
+.group-table {
+    background: white;
+    padding: 16px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+.group-subtitle {
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 18px;
+    background: #f9f9fa;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    align-content: center;
+}
+
 @media (max-width: 768px) {
-    .user-header {
+    .group-header {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    .user-title {
+    .group-title {
         font-size: 20px;
         text-align: center;
     }

@@ -1,0 +1,38 @@
+.admin-section {
+    padding: 80px 24px 24px;
+    /* Top padding to push below navbar */
+    background-color: #ffffff;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.title {
+    grid-column: 2;
+    /* center */
+    justify-self: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.admin-page-mid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.no-data-found {
+    text-align: center;
+    font-size: 16px;
+    padding: 20px;
+    color: #888;
+}
+
+.action-buttons {
+    grid-column: 3;
+    /* right */
+    justify-self: end;
+    align-self: end;
+    /* a bit below */
+    margin-top: 8px;
+}

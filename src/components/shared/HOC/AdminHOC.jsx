@@ -8,30 +8,30 @@ import sideBook from "../../../assets/course.svg";
 import sideIssuance from "../../../assets/group.svg";
 import enrollment from "../../../assets/enrollment.svg"
 import Loader from '../loader/Loader';
-
 const AdminHOC = (Component) => function HOC() {
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] = useState(false)
   const sidebarItems = [
     { path: '/admin', label: 'Dashboard', img: sideDash },
     { path: '/bundles', label: 'Bundles', img: sideCategory },
     { path: '/books', label: 'Courses', img: sideBook },
     { path: '/group', label: 'Groups', img: sideIssuance },
     { path: '/users', label: 'Users', img: sideUsers },
-    { path: '/enroll', label: 'Enrollments', img: enrollment }
+    { path: '/enroll', label: 'Enrollments', img: enrollment },
   ];
 
   return (
     <>
-      {loading && <Loader data-testid="loader" />}
-      <div className='adminhoc' data-testid="adminhoc">
-        <Sidebar items={sidebarItems} />
-        <div className='dash-area'>
+      {loading && <Loader />}
+      <div className="admin-layout">
+        <aside className="admin-sidebar">
+          <Sidebar items={sidebarItems} />
+        </aside>
+        <main className="admin-main">
           <Component loading={loading} setLoading={setLoading} />
-        </div>
+        </main>
       </div>
     </>
-  )
+  );
 }
-
-export default AdminHOC
+export default AdminHOC;

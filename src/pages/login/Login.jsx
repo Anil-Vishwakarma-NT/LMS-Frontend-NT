@@ -79,9 +79,10 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
       const normalizedRoles = Array.isArray(roles) ? roles : [roles];
 
-    dispatch(login({
+      dispatch(login({
         roles: normalizedRoles,
         email,
+        fullName,
         accessToken: response.accessToken
       }));
       // dispatch({ userName: fullName });

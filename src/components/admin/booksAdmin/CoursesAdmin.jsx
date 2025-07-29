@@ -9,7 +9,7 @@ import {
   updateCourse,
 } from "../../../service/BookService";
 import handleCreateCourse from "./BooksModal";
-
+import "./CourseAdmin.css";
 const { Title } = Typography;
 
 const CoursesAdmin = ({ setLoading }) => {
@@ -136,50 +136,42 @@ const CoursesAdmin = ({ setLoading }) => {
   return (
     <div className="admin-section">
       <div className="admin-page-mid">
-        <Title level={3}>Available Courses</Title>
+        <Title level={3}  className="title">Available Courses</Title>
 
-        <div className="search-container" style={{ marginBottom: 16 }}>
-          <Input
-            placeholder="Search by name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 300 }}
-          />
-        </div>
 
-        <div
-          className="action-buttons"
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginBottom: 16,
-          }}
-        >
-          <Button type="primary" onClick={handleOpenModal}>
+        <div className="action-buttons" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <div className="search-container">
+            <Input
+              placeholder="Search by name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: 300 }}
+            />
+          </div>
+          <Button type="primary" onClick={handleOpenModal} className="add-btn">
             Add Course
           </Button>
           <Button onClick={toggleFilterType}>
             {filterType === "all"
               ? "Show Active Courses"
               : filterType === "active"
-              ? "Show Inactive Courses"
-              : "Show All Courses"}
+                ? "Show Inactive Courses"
+                : "Show All Courses"}
           </Button>
         </div>
-      </div>
 
-      {filteredCourses && filteredCourses.length > 0 ? (
-        <CourseTable
-          fields={fields}
-          entries={filteredCourses}
-          type={"course"}
-          onDeleteClick={(course) => showConfirmDelete(course)}
-          onEditClick={handleOpenEditPopup}
-        />
-      ) : (
-        <div className="no-data-found">No Courses Found</div>
-      )}
+        {filteredCourses && filteredCourses.length > 0 ? (
+          <CourseTable
+            fields={fields}
+            entries={filteredCourses}
+            type={"course"}
+            onDeleteClick={showConfirmDelete}
+            onEditClick={handleOpenEditPopup}
+          />
+        ) : (
+          <div className="no-data-found">No Courses Found</div>
+        )}
+      </div>
 
       <CoursesModal
         isModalOpen={isEditPopupOpen}
@@ -196,4 +188,3 @@ const CoursesAdmin = ({ setLoading }) => {
 };
 
 export default AdminHOC(CoursesAdmin);
-

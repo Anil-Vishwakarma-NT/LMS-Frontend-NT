@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Tag, Progress, Card, Empty, Statistic, Typography } from 'antd';
+import { Table, Tag, Progress, Card, Empty, Statistic, Typography, Button, Tooltip } from 'antd';
 import {
   CheckCircleOutlined,
   SolutionOutlined,
   TeamOutlined,
   SyncOutlined,
   ClockCircleOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons';
 
 import AdminHOC from '../../shared/HOC/AdminHOC';
@@ -24,7 +25,7 @@ const UserHistory = ({ setLoading }) => {
   const location = useLocation();
   const userName = location.state?.name || 'N/A';
   const auth = useSelector((state) => state.auth);
-
+  const navigate = useNavigate();
   const [userHistoryData, setUserHistoryData] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(() => (window.innerHeight >= 1024 ? 11 : 10));
@@ -66,15 +67,6 @@ const UserHistory = ({ setLoading }) => {
         setInprogress(courses.filter(course => course.status === "In Progress").length);
         setDefaulters(courses.filter(course => course.status === "Defaulter").length);
         setNotStarted(courses.filter(course => course.status === "Not Started").length);
-
-        {/*Bundle data*/ }
-        // const bundles = 
-
-
-
-
-
-
 
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -227,13 +219,21 @@ const UserHistory = ({ setLoading }) => {
 
 
   return (
-    <div className="user-history-section">
-      <Title level={1} className="user-history-header" style={{ marginBottom: 16 }}>
-        {userName} Details
-      </Title>
-      <div className="user-history-stats">
+    <div className="admin-container">
+      <div className="admin-header">
+        <Tooltip title="Back to users">
+          <Button
+            icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
+            className="admin-back-btn"
+            onClick={() => navigate("/users")}
+          />
+        </Tooltip>
+        <Title level={3} className="admin-page-title">{userName} Details</Title>
+      </div>
+
+      <div className="admin-dashboard-cards">
         {dashData.map((data) => (
-          <Card key={data.id} className="user-history-card">
+          <Card key={data.id} className="admin-dashboard-card">
             <Statistic
               title={<Text strong>{data.title}</Text>}
               value={data.number}
@@ -244,8 +244,7 @@ const UserHistory = ({ setLoading }) => {
         ))}
       </div>
 
-
-      <div className="user-history-table">
+      <div className="admin-table-container">
         {filteredCourses.length > 0 ? (
           <Table
             dataSource={filteredCourses}
@@ -267,6 +266,7 @@ const UserHistory = ({ setLoading }) => {
       </div>
     </div>
   );
+
 };
 
 export default AdminHOC(UserHistory);

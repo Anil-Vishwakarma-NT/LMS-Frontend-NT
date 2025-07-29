@@ -1,12 +1,41 @@
-.dash-area {
-    padding-left: 10rem;
-    padding-top: 1rem;
-    background-color: #F4F4F4;
+/* Layout container */
+.admin-layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    width: 100%;
 }
 
+/* Sidebar */
+.admin-sidebar {
+    width: 220px;
+    background-color: #ffffff;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+}
 
-@media (max-width: 1024px) {
-    .dash-area {
-        padding-left: 11.2rem;
+/* Main content area */
+.admin-main {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* Optional: responsive */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+        min-height: auto;
+    }
+
+    .admin-main {
+        padding: 16px;
     }
 }

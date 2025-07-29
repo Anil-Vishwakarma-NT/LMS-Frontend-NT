@@ -9,15 +9,18 @@ import {
 } from "../../../service/UserService";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Empty, Button, Tag, Space, message, Tooltip } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FilePdfOutlined} from "@ant-design/icons";
+import { Table, Empty, Layout, Button, Tag, Space, message, Tooltip, Typography, Divider } from "antd";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FilePdfOutlined } from "@ant-design/icons";
 import UsersModal from "./UsersModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import "./UsersAdmin.css"; // Importing CSS
 import PDFReaderModal from "../../admin/booksAdmin/PDFReaderModal";
 import UserReportOptionsModal from "../../admin/booksAdmin/UserReportOptionsModal";
+import { UserOutlined } from "@ant-design/icons";
 
 
+const { Content } = Layout;
+const { Title } = Typography;
 const UsersAdmin = ({ setLoading }) => {
 
   const navigate = useNavigate();
@@ -55,8 +58,8 @@ const UsersAdmin = ({ setLoading }) => {
   const handleReportOptionsSubmit = async (options) => {
     try {
       setShowOptionsModal(false);
-      setReportOptions(options);  
-  
+      setReportOptions(options);
+
       const blob = await previewUserReportPdf(options);
       const blobUrl = URL.createObjectURL(blob);
       setReportBlobUrl(blobUrl);
@@ -68,13 +71,13 @@ const UsersAdmin = ({ setLoading }) => {
 
   const handleDownloadPdf = async () => {
     try {
-      await downloadUserReportPdf(reportOptions); 
+      await downloadUserReportPdf(reportOptions);
       message.success("PDF downloaded successfully");
     } catch {
       message.error("Failed to download PDF");
     }
   };
-  
+
   const handleDownloadExcel = async () => {
     try {
       await downloadUserReportExcel(reportOptions);
@@ -222,7 +225,7 @@ const UsersAdmin = ({ setLoading }) => {
                   icon={<FilePdfOutlined />}
                   onClick={() => {
                     setReportingUserId(record?.id);
-                    setShowOptionsModal(true);  
+                    setShowOptionsModal(true);
                   }}
                 />
               </Tooltip>
@@ -246,45 +249,65 @@ const UsersAdmin = ({ setLoading }) => {
   }));
 
   return (
-    <div className="admin-section">
-      <div className="admin-page-mid">
-        <div className="admin-header-bar">
-          <h2 className="admin-page-header">All Employees</h2>
-          <div className="admin-page-search">
+    <div className="user-container">
+      <div className="user-header">
+        <Title level={2} className="user-title"><UserOutlined style={{ paddingRight: 12 }} />Employees Details</Title>
+        <div className="add-btn-div">
+          <Space wrap>
             {!isInactive && (
-              <Button
-                icon={<UserAddOutlined />}
-                onClick={handleAddNew}
-              >
+              <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
                 Add New
               </Button>
             )}
-            <Button
-              icon={<UserAddOutlined />}
-              onClick={handleInactiveUsers}
-            >
+            <Button onClick={handleInactiveUsers}>
               {isInactive ? "Active Users" : "Inactive Users"}
             </Button>
-          </div>
+          </Space>
         </div>
+      </div>
+      <Divider />
+      <div className="user-table">
+        {processedUsers.length > 0 ? (
+          <Table
+            dataSource={processedUsers}
+            columns={fields}
+            bordered
+            scroll={{ x: true }}
+            locale={{ emptyText: "No users found." }}
+            rowKey="id"
+            pagination={{ position: 'bottomCenter' }}
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
+      </div>
 
-        <div className="user-table">
-          {processedUsers.length > 0 ? (
-            <Table
-              dataSource={processedUsers}
-              columns={fields}
-              bordered
-              scroll={{ x: "100%", y: "100%" }}
-              locale={{ emptyText: "No users found." }}
-              rowKey="id"
-              pagination={{ position: 'bottomCenter' }}
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          )}
-        </div>
+      <UsersModal
+        title={selectedUser ? "Edit Employee Details" : "Add New Employee"}
+        isModalOpen={isModalOpen}
+        getUserLists={getUserLists}
+        handleCloseModal={handleCloseModal}
+        selectedUser={selectedUser}
+        setToastMessage={setToastMessage}
+        setToastType={setToastType}
+        setShowToast={setShowToast}
+        setLoading={setLoading}
+      />
 
-        <PDFReaderModal
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
+
+      <ConfirmDeletePopup
+        isOpen={isConfirmPopupOpen}
+        onClose={() => setIsConfirmPopupOpen(false)}
+        onConfirm={handleDeleteUser}
+      />
+
+      <PDFReaderModal
         isOpen={isReportModalOpen}
         pdfUrl={reportBlobUrl}
         onClose={() => {
@@ -297,43 +320,18 @@ const UsersAdmin = ({ setLoading }) => {
         onDownloadPdf={handleDownloadPdf}
         onDownloadExcel={handleDownloadExcel}
       />
+
       {showOptionsModal && (
-      <UserReportOptionsModal
-        isOpen={showOptionsModal}
-        onClose={() => setShowOptionsModal(false)}
-        onSubmit={(options) => handleReportOptionsSubmit(options)}
-        userId={String(reportingUserId)}
-      />
-        )}
-
-        <UsersModal
-          title={selectedUser ? "Edit Employee Details" : "Add New Employee"}
-          isModalOpen={isModalOpen}
-          getUserLists={getUserLists}
-          handleCloseModal={handleCloseModal}
-          selectedUser={selectedUser}
-          setToastMessage={setToastMessage}
-          setToastType={setToastType}
-          setShowToast={setShowToast}
-          setLoading={setLoading}
+        <UserReportOptionsModal
+          isOpen={showOptionsModal}
+          onClose={() => setShowOptionsModal(false)}
+          onSubmit={handleReportOptionsSubmit}
+          userId={String(reportingUserId)}
         />
-
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          show={showToast}
-          onClose={() => setShowToast(false)}
-        />
-
-        <ConfirmDeletePopup
-          isOpen={isConfirmPopupOpen}
-          onClose={() => setIsConfirmPopupOpen(false)}
-          onConfirm={handleDeleteUser}
-        />
-      </div>
-
+      )}
     </div>
   );
+
 };
 
 export default AdminHOC(UsersAdmin);
