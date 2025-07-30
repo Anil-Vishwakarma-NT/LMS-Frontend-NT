@@ -69,7 +69,7 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
 
   } else {
 
-    const trimmedOptions = options.map((opt) => opt.trim()).filter((opt) => opt !== "");
+    trimmedOptions = options.map((opt) => opt.trim()).filter((opt) => opt !== "");
 
     if (trimmedOptions.length < 2) {
       return message.error("Please enter at least two non-empty options.");
@@ -85,6 +85,8 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
 
       setOptions(trimmedOptions);
   }
+
+  console.log("🧪 Trimmed Options:", trimmedOptions);
 
   const payload = {
   quizId,
