@@ -15,7 +15,7 @@ import UsersAdmin from "./components/admin/usersAdmin/UsersAdmin";
 import CategoriesAdmin from "./components/admin/categoriesAdmin/CategoriesAdmin";
 import IssuanceAdmin from "./components/admin/issuanceAdmin/IssuanceAdmin";
 import UserHistory from "./components/admin/userHistory/UserHistory";
-import BookHistory from "./components/admin/bookHistory/BookHistory";
+import BookHistory from "./components/admin/categoriesAdmin/CategoriesAdmin";
 import EnrollmentDashboard from "./components/admin/enrollment/EnrollmentDashboard";
 import AllGroup from "./components/admin/Group/AllGroup";
 import GroupHistory from "./components/admin/Group/GroupHistory";
@@ -30,6 +30,15 @@ import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import AdminHOC from "./components/shared/HOC/AdminHOC"; 
 import QuizReportDashboard from "./components/admin/quizReport/QuizReportDashboard";
+import BundlesHistory from "./components/admin/bundles/BundlesHistory";
+import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
+
+
+
+
+
+
+
 import "./App.css";
 
 
@@ -89,8 +98,16 @@ const router = createBrowserRouter([
         element: <AdminRoutes><AllGroup /></AdminRoutes>
       },
       {
+        path: "bundles",
+        element: <AdminRoutes><BundlesAdmin /></AdminRoutes>
+      },
+      {
         path: "group-history/:id",
         element: <AdminRoutes><GroupHistory /></AdminRoutes>
+      },
+      {
+        path: "bundles-history/:id",
+        element: <AdminRoutes><BundlesHistory /></AdminRoutes>
       },
       {
         path: "course-content/:courseId",

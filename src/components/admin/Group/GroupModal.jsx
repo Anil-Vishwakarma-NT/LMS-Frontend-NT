@@ -100,7 +100,7 @@ const GroupModal = (
                         type="primary"
                         onClick={handleAdd}
                     >
-                        Add Group
+                        Create
                     </Button>
 
 

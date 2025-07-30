@@ -2,8 +2,18 @@ import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { login } from "./redux/authentication/authActions";
+
+import "./App.css";
+import AdminDashboard from "./components/admin/adminDashboard/AdminDashboard";
+import UserDashboard from "./components/user/userDashboard/UserDashboard";
+import Home from "./pages/homePage/Home";
 import Navbar from "./components/shared/navbar/Navbar";
+import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
+import UsersAdmin from "./components/admin/usersAdmin/UsersAdmin";
+import AdminRoutes from "./routes/AdminRoutes";
+import UserRoutes from "./routes/UserRoutes";
+import IssuanceAdmin from "./components/admin/issuanceAdmin/IssuanceAdmin";
+import { login } from "./redux/authentication/authActions";
 import axios from "axios";
 
 const App = () => {
