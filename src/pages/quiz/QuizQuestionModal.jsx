@@ -51,23 +51,39 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
     fieldNames.push("textAnswer");
   }
 
-  const values = await form.validateFields(fieldNames);
+  let values;
+  try {
+    values = await form.validateFields(fieldNames);
+  } catch (err) {
+    message.error("Please complete all required fields before submitting.");
+    console.error("Validation failed:", err);
+    return;
+  }
 
   // Determine correctAnswer
   let correctAnswer;
+  let trimmedOptions = [];
+
   if (answerType === "TEXT") {
-  correctAnswer = [values.textAnswer.trim()];
-} else {
-    if (options.length < 2) {
-      return message.error("Add at least 2 options.");
+    correctAnswer = [values.textAnswer.trim()];
+
+  } else {
+
+    const trimmedOptions = options.map((opt) => opt.trim()).filter((opt) => opt !== "");
+
+    if (trimmedOptions.length < 2) {
+      return message.error("Please enter at least two non-empty options.");
     }
+
     if (!correctAnswers.length) {
       return message.error("Please select at least one correct answer.");
     }
 
     correctAnswer = answerType === "SINGLE_SELECT"
-      ? [correctAnswers[0]] // ✅ wrap single value in array
-      : correctAnswers;     // ✅ already an array
+      ? [correctAnswers[0]]
+      : correctAnswers;
+
+      setOptions(trimmedOptions);
   }
 
   const payload = {
@@ -79,13 +95,14 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
       : answerType === "SINGLE_SELECT"
       ? "MCQ_SINGLE"
       : "MCQ_MULTIPLE",
-  options: answerType === "TEXT" ? null : JSON.stringify(options),
+
+  options: answerType === "TEXT" ? null : JSON.stringify(trimmedOptions),
   correctAnswer: JSON.stringify(correctAnswer),
   points: parseFloat(values.points),
   explanation: values.explanation || "",
   required: !!values.required,
-//   position: parseInt(values.position),
-};
+  //   position: parseInt(values.position),
+ };
 
   console.log("📤 Final Payload:", payload);
 
