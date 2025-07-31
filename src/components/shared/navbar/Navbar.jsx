@@ -22,7 +22,7 @@ const Navbar = () => {
             <>
               <Link to="/about" className='navbar-item nav-items'>About Us</Link>
               <div className='navbar-logo profile-logo'>
-                <Tooltip tooltipText={`Welcome, ${auth?.name}`}>
+                <Tooltip tooltipText={`Welcome, ${auth?.fullName}`}>
                   <Avatar fullName={fullName} />
                 </Tooltip>
               </div>
@@ -32,8 +32,8 @@ const Navbar = () => {
               <Link to="/about" className='navbar-item nav-items'>About Us</Link>
               <Link to="/contact" className='navbar-item nav-items'>Contact Us</Link>
               <div className='navbar-logo profile-logo'>
-                <Tooltip tooltipText={`Welcome, ${auth?.name}`}>
-                  <img src={userLogo} alt='user-logo' className='logo user-profile-logo' />
+                <Tooltip tooltipText={`Welcome, ${auth?.fullName}`}>
+                  <Avatar fullName={fullName} />
                 </Tooltip>
               </div>
             </>
@@ -41,6 +41,7 @@ const Navbar = () => {
             <>
               <Link to="/about" className='navbar-item nav-items'>About Us</Link>
               <Link to="/contact" className='navbar-item nav-items'>Contact Us</Link>
+              Not logged In.
             </>
           )
           }

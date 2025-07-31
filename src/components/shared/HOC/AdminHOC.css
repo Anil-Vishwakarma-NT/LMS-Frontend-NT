@@ -8,7 +8,17 @@
 
 /* Sidebar */
 .admin-sidebar {
-    width: 220px;
+    width: 9rem;
+    background-color: #ffffff;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+
+
+.admin-toggle {
+    width: 3rem;
     background-color: #ffffff;
     min-height: 100vh;
     position: sticky;
@@ -21,6 +31,36 @@
     background-color: #ffffff;
     padding: 24px;
     overflow-y: auto;
+}
+
+.sidebar-toggle-btn {
+    position: fixed;
+    top: 4.6rem;
+    /* Aligns it with navbar padding */
+    left: 0.5rem;
+    /* Adjust as per logo or left padding */
+    z-index: 20;
+    /* Higher than navbar (z-index: 10) */
+    background-color: transparent;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #000;
+    /* Ensure visible on white navbar */
+    padding: 4px 8px;
+}
+
+.sidebar-toggle-btn:hover {
+    color: #5959b4;
+    transform: scale(1.1);
+    transition: 0.3s ease;
+}
+
+.back-btn {
+    bottom: 0.3rem;
+    right: 1.5rem;
+    border: none;
+
 }
 
 /* Optional: responsive */

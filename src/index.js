@@ -130,7 +130,7 @@ const router = createBrowserRouter([
       // Quiz Attempt (no guard)
       { path: "quiz/:courseId", element: <CourseQuizAttempt /> },
       // 404 fallback
-      { path: "*", element: <NotFound /> }
+      { path: "*", element: <NotFound /> } 
     ]
   }
 ]);

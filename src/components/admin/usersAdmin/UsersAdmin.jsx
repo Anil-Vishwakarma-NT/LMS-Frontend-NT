@@ -254,14 +254,15 @@ const UsersAdmin = ({ setLoading }) => {
         <Title level={2} className="user-title"><UserOutlined style={{ paddingRight: 12 }} />Employees Details</Title>
         <div className="add-btn-div">
           <Space wrap>
+
+            <Button onClick={handleInactiveUsers}>
+              {isInactive ? "Active Users" : "Inactive Users"}
+            </Button>
             {!isInactive && (
               <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
                 Add New
               </Button>
             )}
-            <Button onClick={handleInactiveUsers}>
-              {isInactive ? "Active Users" : "Inactive Users"}
-            </Button>
           </Space>
         </div>
       </div>

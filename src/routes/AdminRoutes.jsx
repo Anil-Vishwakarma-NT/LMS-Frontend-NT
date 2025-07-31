@@ -8,16 +8,21 @@ const AdminRoutes = ({ children }) => {
     const [isVerified, setIsVerified] = useState(false)
 
     useEffect(() => {
+        console.log("AUTH IN ADMIN ROUTE before check ", auth)
+
         if (auth && auth.accessToken) {
             try {
                 if (auth.roles.includes("ADMIN")) {
                     console.log("AUTH IN ADMIN ROUTES", auth);
                     setIsVerified(true)
                 } else {
+                    console.log("AUTH WHEN not verified", auth);
+                    console.log("ADMIN ROLE NOT VERIFIED");
                     navigate('/')
                 }
             } catch (error) {
                 console.log(error)
+                console.log("Not verified")
                 setIsVerified(false)
             }
         }

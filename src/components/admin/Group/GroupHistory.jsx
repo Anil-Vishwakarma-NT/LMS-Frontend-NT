@@ -222,13 +222,6 @@ const GroupHistory = ({ setLoading }) => {
             </div>
             <div className='add-btn-div'>
                 <Space>
-                    <Tooltip title="Add user to the group">
-                        {!showCourse && (
-                            <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
-                                Add User
-                            </Button>
-                        )}
-                    </Tooltip>
                     <Tooltip title={!showCourse ? "View courses allocated to the group" : "View members of the group"}>
                         <Button
                             icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
@@ -236,6 +229,13 @@ const GroupHistory = ({ setLoading }) => {
                         >
                             {!showCourse ? "View Course" : "View Users"}
                         </Button>
+                    </Tooltip>
+                    <Tooltip title="Add user to the group">
+                        {!showCourse && (
+                            <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
+                                Add User
+                            </Button>
+                        )}
                     </Tooltip>
                     {showCourse && (
                         <Select

@@ -7,47 +7,50 @@ import { logout } from '../../../redux/authentication/authActions';
 import { logoutUser } from '../../../service/UserService';
 import ConfirmLogoutPopup from '../confirmLogoutPopup/ConfirmLogoutPopup';
 
-const Sidebar = ({ items }) => {
-
+const Sidebar = ({ items, visible }) => {
   const [isPopopOpen, setIsPopopOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const auth = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-
-  const auth = useSelector(state => state.auth);
+  const handleLogoutAuth = () => {
+    dispatch(logout());
+    handleLogout();
+  };
 
   const handleLogout = () => {
-    logoutUser()
-    dispatch(logout())
-    navigate('/')
+    console.log("Auth in logout user ", auth);
+    logoutUser();
+    localStorage.getItem("authToken")
+    console.log("logout user called");
+    navigate('/');
   }
 
   const openPopop = () => setIsPopopOpen(true);
   const closePopop = () => setIsPopopOpen(false);
 
   return (
-    <div className="sidebar">
-      {items && items.length && items.map((item) => (
-        <NavLink key={item.path} to={item.path} className={({ isActive }) => (isActive ? "sidebar-item-active" : "sidebar-item")}>
-          {/* <div style={{ alignSelf: 'center' }}> */}
-          <img className="side-logo" src={item.img} />
-          <div className="sidebar-text">{item.label}</div>
-          {/* </div> */}
-        </NavLink>
-      ))}
-      <div className="sidebar-logout-btn">
-        <Button text="Logout" type="submit" onClick={openPopop} />
+    <div className={`sidebar ${visible ? 'sidebar-show' : 'sidebar-hide'}`}>
+
+      <div className='sidebar-items'>
+
+        {items && items.length && items.map((item) => (
+          <NavLink key={item.path} to={item.path} className={({ isActive }) => (isActive ? "sidebar-item-active" : "sidebar-item")}>
+            <img className="side-logo" src={item.img} alt={item.label} />
+            <div className="sidebar-text">{item.label}</div>
+          </NavLink>
+        ))}
+        <div className="sidebar-logout-btn">
+          <Button text="Logout" type="submit" onClick={openPopop} />
+        </div>
       </div>
       <ConfirmLogoutPopup
         isOpen={isPopopOpen}
         onClose={closePopop}
-        onConfirm={handleLogout}
+        onConfirm={handleLogoutAuth}
       />
     </div>
   );
 };
-
 export default Sidebar;
-
-
