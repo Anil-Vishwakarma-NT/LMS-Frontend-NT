@@ -56,6 +56,7 @@ const GroupKpiReportTable = () => {
     title: "Group Name",
     dataIndex: "groupName",
     key: "groupName",
+    sorter: (a, b) =>a.groupName.localeCompare(b.groupName),
     width: 200,
   },
   {

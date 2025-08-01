@@ -146,6 +146,28 @@ const columns = [
     render: renderWithNA,
   },
   {
+  title: "Bundles Part Of",
+  dataIndex: "bundlesCourseIsPartOf",
+  key: "bundlesCourseIsPartOf",
+  width: 200,
+  sorter: (a, b) => a.bundlesCourseIsPartOf - b.bundlesCourseIsPartOf,
+},
+{
+  title: "Bundle Individual Enrollments",
+  dataIndex: "bundleIndividualEnrollments",
+  key: "bundleIndividualEnrollments",
+  width: 220,
+  sorter: (a, b) => a.bundleIndividualEnrollments - b.bundleIndividualEnrollments,
+},
+{
+  title: "Bundle Group Enrollments",
+  dataIndex: "bundleGroupEnrollments",
+  key: "bundleGroupEnrollments",
+  width: 220,
+  sorter: (a, b) => a.bundleGroupEnrollments - b.bundleGroupEnrollments,
+},
+
+  {
     title: "Total Enrollments",
     dataIndex: "totalEnrollments",
     key: "totalEnrollments",

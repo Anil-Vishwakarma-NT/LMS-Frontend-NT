@@ -123,6 +123,13 @@ const columns = [
     render: renderWithNA,
 
   },
+    {
+    title: "Total Users Enrolled",
+    dataIndex: "totalUsersEnrolled",
+    key: "totalUsersEnrolled",
+    width: 200,
+    sorter: (a, b) => a.totalUsersEnrolled - b.totalUsersEnrolled,
+  },
   {
     title: "Total Courses",
     dataIndex: "totalCourses",
