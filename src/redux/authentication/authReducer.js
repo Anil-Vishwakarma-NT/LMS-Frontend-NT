@@ -1,7 +1,6 @@
 import { LOGIN, LOGOUT, SET_USER_ID } from "./authTypes";
 
 const initialState = {
-
   email: "",
   roles: "",
   accessToken: "",

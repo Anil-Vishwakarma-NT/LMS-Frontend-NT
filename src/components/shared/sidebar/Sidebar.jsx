@@ -20,11 +20,11 @@ const Sidebar = ({ items, visible }) => {
   };
 
   const handleLogout = () => {
-    console.log("Auth in logout user ", auth);
+
     logoutUser();
-    localStorage.getItem("authToken")
+    console.log("Auth in logout user ", auth);
     console.log("logout user called");
-    navigate('/');
+    navigate('/login');
   }
 
   const openPopop = () => setIsPopopOpen(true);
