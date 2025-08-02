@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation  } from "react-router-dom";
-import UserHOC from "../../shared/HOC/UserHOC"; 
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import UserHOC from "../../shared/HOC/UserHOC";
 import "../../admin/booksAdmin/BooksAdmin.css";
-import { Button, Input, Typography, Modal  } from "antd";
+import { Button, Input, Typography, Modal } from "antd";
 import UserCourseContentTable from "../../shared/table/UserCourseContentTable";
 import { fetchCourseContentByCourseId, fetchCourseById, } from "../../../service/BookService";
 import { fetchContentProgress } from "../../../service/UserCourseService";
@@ -46,7 +46,7 @@ const CourseContent = () => {
     const loadCourseContent = async () => {
       try {
         const contentData = await fetchCourseContentByCourseId(courseId);
-  
+
         const enrichedData = await Promise.all(
           contentData.map(async (item) => {
             const completion = await fetchContentProgress(userId, courseId, item.courseContentId);
@@ -56,11 +56,11 @@ const CourseContent = () => {
               title: item.title,
               description: item.description,
               resourceLink: item.resourceLink,
-              completionPercentage: parseFloat(completion.toFixed(2)), 
+              completionPercentage: parseFloat(completion.toFixed(2)),
             };
           })
         );
-  
+
         setCourseContent(enrichedData);
         setFilteredContent(enrichedData);
         setContentIds(enrichedData.map(item => item.contentId));
@@ -69,10 +69,10 @@ const CourseContent = () => {
         console.error("Error fetching content:", error);
       }
     };
-  
+
     loadCourseContent();
   }, [courseId]);
-  
+
 
   // Apply search filter
   useEffect(() => {
@@ -86,42 +86,42 @@ const CourseContent = () => {
   }, [searchTerm, courseContent]);
 
   useEffect(() => {
-  if (quizResult) {
-    console.log("ooooooooooooooooooo", quizResult?.passingScore)
-    const passingScore = quizResult?.passingScore ?? 50;
-    const isPassed = quizResult.percentageScore >= passingScore;
+    if (quizResult) {
+      console.log("ooooooooooooooooooo", quizResult?.passingScore)
+      const passingScore = quizResult?.passingScore ?? 50;
+      const isPassed = quizResult.percentageScore >= passingScore;
 
-    Modal.success({
-      title: isPassed ? "🎉 You Passed!" : "😓 Better Luck Next Time!",
-      content: (
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
-            <strong>✅ Correct Answers:</strong> <span style={{ color: "#52c41a" }}>{quizResult.correctAnswers}</span>
-          </p>
-          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
-            <strong>📊 Percentage Score:</strong> <span style={{ color: "#1890ff" }}>{quizResult.percentageScore}%</span>
-          </p>
-          <p style={{ fontSize: "16px", marginBottom: "12px" }}>
-            <strong>🏆 Total Score:</strong> <span style={{ color: "#faad14" }}>{quizResult.totalScore}</span>
-          </p>
+      Modal.success({
+        title: isPassed ? "🎉 You Passed!" : "😓 Better Luck Next Time!",
+        content: (
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+              <strong>✅ Correct Answers:</strong> <span style={{ color: "#52c41a" }}>{quizResult.correctAnswers}</span>
+            </p>
+            <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+              <strong>📊 Percentage Score:</strong> <span style={{ color: "#1890ff" }}>{quizResult.percentageScore}%</span>
+            </p>
+            <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+              <strong>🏆 Total Score:</strong> <span style={{ color: "#faad14" }}>{quizResult.totalScore}</span>
+            </p>
 
-          <div style={{ marginTop: 20 }}>
-            <progress
-              value={quizResult.percentageScore}
-              max="100"
-              style={{ width: "80%", height: "16px", borderRadius: "8px" }}
-            />
+            <div style={{ marginTop: 20 }}>
+              <progress
+                value={quizResult.percentageScore}
+                max="100"
+                style={{ width: "80%", height: "16px", borderRadius: "8px" }}
+              />
+            </div>
           </div>
-        </div>
-      ),
-      okText: "Back to Course",
-      centered: true,
-      onOk: () => {
-        navigate(location.pathname, { replace: true }); // clear state after OK
-      },
-    });
-  }
-}, [quizResult, location.pathname, navigate]);
+        ),
+        okText: "Back to Course",
+        centered: true,
+        onOk: () => {
+          navigate(location.pathname, { replace: true }); // clear state after OK
+        },
+      });
+    }
+  }, [quizResult, location.pathname, navigate]);
 
 
   const contentFields = [
@@ -131,28 +131,27 @@ const CourseContent = () => {
   ];
 
   return (
-    <div className="admin-section"> 
+    <div className="admin-section">
       <div className="admin-page-mid">
         <Title level={3}>{`Course Content for "${courseTitle}"`}</Title>
-        <div className="search-container">
+        <div className="action-buttons">
           <Input
             placeholder="Search by title"
             className="searchbar"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{  maxWidth: 300 }}
+            style={{ maxWidth: 300 }}
           />
-        </div>
-        <div className="action-buttons">
+
           <Button
             onClick={() => navigate("/my-courses")}
-            className="common-btn"
+            className="add-btn"
           >
             Back to Courses
           </Button>
           <Button
             onClick={() => navigate(`/quiz/${courseId}?userId=${userId}`)}
-            className="common-btn"
+            className="add-btn"
           >
             Attempt Quiz
           </Button>
