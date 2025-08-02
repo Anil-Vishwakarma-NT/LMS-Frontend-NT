@@ -8,8 +8,7 @@
 
 .title {
     grid-column: 2;
-    /* center */
-    justify-self: center;
+    justify-self: left;
     font-size: 24px;
     font-weight: 600;
     margin: 0;

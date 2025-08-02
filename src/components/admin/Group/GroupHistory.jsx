@@ -202,30 +202,27 @@ const GroupHistory = ({ setLoading }) => {
     return (
         <div className="group-container">
             <div className="group-header">
-                <Tooltip title="back to groups">
-                    <Button
-                        icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
-                        className='back-btn'
-                        onClick={() => navigate("/group")}
-                    />
-                </Tooltip>
-                <Row align="middle">
-                    <Title level={2} className="group-title">{groupName} Details</Title>
-                    <Tooltip title="Edit group name" className="edit-btn">
+                <div className="group-title-container">
+                    <Tooltip title="Back to groups">
                         <Button
-                            icon={<EditOutlined />}
-                            onClick={handleEditGroup}
-                            style={{ marginLeft: 12 }}
+                            icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
+                            className="back-btn"
+                            onClick={() => navigate("/group")}
                         />
                     </Tooltip>
-                </Row>
+                    <Title level={2} className="group-title">
+                        {groupName} History
+                    </Title>
+                </div>
             </div>
+
             <div className='add-btn-div'>
                 <Space>
                     <Tooltip title={!showCourse ? "View courses allocated to the group" : "View members of the group"}>
                         <Button
                             icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
                             onClick={handleViewCourse}
+                            className='add-btn'
                         >
                             {!showCourse ? "View Course" : "View Users"}
                         </Button>

@@ -252,17 +252,29 @@ const UsersAdmin = ({ setLoading }) => {
     <div className="user-container">
       <div className="user-header">
         <Title level={2} className="user-title"><UserOutlined style={{ paddingRight: 12 }} />Employees Details</Title>
+
         <div className="add-btn-div">
           <Space wrap>
-
-            <Button onClick={handleInactiveUsers}>
-              {isInactive ? "Active Users" : "Inactive Users"}
-            </Button>
             {!isInactive && (
               <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
                 Add New
               </Button>
             )}
+            <Button
+              icon={<UserAddOutlined />}
+              onClick={handleInactiveUsers}
+              className="add-btn"
+            >
+              {isInactive ? "Active Users" : "Inactive Users"}
+            </Button>
+            <Button
+              icon={<ExportOutlined />}
+              onClick={() => navigate("/user-report")}
+              className="add-btn"
+            >
+              Report
+            </Button>
+
           </Space>
         </div>
       </div>

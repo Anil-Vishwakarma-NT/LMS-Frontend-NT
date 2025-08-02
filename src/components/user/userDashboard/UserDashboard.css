@@ -1,8 +1,35 @@
-/* UserDashboard.css (or a global stylesheet) */
+/* ✅ UserDashboard.css */
+
 .user-dashboard-section {
-    padding: 24px 6vw;
-    background: #ffffff;
+    padding: 80px 24px 24px;
+    background-color: #fff;
+    min-height: 100vh;
+
+}
+
+.user-dashboard-header {
+    margin-bottom: 32px;
+}
+
+.user-dashboard-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-dashboard-row {
     display: flex;
-    flex-direction: column;
-    overflow-y: hidden;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-card {
+    flex: 1 1 400px;
+    min-width: 350px;
+    max-width: 530px;
+}
+
+.user-deadlines-table {
+    overflow-x: auto;
 }

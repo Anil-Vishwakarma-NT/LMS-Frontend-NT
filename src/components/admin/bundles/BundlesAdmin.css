@@ -1,95 +1,91 @@
 .bundle-container {
-    background-color: #ffffff;
     padding: 80px 24px 24px;
-    /* Top padding accounts for navbar height */
-    border-radius: 8px;
-    min-height: 100vh;
-    box-sizing: border-box;
-}
-
-.bundle-title {
-    justify-self: left;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0;
-    line-height: 1;
-    display: flex;
-    align-items: center;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 64px);
+    /* Adjust for navbar */
 }
 
 .bundle-header {
     display: flex;
-    flex-direction: row;
     align-items: center;
+    gap: 12px;
     margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 
-
-.edit-btn button {
-    background-color: #17426d;
-    color: white;
-    border: none;
+.bundle-title {
+    font-size: 24px;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    justify-content: top;
-
 }
 
-
-
-.edit-btn {
-    border: none;
-    justify-self: start;
+.bundle-title .anticon {
+    margin-right: 8px;
 }
 
-
-.edit-btn button:hover {
-    background-color: #771a64;
-    color: white;
+.bundle-title-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .add-btn-div {
-    grid-column: 3;
-    justify-self: end;
-    align-self: end;
-    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
-
-
-
-
-
-
-.add-btn button {
-    background-color: #1890ff;
+.add-btn,
+.report-btn {
+    background-color: #52c41a;
     color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-.add-btn button:hover {
+.add-btn:hover {
+    background-color: #73d13d;
+}
+
+.report-btn {
+    background-color: #1890ff;
+}
+
+.report-btn:hover {
     background-color: #40a9ff;
-    color: rgb(192, 188, 188);
-    border-color: #17426d;
+}
+
+.bundle-table {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 768px) {
     .bundle-header {
-        display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
     }
 
     .bundle-title {
         font-size: 20px;
-        text-align: center;
+        text-align: left;
     }
 
     .add-btn-div {
-        margin-top: 10px;
-        align-self: center;
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .add-btn {
+    .add-btn,
+    .report-btn {
         width: 100%;
     }
 }

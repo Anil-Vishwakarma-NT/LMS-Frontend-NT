@@ -159,28 +159,24 @@ const BundleHistory = ({ setLoading }) => {
 
     return (
         <div className="bundle-container">
-
             <div className="bundle-header">
-                <Tooltip title="back to bundles">
-                    <Button
-                        icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
-                        className='back-btn'
-                        onClick={() => navigate("/bundles")}
-                    />
-                </Tooltip>
-                <Row align="middle">
-
+                <div className="bundle-title-container">
+                    <Tooltip title="Back to bundles">
+                        <Button
+                            icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
+                            onClick={() => navigate("/bundles")}
+                        />
+                    </Tooltip>
                     <Title level={2} className="bundle-title">
                         {bundleName} Details
                     </Title>
-                    <Tooltip title="Edit bundle name" className="edit-btn">
+                    <Tooltip title="Edit bundle name">
                         <Button
                             icon={<EditOutlined />}
                             onClick={handleEditBundle}
-                            style={{ marginLeft: 12 }}
                         />
                     </Tooltip>
-                </Row>
+                </div>
             </div>
 
             <div className='add-btn-div'>

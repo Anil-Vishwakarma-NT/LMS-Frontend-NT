@@ -1,16 +1,40 @@
 .user-container {
     background-color: #ffffff;
     padding: 80px 24px 24px;
-    /* Top padding accounts for navbar height */
     border-radius: 8px;
     min-height: 100vh;
     box-sizing: border-box;
 }
 
+.user-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* New row for title + report button */
+.user-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Adjust report button */
+.report-btn {
+    background-color: #0c60b5;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.report-btn:hover {
+    background-color: #40a9ff;
+}
 
 .user-title {
     grid-column: 2;
-    /* center */
     justify-self: left;
     font-size: 24px;
     font-weight: 600;
@@ -46,6 +70,21 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+.report-btn {
+    background-color: #0c60b5;
+    color: white;
+    border: none;
+    justify-self: right;
+    padding: 3px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.report-btn:hover {
+    background-color: #40a9ff;
+}
+
+
 @media (max-width: 768px) {
     .user-header {
         display: flex;
@@ -65,5 +104,11 @@
 
     .add-btn {
         width: 100%;
+    }
+
+    .user-title-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
     }
 }

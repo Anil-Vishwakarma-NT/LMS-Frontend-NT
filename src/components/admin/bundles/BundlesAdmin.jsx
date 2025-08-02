@@ -125,8 +125,7 @@ const BundlesAdmin = ({ setLoading }) => {
   return (
     <div className="bundle-container">
       <div className="bundle-header">
-        <Title level={2} className="bundle-title"><GroupOutlined style={{ marginRight: 12 }} />Bundles Overview</Title>
-
+        <Title level={2} className="bundle-title"><GroupOutlined style={{ marginRight: 12 }} />Active Bundles Overview</Title>
       </div>
       <div className="add-btn-div">
         <Tooltip title="Create new bundle" >
@@ -138,7 +137,16 @@ const BundlesAdmin = ({ setLoading }) => {
             Create new Bundle
           </Button>
         </Tooltip>
+        <Button
+          icon={<ExportOutlined />}
+          onClick={() => navigate("/bundle-report")}
+          className="add-btn"
+        >
+          Report
+        </Button>
+
       </div>
+
 
       <Divider />
 

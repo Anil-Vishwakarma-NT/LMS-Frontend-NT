@@ -135,7 +135,8 @@ const AllGroup = ({ setLoading }) => {
     return (
         <div className="group-container">
             <div className="group-header">
-                <Title level={2} className="group-title"><UsergroupAddOutlined style={{ paddingRight: 12 }} />Groups Overview</Title>
+                <Title level={2} className="group-title"><UsergroupAddOutlined style={{ paddingRight: 12 }} />Active Groups Overview</Title>
+
             </div>
             <div className="add-btn-div">
                 <Tooltip title="create new group">
@@ -147,6 +148,14 @@ const AllGroup = ({ setLoading }) => {
                         Add new Group
                     </Button>
                 </Tooltip>
+                <Button
+                    icon={<ExportOutlined />}
+                    onClick={() => navigate("/group-report")}
+                    className="add-btn"
+                >
+                    Report
+                </Button>
+
             </div>
 
 
