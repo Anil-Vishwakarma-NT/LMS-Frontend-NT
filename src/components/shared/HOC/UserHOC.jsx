@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import Sidebar from '../sidebar/Sidebar';
-import userProfile from "../../../assets/man.png";
-import userHistory from "../../../assets/clock.png";
-import userIssuance from "../../../assets/occupation.png";
+import sideDash from "../../../assets/dashboard.svg";
+import sideBook from "../../../assets/course.svg";
+import sideIssuance from "../../../assets/group.svg";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import './AdminHOC.css';
 
@@ -15,9 +15,9 @@ const UserHOC = (Component) => function HOC() {
   const [loading, setLoading] = useState(false)
 
   const sidebarItems = [
-    { path: "/user", label: "Dashboard", img: userHistory },
-    { path: "/my-courses", label: "Courses", img: userHistory },
-    { path: "/my-groups", label: "Groups", img: userHistory }
+    { path: "/user", label: "Dashboard", img: sideDash },
+    { path: "/my-courses", label: "Courses", img: sideBook },
+    { path: "/my-groups", label: "Groups", img: sideIssuance }
   ];
   const [visible, setVisible] = useState(true);
 
