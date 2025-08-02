@@ -43,8 +43,10 @@ const CourseContentAdmin = ({ setLoading }) => {
         ...item,
         isActive: item.active,
       }));
+      console.log("Mapped Content:", mappedContent);
       setCourseContent(mappedContent);
       setFilteredContent(mappedContent);
+
     } catch (error) {
       setErrorMessage("Failed to fetch course content.");
       // message.error("Failed to fetch course content.");

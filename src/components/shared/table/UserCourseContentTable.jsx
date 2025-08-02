@@ -106,14 +106,14 @@ const UserCourseContentTable = ({ fields, entries, courseId }) => {
     <div style={{ padding: 16, marginLeft: 35, marginRight: 25 }}>
       <VideoModal
         isOpen={isVideoModalOpen}
-        videoUrl={currentVideoUrl}
+        fileName={currentVideoUrl}
         contentId={currentContentId}
         courseId={courseId}
         onClose={handleCloseVideoModal}
       />
       <PDFReaderModal
         isOpen={isPDFModalOpen}
-        pdfUrl={currentPDFUrl}
+        fileName={currentPDFUrl}
         contentId={currentContentId}
         courseId={courseId}
         onClose={handleClosePDFModal}
