@@ -1,4 +1,4 @@
-import {app}from "./serviceLMS"
+import { app } from "./serviceLMS"
 
 export const fetchAllCourses = async () => {
   try {
@@ -32,7 +32,7 @@ export async function updateCourse(courseId, updatedData) {
 
 export async function createCourse(courseData) {
   try {
-    const response = await app.post("course/api/client-api/course",courseData);
+    const response = await app.post("course/api/client-api/course", courseData);
     return response.data.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || "Course creation failed");
@@ -73,7 +73,7 @@ export async function deleteCourseContent(id) {
 
 export async function updateCourseContent(id, updatedData) {
   try {
-    const response = await app.put(`course/api/client-api/course-content/${id}`,updatedData);
+    const response = await app.put(`course/api/client-api/course-content/${id}`, updatedData);
     return response.data.data;
   } catch (error) {
     throw new Error(
@@ -84,7 +84,11 @@ export async function updateCourseContent(id, updatedData) {
 
 export async function createCourseContent(newData) {
   try {
-    const response = await app.post("course/api/client-api/course-content",newData);
+    const response = await app.post("course/api/client-api/course-content", newData, {
+      headers: {
+        "Content-Type": undefined,
+      },
+    });
     return response.data.data;
   } catch (error) {
     throw new Error(

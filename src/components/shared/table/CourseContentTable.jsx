@@ -24,17 +24,20 @@ const getResourceType = (resourceLink) => {
 
 const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCourseContent }) => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const [currentVideoUrl, setCurrentVideoUrl] = useState("");
+  const [currentVideoFileName, setCurrentVideoFileName] = useState("");
   const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
   const [currentPDFUrl, setCurrentPDFUrl] = useState("");
+  const [currentContentType, setCurrentContentType] = useState("");
 
-  const handlePlayVideo = (resourceLink) => {
-    setCurrentVideoUrl(resourceLink);
+  const handlePlayVideo = (resourceLink ,contentType) => {
+    console.log("Current content type", contentType);
+    setCurrentVideoFileName(resourceLink);
+    setCurrentContentType(contentType);
     setIsVideoModalOpen(true);
   };
 
   const handleCloseVideoModal = () => {
-    setCurrentVideoUrl("");
+    setCurrentVideoFileName("");
     setIsVideoModalOpen(false);
   };
 
@@ -48,7 +51,7 @@ const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCou
     setIsPDFModalOpen(false);
   };
 
-  const renderActionButton = (resourceLink) => {
+  const renderActionButton = (resourceLink ,contentType) => {
     const resourceType = getResourceType(resourceLink);
     switch (resourceType) {
       case "youtube":
@@ -56,7 +59,7 @@ const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCou
         return (
           <Button
             icon={<PlayCircleOutlined />}
-            onClick={() => handlePlayVideo(resourceLink)}
+            onClick={() => handlePlayVideo(resourceLink ,contentType)}
           >
             Watch
           </Button>
@@ -131,8 +134,8 @@ const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCou
       title: "Resource",
       dataIndex: "resourceLink",
       key: "resourceLink",
-      render: (resourceLink) =>
-        resourceLink ? renderActionButton(resourceLink) : "N/A",
+      render: (_,record) =>
+        record.resourceLink ? renderActionButton(record.resourceLink , record.contentType) : "N/A",
     },
     {
       title: "Actions",
@@ -163,12 +166,13 @@ const CourseContentTable = ({ onEditClick, fields, entries, showConfirmDeleteCou
     <>
       <VideoModal
         isOpen={isVideoModalOpen}
-        videoUrl={currentVideoUrl}
+        fileName={currentVideoFileName}
+        resourceType={currentContentType}
         onClose={handleCloseVideoModal}
       />
       <PDFReaderModal
         isOpen={isPDFModalOpen}
-        pdfUrl={currentPDFUrl}
+        fileName={currentPDFUrl}
         onClose={handleClosePDFModal}
         blockTime={0}
       />
