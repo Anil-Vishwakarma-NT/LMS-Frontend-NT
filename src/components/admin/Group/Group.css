@@ -44,6 +44,16 @@
     color: #1890ff;
 }
 
+.group-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 16px 0;
+    padding-left: 8px;
+    color: #333;
+    border-left: 4px solid #1890ff;
+}
+
+
 /* Responsive tweaks */
 @media (max-width: 768px) {
     .group-header {

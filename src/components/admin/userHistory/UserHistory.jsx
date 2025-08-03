@@ -208,13 +208,14 @@ const UserHistory = ({ setLoading }) => {
       icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
     },
     {
-      id: 5,
+      id: 6,
       title: 'Not Started',
       number: notStarted,
       color: '#fa8c16',
       icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
     },
   ];
+
 
 
 
@@ -243,7 +244,9 @@ const UserHistory = ({ setLoading }) => {
           </Card>
         ))}
       </div>
-
+      <div className='table-subtitle'>
+        User course progress history
+      </div>
       <div className="admin-table-container">
         {filteredCourses.length > 0 ? (
           <Table
