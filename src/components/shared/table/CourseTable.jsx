@@ -1,6 +1,6 @@
 import { app } from "../../../service/serviceLMS";
 import React, { useState, useEffect } from "react";
-import { Table, Tooltip, Space, Button, message } from "antd";
+import { Table, Tooltip, Space, Button, message, Tag } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -126,7 +126,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
   };
 
   const finalData = entries
-  ? entries.map((entry) => {
+    ? entries.map((entry) => {
       const courseMatch = courses.find((c) => c.courseId === entry.courseId);
       return {
         ...entry,
@@ -134,7 +134,7 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
         quizId: courseMatch?.quizId || null,
       };
     })
-  : courses;
+    : courses;
 
   useEffect(() => {
     fetchCourses();
@@ -144,7 +144,24 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
     { title: "Course ID", dataIndex: "courseId" },
     { title: "Title", dataIndex: "title" },
     { title: "Description", dataIndex: "description" },
-    { title: "Level", dataIndex: "level" },
+    {
+      title: "Level", dataIndex: "level",
+      filters: [
+        { text: 'beginner', value: 'Beginner' },
+        { text: 'intermediate', value: 'Intermediate' },
+        { text: 'advanced', value: 'Advanced' },
+      ],
+      onFilter: (value, record) => record.level === value,
+      render: (level) => {
+        const color = {
+          'beginner': 'blue',
+          'intermediate': 'orange',
+          'advanced': 'purple',
+        }[level?.toLowerCase()] || 'gray';
+        return <Tag color={color} style={{ textTransform: 'capitalize' }}>{level}</Tag>;
+
+      },
+    },
     { title: "Owner ID", dataIndex: "ownerId" },
     {
       title: "Is Active",

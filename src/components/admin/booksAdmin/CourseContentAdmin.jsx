@@ -51,7 +51,7 @@ const CourseContentAdmin = ({ setLoading }) => {
       setFilteredContent(mappedContent);
     } catch (error) {
       setErrorMessage("Failed to fetch course content.");
-      // message.error("Failed to fetch course content.");
+      
     } finally {
       setLoading(false);
     }

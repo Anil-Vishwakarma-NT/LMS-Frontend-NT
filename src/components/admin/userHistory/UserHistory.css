@@ -34,7 +34,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 14px;
+    margin-bottom: 34px;
 }
 
 .admin-dashboard-card {
@@ -43,6 +43,16 @@
     box-shadow: 0 8px 8px rgba(0, 0, 0, 0.08);
     width: 20rem;
 }
+
+.admin-dashboard-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.admin-dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
 
 .admin-table-container {
     background: #ffffff;

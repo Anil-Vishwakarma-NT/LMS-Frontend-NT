@@ -108,9 +108,9 @@ const UserHistory = ({ setLoading }) => {
       key: 'level',
       render: (level) => {
         const levelColor = {
-          beginner: 'green',
-          intermediate: 'blue',
-          professional: 'purple',
+          "beginner": 'blue',
+          "intermediate": 'orange',
+          "advanced": 'purple',
         }[level?.toLowerCase()] || 'gray';
         return <Tag color={levelColor}>{level || 'Not Defined'}</Tag>;
       },
@@ -162,11 +162,11 @@ const UserHistory = ({ setLoading }) => {
       render: (status) => {
         const color = {
           completed: 'green',
-          'in progress': 'orange',
-          'not started': 'purple',
+          'in progress': 'blue',
+          'not started': 'orange',
           'defaulter': 'red'
         }[status?.toLowerCase()] || 'gray';
-        return <span style={{ color }}>{status}</span>;
+        return <Tag style={{ color }}>{status}</Tag>;
       },
     },
   ];
@@ -176,47 +176,45 @@ const UserHistory = ({ setLoading }) => {
       id: 1,
       title: 'Total Enrollments',
       number: dashStatsData.enrollments,
-      color: '#13c2c2',
-      icon: <SolutionOutlined style={{ color: '#13c2c2' }} />,
+      color: '#36cfc9',
+      icon: <SolutionOutlined style={{ color: '#36cfc9' }} />,
     },
     {
       id: 2,
       title: 'Total Groups',
       number: dashStatsData.groups,
-      color: '#fa8c16',
-      icon: <TeamOutlined style={{ color: '#fa8c16' }} />,
+      color: '#ffc53d',
+      icon: <TeamOutlined style={{ color: '#ffc53d' }} />,
     },
     {
       id: 3,
       title: 'Total Completed Courses',
       number: completed,
-      color: '#52c41a',
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      color: '#73d13d',
+      icon: <CheckCircleOutlined style={{ color: '#73d13d' }} />,
     },
     {
       id: 4,
       title: 'Incomplete Courses',
       number: inprogress,
-      color: '#faad14',
-      icon: <SyncOutlined style={{ color: '#faad14' }} />,
+      color: '#ffec3d',
+      icon: <SyncOutlined style={{ color: '#ffec3d' }} />,
     },
     {
       id: 5,
       title: 'Defaulters',
       number: defaulters,
-      color: '#f5222d',
-      icon: <ClockCircleOutlined style={{ color: '#f5222d' }} />,
+      color: '#ff4d4f',
+      icon: <ClockCircleOutlined style={{ color: '#ff4d4f' }} />,
     },
     {
       id: 6,
       title: 'Not Started',
       number: notStarted,
-      color: '#fa8c16',
-      icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
+      color: '#ffa940',
+      icon: <ClockCircleOutlined style={{ color: '#ffa940' }} />,
     },
   ];
-
-
 
 
   return (

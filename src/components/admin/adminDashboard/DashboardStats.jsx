@@ -26,7 +26,7 @@ const DashboardStats = ({
   return (
     <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/users")}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}    onClick={() => navigate("/users")}       >
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Users</Text>}
             value={userCount}
