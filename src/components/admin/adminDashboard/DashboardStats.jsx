@@ -8,6 +8,7 @@ import {
   SolutionOutlined,
   WarningOutlined
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -20,20 +21,23 @@ const DashboardStats = ({
   activeUsers,
   stalledProgress
 }) => {
+
+  const navigate = useNavigate();
   return (
     <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/users")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Users</Text>}
             value={userCount}
             prefix={<UserOutlined style={{ color: '#1890ff' }} />}
             valueStyle={{ color: '#1890ff' }}
+
           />
-        </Card>
+        </Card >
       </Col>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/books")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Courses</Text>}
             value={courseCount}
@@ -43,7 +47,7 @@ const DashboardStats = ({
         </Card>
       </Col>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/bundles")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Bundles</Text>}
             value={bundleCount}
@@ -53,7 +57,7 @@ const DashboardStats = ({
         </Card>
       </Col>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/group")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Groups</Text>}
             value={groupCount}
@@ -63,7 +67,7 @@ const DashboardStats = ({
         </Card>
       </Col>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/enroll")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Total Enrollments</Text>}
             value={enrollmentCount}
@@ -73,7 +77,7 @@ const DashboardStats = ({
         </Card>
       </Col>
       <Col xs={24} sm={12} md={8} lg={6}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
+        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }} onClick={() => navigate("/users")}>
           <Statistic
             title={<Text strong style={{ fontSize: 16 }}>Active Users</Text>}
             value={activeUsers}
@@ -83,23 +87,43 @@ const DashboardStats = ({
         </Card>
       </Col>
       <Col xs={24} sm={24} md={16} lg={12}>
-        <Card hoverable style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
-          <Statistic
-            title={<Text strong style={{ fontSize: 16 }}>Stalled Progress</Text>}
-            value={stalledProgress}
-            prefix={<WarningOutlined style={{ color: '#faad14' }} />}
-            valueStyle={{ color: '#faad14' }}
-            suffix="users/groups"
-          />
+        <Card
+          hoverable
+          style={{
+            borderRadius: 8,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+            minHeight: 130, // Equalize height visually
+          }}
+          bodyStyle={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+        >
+          <div style={{ flexGrow: 1 }}>
+            <Statistic
+              title={<Text strong style={{ fontSize: 16, }}>Stalled Progress</Text>}
+              value={stalledProgress}
+              prefix={<WarningOutlined style={{ color: '#faad14' }} />}
+              valueStyle={{ color: '#faad14' }}
+              suffix="users/groups"
+            />
+          </div>
           <Alert
             message={<Text strong>Attention Required</Text>}
             description={`${stalledProgress} users or groups have inactive learning paths for over 30 days.`}
             type="warning"
             showIcon
-            style={{ marginTop: 16, borderRadius: 4 }}
+            style={{
+              marginTop: 16,
+              borderRadius: 6,
+              fontSize: 14,
+              flexShrink: 0,
+            }}
           />
         </Card>
       </Col>
+
     </Row>
   );
 };

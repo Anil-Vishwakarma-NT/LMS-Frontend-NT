@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { Input, Button, Typography, Modal, message } from "antd";
+import { ExportOutlined } from "@ant-design/icons";
 import CourseTable from "../../shared/table/CourseTable";
 import CoursesModal from "./BooksModal";
 import {
@@ -9,6 +10,7 @@ import {
   updateCourse,
 } from "../../../service/BookService";
 import handleCreateCourse from "./BooksModal";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -20,6 +22,8 @@ const CoursesAdmin = ({ setLoading }) => {
   const [editingCourse, setEditingCourse] = useState(null);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [filterType, setFilterType] = useState("all");
+
+  const navigate = useNavigate();
 
   const loadCourses = async () => {
     try {
@@ -134,52 +138,46 @@ const CoursesAdmin = ({ setLoading }) => {
   ];
 
   return (
-    <div className="admin-section">
-      <div className="admin-page-mid">
-        <Title level={3}>Available Courses</Title>
-
-        <div className="search-container" style={{ marginBottom: 16 }}>
-          <Input
-            placeholder="Search by name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 300 }}
+    <>
+      <div className="admin-section">
+        <div className="admin-page-mid">
+          <Title level={3} className="title">Available Courses</Title>
+          <div className="action-buttons" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div className="search-container">
+              <Input
+                placeholder="Search by name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: 300 }}
+              />
+            </div>
+            <Button onClick={handleOpenModal} className="add-btn">
+              Add Course
+            </Button>
+            <Button onClick={toggleFilterType} className="add-btn">
+              {filterType === "all"
+                ? "Show Active Courses"
+                : filterType === "active"
+                  ? "Show Inactive Courses"
+                  : "Show All Courses"}
+            </Button>
+            <Button icon={<ExportOutlined />} onClick={() => navigate("/course-report")} className="add-btn">
+              Report
+            </Button>
+          </div>
+        </div>
+        {filteredCourses && filteredCourses.length > 0 ? (
+          <CourseTable
+            fields={fields}
+            entries={filteredCourses}
+            type={"course"}
+            onDeleteClick={showConfirmDelete}
+            onEditClick={handleOpenEditPopup}
           />
-        </div>
-
-        <div
-          className="action-buttons"
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginBottom: 16,
-          }}
-        >
-          <Button type="primary" onClick={handleOpenModal}>
-            Add Course
-          </Button>
-          <Button onClick={toggleFilterType}>
-            {filterType === "all"
-              ? "Show Active Courses"
-              : filterType === "active"
-              ? "Show Inactive Courses"
-              : "Show All Courses"}
-          </Button>
-        </div>
+        ) : (
+          <div className="no-data-found">No Courses Found</div>
+        )}
       </div>
-
-      {filteredCourses && filteredCourses.length > 0 ? (
-        <CourseTable
-          fields={fields}
-          entries={filteredCourses}
-          type={"course"}
-          onDeleteClick={(course) => showConfirmDelete(course)}
-          onEditClick={handleOpenEditPopup}
-        />
-      ) : (
-        <div className="no-data-found">No Courses Found</div>
-      )}
 
       <CoursesModal
         isModalOpen={isEditPopupOpen}
@@ -191,9 +189,8 @@ const CoursesAdmin = ({ setLoading }) => {
         title={editingCourse ? "Edit Course" : "Add New Course"}
         loadCourses={loadCourses}
       />
-    </div>
+    </>
   );
 };
 
 export default AdminHOC(CoursesAdmin);
-

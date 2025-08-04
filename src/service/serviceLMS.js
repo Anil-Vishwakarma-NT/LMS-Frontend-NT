@@ -65,7 +65,7 @@ app.interceptors.response.use(
                     refreshToken,
                 });
             
-                console.log("🔄 Token refreshed successfully:", res.data);
+                console.log("Token refreshed successfully:", res.data);
                 const { accessToken } = res.data;
 
                 //  Update localStorage with new token

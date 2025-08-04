@@ -77,7 +77,10 @@ const DeadlineTable = () => {
                         rowKey={(record) => record.courseId}
                     />
                 ) : (
-                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    <Empty
+                        description="No deadlines this week!"
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    />
                 )}
             </div>
 

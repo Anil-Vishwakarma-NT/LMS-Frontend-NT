@@ -51,7 +51,7 @@ const EnrollmentDashboard = () => {
   const [coursesLoading, setCourseLoading] = useState(false);
   const [bundlesLoading, setBundlesLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  
+
   // Main data states
   const [statistics, setStatistics] = useState(null);
   const [enrollmentData, setEnrollmentData] = useState([]);
@@ -60,7 +60,7 @@ const EnrollmentDashboard = () => {
   const [bundles, setBundles] = useState([]);
   const [employees, setEmployees] = useState([]);
 
-  
+
   // Filter states
   const [viewType, setViewType] = useState('users'); // 'users' or 'groups'
   const [selectedUser, setSelectedUser] = useState(null);
@@ -88,26 +88,26 @@ const EnrollmentDashboard = () => {
   };
 
   const fetchEmployees = async () => {
-  try {
-    const response = await enrollmentService.getAllEmployees();
-    
-    if (enrollmentService.isSuccess(response)) {
-      const employeesData = enrollmentService.extractData(response) || [];
-      console.log('Employees Data:', employeesData);
-      setEmployees(employeesData);
-    } else {
-      console.warn('Failed to fetch employees:', enrollmentService.getMessage(response));
+    try {
+      const response = await enrollmentService.getAllEmployees();
+
+      if (enrollmentService.isSuccess(response)) {
+        const employeesData = enrollmentService.extractData(response) || [];
+        console.log('Employees Data:', employeesData);
+        setEmployees(employeesData);
+      } else {
+        console.warn('Failed to fetch employees:', enrollmentService.getMessage(response));
+      }
+    } catch (error) {
+      console.error('Error fetching employees:', error);
     }
-  } catch (error) {
-    console.error('Error fetching employees:', error);
-  }
-};
+  };
 
   const fetchStatistics = async () => {
     try {
       setStatsLoading(true);
       const response = await enrollmentService.getEnrollmentStatistics();
-      
+
       if (enrollmentService.isSuccess(response)) {
         setStatistics(enrollmentService.extractData(response));
       } else {
@@ -126,7 +126,7 @@ const EnrollmentDashboard = () => {
     try {
       setLoading(true);
       let response;
-      
+
       if (viewType === 'users') {
         response = await enrollmentService.getAllUserEnrollments();
       } else {
@@ -134,7 +134,7 @@ const EnrollmentDashboard = () => {
         // For now, we'll use empty data
         response = { status: 'SUCCESS', data: [] };
       }
-      
+
       if (enrollmentService.isSuccess(response)) {
         const data = enrollmentService.extractData(response) || [];
         setEnrollmentData(data);
@@ -155,7 +155,7 @@ const EnrollmentDashboard = () => {
     try {
       setCourseLoading(true);
       const response = await enrollmentService.getAllCourses();
-      
+
       if (enrollmentService.isSuccess(response)) {
         const coursesData = enrollmentService.extractData(response) || [];
         console.log('Courses Data:', coursesData);
@@ -174,7 +174,7 @@ const EnrollmentDashboard = () => {
     try {
       setBundlesLoading(true);
       const response = await enrollmentService.getAllBundles();
-      
+
       if (enrollmentService.isSuccess(response)) {
         const bundlesData = enrollmentService.extractData(response) || [];
         setBundles(enrollmentService.filterActiveBundles(bundlesData));
@@ -193,83 +193,83 @@ const EnrollmentDashboard = () => {
     filterData(value, selectedUser, selectedCourse, selectedBundle, dateRange);
   };
 
-const filterData = (search, user, course, bundle, dates) => {
-  let filtered = [...enrollmentData];
+  const filterData = (search, user, course, bundle, dates) => {
+    let filtered = [...enrollmentData];
 
-  // Filter by search text (username or full name)
-  if (search) {
-    filtered = filtered.filter(item => {
-      const employee = employees.find(emp => emp.userId === item.userId);
-      const fullName = employee ? `${employee.firstName} ${employee.lastName}` : '';
-      const username = employee ? employee.username : '';
-      
-      return item.userName?.toLowerCase().includes(search.toLowerCase()) ||
-             fullName.toLowerCase().includes(search.toLowerCase()) ||
-             username.toLowerCase().includes(search.toLowerCase());
-    });
-  }
+    // Filter by search text (username or full name)
+    if (search) {
+      filtered = filtered.filter(item => {
+        const employee = employees.find(emp => emp.userId === item.userId);
+        const fullName = employee ? `${employee.firstName} ${employee.lastName}` : '';
+        const username = employee ? employee.username : '';
 
-  // Filter by specific user
-  if (user) {
-    filtered = filtered.filter(item => item.userId === user);
-  }
-
-  // Filter by course - check if user is enrolled in specific course
-  if (course) {
-    filtered = filtered.filter(item => {
-      const hasCourse = item.enrolledCoursesList?.some(c => c.courseId === course);
-      const hasCourseInBundle = item.enrolledBundlesList?.some(bundle => 
-        bundle.enrolledCoursesList?.some(c => c.courseId === course)
-      );
-      return hasCourse || hasCourseInBundle;
-    });
-  }
-
-  // Filter by bundle - check if user is enrolled in specific bundle
-  if (bundle) {
-    filtered = filtered.filter(item => 
-      item.enrolledBundlesList?.some(b => b.bundleId === bundle)
-    );
-  }
-
-  // Filter by date range - check enrollment dates
-  if (dates && dates.length === 2) {
-    const [startDate, endDate] = dates;
-    filtered = filtered.filter(item => {
-      const hasEnrollmentInRange = item.enrolledCoursesList?.some(course => {
-        const enrollmentDate = new Date(course.enrollmentDate);
-        return enrollmentDate >= startDate && enrollmentDate <= endDate;
-      }) || item.enrolledBundlesList?.some(bundle => {
-        const enrollmentDate = new Date(bundle.enrollmentDate);
-        return enrollmentDate >= startDate && enrollmentDate <= endDate;
+        return item.userName?.toLowerCase().includes(search.toLowerCase()) ||
+          fullName.toLowerCase().includes(search.toLowerCase()) ||
+          username.toLowerCase().includes(search.toLowerCase());
       });
-      return hasEnrollmentInRange;
-    });
-  }
+    }
 
-  setFilteredData(filtered);
-};
+    // Filter by specific user
+    if (user) {
+      filtered = filtered.filter(item => item.userId === user);
+    }
 
-const handleFilterChange = (filterType, value) => {
-  switch (filterType) {
-    case 'user':
-      setSelectedUser(value);
-      filterData(searchText, value, selectedCourse, selectedBundle, dateRange);
-      break;
-    case 'course':
-      setSelectedCourse(value);
-      filterData(searchText, selectedUser, value, selectedBundle, dateRange);
-      break;
-    case 'bundle':
-      setSelectedBundle(value);
-      filterData(searchText, selectedUser, selectedCourse, value, dateRange);
-      break;
-    case 'date':
-      setDateRange(value);
-      filterData(searchText, selectedUser, selectedCourse, selectedBundle, value);
-      break;
-  }
-};
+    // Filter by course - check if user is enrolled in specific course
+    if (course) {
+      filtered = filtered.filter(item => {
+        const hasCourse = item.enrolledCoursesList?.some(c => c.courseId === course);
+        const hasCourseInBundle = item.enrolledBundlesList?.some(bundle =>
+          bundle.enrolledCoursesList?.some(c => c.courseId === course)
+        );
+        return hasCourse || hasCourseInBundle;
+      });
+    }
+
+    // Filter by bundle - check if user is enrolled in specific bundle
+    if (bundle) {
+      filtered = filtered.filter(item =>
+        item.enrolledBundlesList?.some(b => b.bundleId === bundle)
+      );
+    }
+
+    // Filter by date range - check enrollment dates
+    if (dates && dates.length === 2) {
+      const [startDate, endDate] = dates;
+      filtered = filtered.filter(item => {
+        const hasEnrollmentInRange = item.enrolledCoursesList?.some(course => {
+          const enrollmentDate = new Date(course.enrollmentDate);
+          return enrollmentDate >= startDate && enrollmentDate <= endDate;
+        }) || item.enrolledBundlesList?.some(bundle => {
+          const enrollmentDate = new Date(bundle.enrollmentDate);
+          return enrollmentDate >= startDate && enrollmentDate <= endDate;
+        });
+        return hasEnrollmentInRange;
+      });
+    }
+
+    setFilteredData(filtered);
+  };
+
+  const handleFilterChange = (filterType, value) => {
+    switch (filterType) {
+      case 'user':
+        setSelectedUser(value);
+        filterData(searchText, value, selectedCourse, selectedBundle, dateRange);
+        break;
+      case 'course':
+        setSelectedCourse(value);
+        filterData(searchText, selectedUser, value, selectedBundle, dateRange);
+        break;
+      case 'bundle':
+        setSelectedBundle(value);
+        filterData(searchText, selectedUser, selectedCourse, value, dateRange);
+        break;
+      case 'date':
+        setDateRange(value);
+        filterData(searchText, selectedUser, selectedCourse, selectedBundle, value);
+        break;
+    }
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -519,8 +519,8 @@ const handleFilterChange = (filterType, value) => {
       dataIndex: 'upcomingDeadlines',
       key: 'upcomingDeadlines',
       render: (count) => (
-        <Tag 
-          icon={<ClockCircleOutlined />} 
+        <Tag
+          icon={<ClockCircleOutlined />}
           color={count > 5 ? 'red' : count > 2 ? 'orange' : 'green'}
         >
           {count || 0}
@@ -557,298 +557,290 @@ const handleFilterChange = (filterType, value) => {
     </Card>
   );
 
-return (
-  <div className="admin-section" style={{ 
-    padding: '20px', 
-    background: '#f5f5f5', 
-    minHeight: '100vh',
-    position: 'relative',
-    zIndex: 1,
-    overflow: 'hidden',
-    marginTop: '54px'
-  }}>
-    <Content style={{ 
-      margin: '0 16px', 
-      maxWidth: '100%',
-      position: 'relative',
-      zIndex: 1
-    }}>
-      {/* Header */}
-      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={16}>
-          <Title level={2} style={{ margin: 0, fontSize: '1.5rem' }}>
-            <BarChartOutlined /> Enrollment Dashboard
-          </Title>
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Space wrap style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Select
-              style={{ minWidth: 100, width: '100%', maxWidth: 120 }}
-              value={viewType}
-              onChange={setViewType}
-            >
-              <Option value="users">Users</Option>
-              <Option value="groups">Groups</Option>
-            </Select>
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              style={{ minWidth: 'auto' }}
-              onClick={() => setShowAddModal(true)}
->
-  <span className="btn-text">Add Enrollment</span>
-</Button>
-          </Space>
-        </Col>
-      </Row>
+  return (
+    <div className="admin-section" >
+      <Content style={{
+        margin: '0 16px',
+        maxWidth: '100%',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        {/* Header */}
+        <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+          <Col xs={24} sm={12} md={16}>
+            <Title level={2} style={{ margin: 0, fontSize: '1.5rem' }}>
+              <BarChartOutlined /> Enrollment Dashboard
+            </Title>
+          </Col>
+          <Col xs={24} sm={12} md={8}>
+            <Space wrap style={{ width: '100%', justifyContent: 'flex-end' }}>
+              <Select
+                style={{ minWidth: 100, width: '100%', maxWidth: 120 }}
+                value={viewType}
+                onChange={setViewType}
+              >
+                <Option value="users">Users</Option>
+                <Option value="groups">Groups</Option>
+              </Select>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                style={{ minWidth: 'auto' }}
+                onClick={() => setShowAddModal(true)}
+              >
+                <span className="btn-text">Add Enrollment</span>
+              </Button>
+            </Space>
+          </Col>
+        </Row>
 
-      {/* Statistics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={12} md={6}>
-          <StatCard
-            title="Total Enrollments"
-            value={statistics?.totalEnrollments}
-            icon={<UserOutlined />}
-            color="#1890ff"
-            loading={statsLoading}
-          />
-        </Col>
-        <Col xs={12} sm={12} md={6}>
-          <StatCard
-            title="Users Enrolled"
-            value={statistics?.totalUniqueUsers}
-            icon={<TeamOutlined />}
-            color="#52c41a"
-            loading={statsLoading}
-          />
-        </Col>
-        <Col xs={12} sm={12} md={6}>
-          <StatCard
-            title="Courses"
-            value={statistics?.totalUniqueCourses}
-            icon={<BookOutlined />}
-            color="#faad14"
-            loading={statsLoading}
-          />
-        </Col>
-        <Col xs={12} sm={12} md={6}>
-          <StatCard
-            title="Completion Rate"
-            value={statistics?.overallCompletionRate}
-            icon={<TrophyOutlined />}
-            color="#722ed1"
-            suffix="%"
-            loading={statsLoading}
-          />
-        </Col>
-      </Row>
-
-      {/* Secondary Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={24} md={8}>
-          <Card style={{ height: '100%' }}>
-            <Statistic
-              title="Recent Enrollments (7 days)"
-              value={statistics?.recentEnrollments}
-              prefix={<ClockCircleOutlined style={{ color: '#13c2c2' }} />}
+        {/* Statistics Cards */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col xs={12} sm={12} md={6}>
+            <StatCard
+              title="Total Enrollments"
+              value={statistics?.totalEnrollments}
+              icon={<UserOutlined />}
+              color="#1890ff"
               loading={statsLoading}
             />
-            <div style={{ marginTop: '12px' }}>
-              <Progress
-                percent={statistics?.totalEnrollments ? 
-                  ((statistics?.recentEnrollments || 0) / statistics.totalEnrollments) * 100 : 0}
-                size="small"
-                strokeColor="#13c2c2"
-                showInfo={false}
-              />
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                Recent activity trend
-              </Text>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} md={8}>
-          <Card style={{ height: '100%' }}>
-            <Statistic
-              title="Completed"
-              value={statistics?.completedEnrollments}
-              prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+          </Col>
+          <Col xs={12} sm={12} md={6}>
+            <StatCard
+              title="Users Enrolled"
+              value={statistics?.totalUniqueUsers}
+              icon={<TeamOutlined />}
+              color="#52c41a"
               loading={statsLoading}
             />
-            <div style={{ marginTop: '12px' }}>
-              <Progress
-                percent={statistics?.totalEnrollments ? 
-                  ((statistics?.completedEnrollments || 0) / statistics.totalEnrollments) * 100 : 0}
-                size="small"
-                strokeColor="#52c41a"
-                showInfo={false}
-              />
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                Completion progress
-              </Text>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} md={8}>
-          <Card style={{ height: '100%' }}>
-            <Statistic
-              title="Bundles"
-              value={statistics?.totalUniqueBundles}
-              prefix={<ContainerOutlined style={{ color: '#eb2f96' }} />}
+          </Col>
+          <Col xs={12} sm={12} md={6}>
+            <StatCard
+              title="Courses"
+              value={statistics?.totalUniqueCourses}
+              icon={<BookOutlined />}
+              color="#faad14"
               loading={statsLoading}
             />
-            <div style={{ marginTop: '12px', textAlign: 'center' }}>
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                Bundle-based learning
-              </Text>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Filters and Table */}
-      <Card style={{ position: 'relative', zIndex: 1 }}>
-        <Row gutter={[8, 16]} style={{ marginBottom: '16px' }}>
-          <Col xs={24} sm={24} md={24} lg={6}>
-            <Search
-              placeholder={`Search ${viewType === 'users' ? 'users' : 'groups'}...`}
-              allowClear
-              onSearch={handleSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: '100%' }}
-            />
           </Col>
-          <Col xs={24} sm={12} md={12} lg={4}>
-            <Select
-              placeholder="Filter by User"
-              allowClear
-              style={{ width: '100%' }}
-              onChange={(value) => handleFilterChange('user', value)}
-              disabled={viewType !== 'users'}
-              loading={loading}
-              showSearch
-              dropdownStyle={{ zIndex: 1050 }}
-              getPopupContainer={(triggerNode) => triggerNode.parentElement}
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {employees.map(employee => (
-                <Option key={employee.userId} value={employee.userId}>
-                  {`${employee.firstName} ${employee.lastName} - ${employee.username}`}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={12} lg={4}>
-            <Select
-              placeholder="Filter by Course"
-              allowClear
-              style={{ width: '100%' }}
-              onChange={(value) => handleFilterChange('course', value)}
-              loading={coursesLoading}
-              showSearch
-              dropdownStyle={{ zIndex: 1050 }}
-              getPopupContainer={(triggerNode) => triggerNode.parentElement}
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {courses.map(course => (
-                <Option key={course.courseId} value={course.courseId}>
-                  {course.title}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={12} lg={4}>
-            <Select
-              placeholder="Filter by Bundle"
-              allowClear
-              style={{ width: '100%' }}
-              onChange={(value) => handleFilterChange('bundle', value)}
-              loading={bundlesLoading}
-              showSearch
-              dropdownStyle={{ zIndex: 1050 }}
-              getPopupContainer={(triggerNode) => triggerNode.parentElement}
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {bundles.map(bundle => (
-                <Option key={bundle.bundleId} value={bundle.bundleId}>
-                  {bundle.bundleName}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={12} lg={6}>
-            <RangePicker
-              style={{ width: '100%' }}
-              onChange={(dates) => handleFilterChange('date', dates)}
-              placeholder={['Start Date', 'End Date']}
-              dropdownClassName="custom-date-picker"
-              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+          <Col xs={12} sm={12} md={6}>
+            <StatCard
+              title="Completion Rate"
+              value={statistics?.overallCompletionRate}
+              icon={<TrophyOutlined />}
+              color="#722ed1"
+              suffix="%"
+              loading={statsLoading}
             />
           </Col>
         </Row>
 
-        <div style={{ overflowX: 'auto', position: 'relative', zIndex: 1 }}>
-          <Table
-            columns={columns}
-            dataSource={filteredData}
-            rowKey="userId"
-            loading={loading}
-            scroll={{ x: 'max-content' }}
-            expandable={{
-              expandedRowRender,
-              expandIcon: ({ expanded, onExpand, record }) => (
-                <Button
-                  type="text"
+        {/* Secondary Stats */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col xs={24} sm={24} md={8}>
+            <Card style={{ height: '100%' }}>
+              <Statistic
+                title="Recent Enrollments (7 days)"
+                value={statistics?.recentEnrollments}
+                prefix={<ClockCircleOutlined style={{ color: '#13c2c2' }} />}
+                loading={statsLoading}
+              />
+              <div style={{ marginTop: '12px' }}>
+                <Progress
+                  percent={statistics?.totalEnrollments ?
+                    ((statistics?.recentEnrollments || 0) / statistics.totalEnrollments) * 100 : 0}
                   size="small"
-                  icon={<ExpandAltOutlined />}
-                  onClick={(e) => onExpand(record, e)}
-                  style={{
-                    transform: expanded ? 'rotate(45deg)' : 'none',
-                    transition: 'transform 0.2s',
-                    zIndex: 1
-                  }}
+                  strokeColor="#13c2c2"
+                  showInfo={false}
                 />
-              ),
-            }}
-            pagination={{
-              total: filteredData.length,
-              pageSize: 10,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} ${viewType}`,
-              responsive: true,
-            }}
-            locale={{
-              emptyText: (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={`No ${viewType} enrollments found`}
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  Recent activity trend
+                </Text>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={8}>
+            <Card style={{ height: '100%' }}>
+              <Statistic
+                title="Completed"
+                value={statistics?.completedEnrollments}
+                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                loading={statsLoading}
+              />
+              <div style={{ marginTop: '12px' }}>
+                <Progress
+                  percent={statistics?.totalEnrollments ?
+                    ((statistics?.completedEnrollments || 0) / statistics.totalEnrollments) * 100 : 0}
+                  size="small"
+                  strokeColor="#52c41a"
+                  showInfo={false}
                 />
-              ),
-            }}
-          />
-        </div>
-      </Card>
-    </Content>
-    <AddEnrollmentModal
-  visible={showAddModal}
-  onCancel={() => setShowAddModal(false)}
-  onSuccess={() => {
-    setShowAddModal(false);
-    // Refresh the dashboard data
-    initializeData();
-    message.success('Enrollment added successfully!');
-  }}
-/>
-  </div>
-);
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  Completion progress
+                </Text>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={8}>
+            <Card style={{ height: '100%' }}>
+              <Statistic
+                title="Bundles"
+                value={statistics?.totalUniqueBundles}
+                prefix={<ContainerOutlined style={{ color: '#eb2f96' }} />}
+                loading={statsLoading}
+              />
+              <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  Bundle-based learning
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Filters and Table */}
+        <Card style={{ position: 'relative', zIndex: 1 }}>
+          <Row gutter={[8, 16]} style={{ marginBottom: '16px' }}>
+            <Col xs={24} sm={24} md={24} lg={6}>
+              <Search
+                placeholder={`Search ${viewType === 'users' ? 'users' : 'groups'}...`}
+                allowClear
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+                style={{ width: '100%' }}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={4}>
+              <Select
+                placeholder="Filter by User"
+                allowClear
+                style={{ width: '100%' }}
+                onChange={(value) => handleFilterChange('user', value)}
+                disabled={viewType !== 'users'}
+                loading={loading}
+                showSearch
+                dropdownStyle={{ zIndex: 1050 }}
+                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {employees.map(employee => (
+                  <Option key={employee.userId} value={employee.userId}>
+                    {`${employee.firstName} ${employee.lastName} - ${employee.username}`}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={4}>
+              <Select
+                placeholder="Filter by Course"
+                allowClear
+                style={{ width: '100%' }}
+                onChange={(value) => handleFilterChange('course', value)}
+                loading={coursesLoading}
+                showSearch
+                dropdownStyle={{ zIndex: 1050 }}
+                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {courses.map(course => (
+                  <Option key={course.courseId} value={course.courseId}>
+                    {course.title}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={4}>
+              <Select
+                placeholder="Filter by Bundle"
+                allowClear
+                style={{ width: '100%' }}
+                onChange={(value) => handleFilterChange('bundle', value)}
+                loading={bundlesLoading}
+                showSearch
+                dropdownStyle={{ zIndex: 1050 }}
+                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {bundles.map(bundle => (
+                  <Option key={bundle.bundleId} value={bundle.bundleId}>
+                    {bundle.bundleName}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={6}>
+              <RangePicker
+                style={{ width: '100%' }}
+                onChange={(dates) => handleFilterChange('date', dates)}
+                placeholder={['Start Date', 'End Date']}
+                dropdownClassName="custom-date-picker"
+                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+              />
+            </Col>
+          </Row>
+
+          <div style={{ overflowX: 'auto', position: 'relative', zIndex: 1 }}>
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              rowKey="userId"
+              loading={loading}
+              scroll={{ x: 'max-content' }}
+              expandable={{
+                expandedRowRender,
+                expandIcon: ({ expanded, onExpand, record }) => (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<ExpandAltOutlined />}
+                    onClick={(e) => onExpand(record, e)}
+                    style={{
+                      transform: expanded ? 'rotate(45deg)' : 'none',
+                      transition: 'transform 0.2s',
+                      zIndex: 1
+                    }}
+                  />
+                ),
+              }}
+              pagination={{
+                total: filteredData.length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} ${viewType}`,
+                responsive: true,
+              }}
+              locale={{
+                emptyText: (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={`No ${viewType} enrollments found`}
+                  />
+                ),
+              }}
+            />
+          </div>
+        </Card>
+      </Content>
+      <AddEnrollmentModal
+        visible={showAddModal}
+        onCancel={() => setShowAddModal(false)}
+        onSuccess={() => {
+          setShowAddModal(false);
+          // Refresh the dashboard data
+          initializeData();
+          message.success('Enrollment added successfully!');
+        }}
+      />
+    </div>
+  );
 };
 
 export default AdminHOC(EnrollmentDashboard);

@@ -32,22 +32,22 @@ import AdminHOC from "./components/shared/HOC/AdminHOC";
 import QuizReportDashboard from "./components/admin/quizReport/QuizReportDashboard";
 import BundlesHistory from "./components/admin/bundles/BundlesHistory";
 import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
-
-
-
-
-
-
+import UserGroup from "./components/user/myGroups/UserGroup";
+import UserGroupHistory from "./components/user/myGroups/UserGroupHistory";import UserReportPage from "./components/admin/ReportPages/UsersReport";
+import CourseReportPage from "./components/admin/ReportPages/CoursesReport";
+import GroupReportPage from "./components/admin/ReportPages/GroupsReport";
+import BundleReportPage from "./components/admin/ReportPages/BundlesReport";
 
 import "./App.css";
+import { UsergroupAddOutlined } from "@ant-design/icons";
 
 
 const QuizReportWithHOC = AdminHOC(QuizReportDashboard);
 
 const router = createBrowserRouter([
   {
-    path: "/login",    // :large_green_circle: Login route explicitly defined
-    element: <Login />
+    path: "/login", // :large_green_circle: Login route explicitly defined
+    element: <Login />,
   },
   {
     path: "/",
@@ -59,31 +59,59 @@ const router = createBrowserRouter([
       // Admin routes
       {
         path: "admin",
-        element: <AdminRoutes><AdminDashboard /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <AdminDashboard />
+          </AdminRoutes>
+        ),
       },
       {
         path: "books",
-        element: <AdminRoutes><CoursesAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <CoursesAdmin />
+          </AdminRoutes>
+        ),
       },
       {
         path: "users",
-        element: <AdminRoutes><UsersAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <UsersAdmin />
+          </AdminRoutes>
+        ),
       },
       {
         path: "categories",
-        element: <AdminRoutes><CategoriesAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <CategoriesAdmin />
+          </AdminRoutes>
+        ),
       },
       {
         path: "issuance",
-        element: <AdminRoutes><IssuanceAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <IssuanceAdmin />
+          </AdminRoutes>
+        ),
       },
       {
         path: "user-history/:id",
-        element: <AdminRoutes><UserHistory /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <UserHistory />
+          </AdminRoutes>
+        ),
       },
       {
         path: "book-history/:id",
-        element: <AdminRoutes><BookHistory /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <BookHistory />
+          </AdminRoutes>
+        ),
       },
       {
         path: "enroll",
@@ -95,46 +123,115 @@ const router = createBrowserRouter([
       },
       {
         path: "group",
-        element: <AdminRoutes><AllGroup /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <AllGroup />
+          </AdminRoutes>
+        ),
       },
       {
         path: "bundles",
-        element: <AdminRoutes><BundlesAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <BundlesAdmin />
+          </AdminRoutes>
+        ),
       },
       {
         path: "group-history/:id",
-        element: <AdminRoutes><GroupHistory /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <GroupHistory />
+          </AdminRoutes>
+        ),
       },
       {
         path: "bundles-history/:id",
-        element: <AdminRoutes><BundlesHistory /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <BundlesHistory />
+          </AdminRoutes>
+        ),
       },
       {
         path: "course-content/:courseId",
-        element: <AdminRoutes><CourseContentAdmin /></AdminRoutes>
+        element: (
+          <AdminRoutes>
+            <CourseContentAdmin />
+          </AdminRoutes>
+        ),
       },
       // Quiz routes
       { path: "course-content/:courseId/quizzes", element: <QuizListPage /> },
-      { path: "course-content/:courseId/quizzes/edit-question/:questionId", element: <QuizQuestionEditPage /> },
+      {
+        path: "course-content/:courseId/quizzes/edit-question/:questionId",
+        element: <QuizQuestionEditPage />,
+      },
       // User routes
       {
         path: "user",
-        element: <UserRoutes><UserDashboard /></UserRoutes>
+        element: (
+          <UserRoutes>
+            <UserDashboard />
+          </UserRoutes>
+        ),
       },
       {
         path: "my-courses",
         element: <UserRoutes><MyCourses /></UserRoutes>
+      }, {
+        path: "my-groups",
+        element: <UserRoutes><UserGroup /></UserRoutes>
       },
       {
         path: "course-content-user/:courseId",
         element: <UserRoutes><CourseContentUser /></UserRoutes>
+      }, {
+        path: "group-user-history/:id",
+        element: <UserRoutes><UserGroupHistory /></UserRoutes>
       },
       // Quiz Attempt (no guard)
       { path: "quiz/:courseId", element: <CourseQuizAttempt /> },
       // 404 fallback
-      { path: "*", element: <NotFound /> }
-    ]
-  }
+      { path: "*", element: <NotFound /> },
+      {
+        path: "/user-report",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <UserReportPage />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "/course-report",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <CourseReportPage />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "/group-report",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <GroupReportPage />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "/bundle-report",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <BundleReportPage />
+          </AdminRoutes>
+        ),
+      },
+    ],
+  },
 ]);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

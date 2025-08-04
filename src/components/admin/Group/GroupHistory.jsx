@@ -1,6 +1,6 @@
 import { Layout, Typography, Divider, Radio } from 'antd';
-import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Empty, Button, Tag, Space, Progress, Tooltip, Row, Select } from "antd";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -16,6 +16,7 @@ import { bundlesOfGroup } from '../../../service/BundleService';
 
 const { Content } = Layout;
 const { Title } = Typography;
+const { Option } = Select;
 
 const GroupHistory = ({ setLoading }) => {
     const { id } = useParams();
@@ -199,54 +200,83 @@ const GroupHistory = ({ setLoading }) => {
     ].filter(Boolean);
 
     return (
-        <div className="admin-section">
-            <Content style={{ margin: '0 16px' }}>
-                <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        <Title level={2} style={{ margin: 0 }}>{groupName} Details</Title>
-                        <Button style={{ marginLeft: 30 }} icon={<EditOutlined />} onClick={handleEditGroup} />
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        {!showCourse && <Button style={{ marginLeft: 30 }} icon={<UserAddOutlined />} onClick={handleAddNew}>Add new User</Button>}
-                        <Button style={{ marginLeft: 30 }} icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />} onClick={handleViewCourse}>
+        <div className="group-container">
+            <div className="group-header">
+                <div className="group-title-container">
+                    <Tooltip title="Back to groups">
+                        <Button
+                            icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
+                            className="back-btn"
+                            onClick={() => navigate("/group")}
+                        />
+                    </Tooltip>
+                    <Title level={2} className="group-title">
+                        {groupName} History
+                    </Title>
+                </div>
+            </div>
+
+            <div className='add-btn-div'>
+                <Space>
+                    <Tooltip title={!showCourse ? "View courses allocated to the group" : "View members of the group"}>
+                        <Button
+                            icon={!showCourse ? <FolderOpenOutlined /> : <UserOutlined />}
+                            onClick={handleViewCourse}
+                            className='add-btn'
+                        >
                             {!showCourse ? "View Course" : "View Users"}
                         </Button>
-                        {showCourse && <Radio.Group value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} style={{ marginLeft: 30 }}>
-                            <Radio.Button value="all">All Allocations</Radio.Button>
-                            <Radio.Button value="bundle">Bundles</Radio.Button>
-                            <Radio.Button value="standalone">Courses</Radio.Button>
-                        </Radio.Group>}
-                    </div>
-                    <Divider style={{ marginTop: 0 }} >
-                        <span style={{
-                            display: 'block',
-                            padding: '12px 24px',
-                            fontWeight: 600,
-                            fontSize: '18px',
-                            background: '#e9e7e74',
-                            // border: '1px solid  #e9e7e74',
-                            borderRadius: '8px',
-                            marginBottom: '16px',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-                        }}>
-                            {showCourse
-                                ? courseFilter === "all"
-                                    ? "Courses and bundles allocated to the group"
-                                    : courseFilter === "bundle"
-                                        ? "All Bundles allocated to the group"
-                                        : "All Courses allocated to the group"
-                                : "Users in the group"}
-                        </span>
-                    </Divider>
-                    {(filteredList.length > 0 &&
-                        dataLoaded) ? (<Table dataSource={filteredList} columns={columns} bordered scroll={{ x: "100%", y: "100%" }}
-                            locale={{ emptyText: "No data found." }} rowKey="id"
-                            pagination={{ position: 'bottomCenter' }} />
-                    ) : (
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    </Tooltip>
+                    <Tooltip title="Add user to the group">
+                        {!showCourse && (
+                            <Button icon={<UserAddOutlined />} onClick={handleAddNew} className="add-btn">
+                                Add User
+                            </Button>
+                        )}
+                    </Tooltip>
+                    {showCourse && (
+                        <Select
+                            value={courseFilter}
+                            onChange={(value) => { setCourseFilter(value) }}
+                            placeholder="Select Filter"
+                        >
+                            <Option value="all">All Allocations</Option>
+                            <Option value="bundle">Bundles</Option>
+                            <Option value="standalone">Courses</Option>
+                        </Select>
                     )}
+                </Space>
+            </div>
+
+
+            <Divider />
+
+            <div className="group-table">
+                <div className="group-subtitle">
+                    {showCourse
+                        ? courseFilter === "all"
+                            ? "Courses and bundles allocated to the group"
+                            : courseFilter === "bundle"
+                                ? "All Bundles allocated to the group"
+                                : "All Courses allocated to the group"
+                        : "Users in the group"}
                 </div>
-            </Content>
+
+                {filteredList.length > 0 && dataLoaded ? (
+                    <Table
+                        dataSource={filteredList}
+                        columns={columns}
+                        bordered
+                        scroll={{ x: true }}
+                        locale={{ emptyText: "No data found." }}
+                        rowKey="id"
+                        pagination={{ position: 'bottomCenter' }}
+                    />
+                ) : (
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+            </div>
+
             <AddNewUserModal isModalOpen={isModalOpen}
                 getUsers={getUsers}
                 handleCloseModal={handleCloseModal}

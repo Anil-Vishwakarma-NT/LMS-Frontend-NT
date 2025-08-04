@@ -1,95 +1,114 @@
-Main container 
-.admin-section {
-    padding: 50px;
-    max-width: fit-content;
+.user-container {
+    background-color: #ffffff;
+    padding: 80px 24px 24px;
+    border-radius: 8px;
+    min-height: 100vh;
     box-sizing: border-box;
-    overflow-y: hidden;
-    overflow-x: hidden;
-
 }
 
-
-.admin-page-mid {
-
-    left: 10px;
-    position: relative;
-    max-width: fit-content;
-    box-sizing: border-box;
+.user-header {
     display: flex;
     flex-direction: column;
-    overflow-y: hidden;
-
-}
-
-
-.admin-header-bar {
-    font-size: 1.8rem;
-    font-weight: 300;
-    margin-bottom: 30px;
-
-    color: #0c0c0c;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    top: 10px;
-}
-
-
-.admin-page-header {
-    display: flex;
-    flex-wrap: wrap;
     gap: 16px;
-    margin-bottom: 24px;
-    margin-top: 24px;
-    justify-content: center;
 }
 
-
-.admin-page-search {
+/* New row for title + report button */
+.user-title-row {
     display: flex;
-    gap: 12px;
-    margin-top: 12px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Adjust report button */
+.report-btn {
+    background-color: #0c60b5;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.report-btn:hover {
+    background-color: #40a9ff;
+}
+
+.user-title {
+    grid-column: 2;
+    justify-self: left;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.add-btn-div {
+    grid-column: 3;
+    /* right */
+    justify-self: end;
+    align-self: end;
+    /* a bit below */
+    margin-top: 8px;
+}
+
+.add-btn {
+    background-color: #1890ff;
+    color: white;
+    border: none;
+}
+
+.user-add-btn:hover {
+    background-color: #40a9ff;
+    color: white;
 }
 
 .user-table {
-    position: relative;
-    overflow-x: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow-y: auto;
+    flex: 1;
+    overflow: auto;
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.user-table .ant-table {
-    border-collapse: collapse;
-
+.report-btn {
+    background-color: #0c60b5;
+    color: white;
+    border: none;
+    justify-self: right;
+    padding: 3px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-
-.ant-btn {
-    border-radius: 6px;
-}
-
-.ant-btn>.anticon {
-    vertical-align: middle;
-}
-
-
-.user-table .ant-table-cell .ant-btn {
-    position: relative;
-    margin-left: 8px;
-    display: flex;
-    flex-direction: row;
+.report-btn:hover {
+    background-color: #40a9ff;
 }
 
 
 @media (max-width: 768px) {
-    .admin-header-bar {
-        font-size: 1.4rem;
-    }
-
-    .admin-page-search {
+    .user-header {
+        display: flex;
         flex-direction: column;
         align-items: center;
     }
 
+    .user-title {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .add-btn-div {
+        margin-top: 10px;
+        align-self: center;
+    }
+
+    .add-btn {
+        width: 100%;
+    }
+
+    .user-title-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
 }

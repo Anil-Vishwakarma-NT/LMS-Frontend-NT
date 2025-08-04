@@ -154,7 +154,7 @@ const CourseContent = () => {
     <div className="admin-section">
       <div className="admin-page-mid">
         <Title level={3}>{`Course Content for "${courseTitle}"`}</Title>
-        <div className="search-container">
+        <div className="action-buttons">
           <Input
             placeholder="Search by title"
             className="searchbar"
@@ -169,7 +169,7 @@ const CourseContent = () => {
           </Button>
           <Button
             onClick={() => navigate(`/quiz/${courseId}?userId=${userId}`)}
-            className="common-btn"
+            className="add-btn"
           >
             Attempt Quiz
           </Button>

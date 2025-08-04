@@ -1,6 +1,6 @@
 import { Layout, Typography, Divider } from 'antd';
-import { Table, Empty, Button, Tag, Space, Progress, Tooltip } from "antd";
-import { BookOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Empty, Button, Tag, Space, Progress, Tooltip, Row } from "antd";
+import { BookOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -12,10 +12,14 @@ import { useSelector } from "react-redux";
 import AddNewCourseModal from './AddNewCourseModal';
 import { getAllBundleCourses, deleteCourseFromBundle } from '../../../service/BundleService';
 import EditBundleNameModal from './EditBundleNameModal';
+
+
+
+
 const { Content } = Layout;
 const { Title } = Typography;
 
-const GroupHistory = ({ setLoading }) => {
+const BundleHistory = ({ setLoading }) => {
 
     const { id } = useParams();
     const location = useLocation();
@@ -154,49 +158,60 @@ const GroupHistory = ({ setLoading }) => {
     ];
 
     return (
-        <div className="admin-section">
-            <Content style={{ margin: '0 16px' }}>
-                <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        <Title level={2} style={{ margin: 0 }}>{bundleName}   Details</Title>
-                        <Tooltip title="Edit bundle name">
-                            <Button style={{ marginLeft: 30 }}
-                                icon={<EditOutlined />}
-                                onClick={handleEditBundle}
-                            >
-                            </Button>
-                        </Tooltip>
-
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }} >
-
-                        <Tooltip title="Add new Course to bundle">
-                            <Button style={{ marginLeft: 30 }}
-                                icon={<BookOutlined />}
-                                onClick={handleAddNew}
-                            >
-                                Add new Course
-                            </Button>
-                        </Tooltip>
-
-                    </div>
-                    <Divider style={{ marginTop: 0 }} />
-                    {filteredList.length > 0 ? (
-                        <Table
-                            dataSource={filteredList}
-                            columns={columns}
-                            bordered
-                            scroll={{ x: "100%", y: "100%" }}
-                            locale={{ emptyText: "No users found." }}
-                            rowKey="id"
-                            pagination={{ position: 'bottomCenter' }}
+        <div className="bundle-container">
+            <div className="bundle-header">
+                <div className="bundle-title-container">
+                    <Tooltip title="Back to bundles">
+                        <Button
+                            icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
+                            onClick={() => navigate("/bundles")}
                         />
-                    ) : (
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                    )}
+                    </Tooltip>
+                    <Title level={2} className="bundle-title">
+                        {bundleName} Details
+                    </Title>
+                    <Tooltip title="Edit bundle name">
+                        <Button
+                            icon={<EditOutlined />}
+                            onClick={handleEditBundle}
+                        />
+                    </Tooltip>
                 </div>
-            </Content>
+            </div>
+
+            <div className='add-btn-div'>
+                <Space>
+                    <Tooltip title="Add new Course to bundle">
+                        <Button
+                            icon={<BookOutlined />}
+                            onClick={handleAddNew}
+                            className="add-btn"
+                        >
+                            Add new Course
+                        </Button>
+                    </Tooltip>
+                </Space>
+            </div>
+
+
+            <Divider />
+            <div className="bundle-table">
+                {filteredList.length > 0 ? (
+                    <Table
+                        dataSource={filteredList}
+                        columns={columns}
+                        bordered
+                        scroll={{ x: "100%", y: "100%" }}
+                        locale={{ emptyText: "No users found." }}
+                        rowKey="id"
+                        pagination={{ position: 'bottomCenter' }}
+                    />
+                ) : (
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+            </div>
+
+
             <AddNewCourseModal isModalOpen={isModalOpen} handleCloseModal={handleCloseModal} setShowToast={setShowToast}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
@@ -227,11 +242,11 @@ const GroupHistory = ({ setLoading }) => {
                 setBundleName={setBundleName}
 
             />
-        </div>
+        </div >
     );
 };
 
 
 
 
-export default AdminHOC(GroupHistory);
+export default AdminHOC(BundleHistory);

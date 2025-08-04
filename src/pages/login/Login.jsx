@@ -26,6 +26,8 @@ const Login = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
   const auth = useSelector((state) => state.auth);
+
+
   const publicKey = `-----BEGIN PUBLIC KEY-----
 MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHZxpdXzzP3VeM50CLkYx5Ih4jZN
 W9/SyLNzJgBujCmOe49QnJNKD79eM/VUFHAGPLO5f1Krh9J1PoOZAEeimzdOnkFf
@@ -79,19 +81,17 @@ u/bvWV47VOzzM+ObAgMBAAE=
 
       const normalizedRoles = Array.isArray(roles) ? roles : [roles];
 
-    dispatch(login({
+      dispatch(login({
+        fullName,
+        email: email,
         roles: normalizedRoles,
-        email,
-        accessToken: response.accessToken
+        accessToken: response.accessToken,
       }));
 
-   
       localStorage.setItem('authtoken', response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
       console.log("roles", normalizedRoles)
-      // ✅ Navigate based on role
       if (normalizedRoles.includes("ADMIN")) {
-        console.log(auth.roles);
         navigate("/admin");
       } else if (normalizedRoles.includes("EMPLOYEE")) {
         navigate("/user", { state: { userId, name: fullName } });
