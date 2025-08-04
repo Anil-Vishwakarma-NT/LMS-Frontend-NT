@@ -9,7 +9,7 @@ import sideIssuance from "../../../assets/group.svg";
 import enrollment from "../../../assets/enrollment.svg"
 import Loader from '../loader/Loader';
 import { ArrowLeftOutlined } from "@ant-design/icons";
-
+import Navbar from '../navbar/Navbar';
 
 
 const AdminHOC = (Component) => function HOC() {
@@ -28,6 +28,7 @@ const AdminHOC = (Component) => function HOC() {
 
   return (
     <>
+      <Navbar />
       {loading && <Loader />}
       <div className="admin-layout">
         <aside className={visible ? "admin-sidebar" : "admin-toggle"}>
