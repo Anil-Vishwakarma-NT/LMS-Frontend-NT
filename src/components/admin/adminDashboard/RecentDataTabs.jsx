@@ -16,26 +16,33 @@ const RecentDataTabs = ({
   recentUserList,
   recentCourseList,
   recentBundleList,
-  // recentGroupList
+  recentGroupList
 }) => {
   const navigate = useNavigate();
 
   // Navigation handlers
-  const handleViewUserDetails = (userId) => {
-    navigate(`/admin/users/${userId}`);
+  const handleViewUserDetails = (userId, name) => {
+    navigate(`/user-history/${userId}`, {
+      state: { name: name }
+    });
   };
 
   const handleViewCourseDetails = (courseId) => {
-    navigate(`/admin/courses/${courseId}`);
+    navigate(`/course-content/${courseId}`);
   };
 
-  const handleViewBundleDetails = (bundleId) => {
-    navigate(`/admin/bundles/${bundleId}`);
+  const handleViewBundleDetails = (bundleId, name) => {
+    navigate(`/bundles-history/${bundleId}`, {
+      state: { name: name },
+    });
   };
 
-  // const handleViewGroupDetails = (groupId) => {
-  //   navigate(`/admin/groups/${groupId}`);
-  // };
+  const handleViewGroupDetails = (groupId, name) => {
+    navigate(`/group-history/${groupId}`, {
+
+      state: { name: name }
+    });
+  };
 
   // Table column definitions
   const usersColumns = [
@@ -90,7 +97,7 @@ const RecentDataTabs = ({
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => handleViewUserDetails(record.id)}
+          onClick={() => handleViewUserDetails(record.userId, record.fullName)}
         >
           View Details
         </Button>
@@ -149,7 +156,7 @@ const RecentDataTabs = ({
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => handleViewCourseDetails(record.id)}
+          onClick={() => handleViewCourseDetails(record.courseId)}
         >
           View Details
         </Button>
@@ -194,7 +201,7 @@ const RecentDataTabs = ({
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => handleViewBundleDetails(record.id)}
+          onClick={() => handleViewBundleDetails(record.bundleId, record.bundleName)}
         >
           View Details
         </Button>
@@ -202,51 +209,51 @@ const RecentDataTabs = ({
     },
   ];
 
-  // const groupsColumns = [
-  //   { 
-  //     title: 'Name', 
-  //     dataIndex: 'name', 
-  //     key: 'name',
-  //     render: (name) => (
-  //       <Space>
-  //         <TeamOutlined style={{ color: '#fa8c16' }} />
-  //         <Text strong>{name}</Text>
-  //       </Space>
-  //     )
-  //   },
-  //   { title: 'Created By', dataIndex: 'createdBy', key: 'createdBy' },
-  //   { 
-  //     title: 'Members', 
-  //     dataIndex: 'memberCount', 
-  //     key: 'memberCount',
-  //     render: (count) => (
-  //       <Badge count={count} style={{ backgroundColor: '#1890ff' }} />
-  //     )
-  //   },
-  //   { 
-  //     title: 'Created At', 
-  //     dataIndex: 'createdAt', 
-  //     key: 'createdAt',
-  //     render: (date) => (
-  //       <Space>
-  //         <CalendarOutlined />
-  //         {new Date(date).toLocaleString()}
-  //       </Space>
-  //     )
-  //   },
-  //   {
-  //     title: 'Action',
-  //     key: 'action',
-  //     render: (_, record) => (
-  //       <Button 
-  //         type="link" 
-  //         onClick={() => handleViewGroupDetails(record.id)}
-  //       >
-  //         View Details
-  //       </Button>
-  //     ),
-  //   },
-  // ];
+  const groupsColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'groupName',
+      key: 'name',
+      render: (name) => (
+        <Space>
+          <TeamOutlined style={{ color: '#fa8c16' }} />
+          <Text strong>{name}</Text>
+        </Space>
+      )
+    },
+    { title: 'Created By', dataIndex: 'creatorName', key: 'createdBy' },
+    {
+      title: 'Members',
+      dataIndex: 'memberCount',
+      key: 'memberCount',
+      render: (count) => (
+        <Badge count={count} style={{ backgroundColor: '#1890ff' }} />
+      )
+    },
+    // {
+    //   title: 'Created At',
+    //   dataIndex: 'createdAt',
+    //   key: 'createdAt',
+    //   render: (date) => (
+    //     <Space>
+    //       <CalendarOutlined />
+    //       {new Date(date).toLocaleString()}
+    //     </Space>
+    //   )
+    // },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button
+          type="link"
+          onClick={() => handleViewGroupDetails(record.groupId, record.groupName)}
+        >
+          View Details
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <Card style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.09)' }}>
@@ -254,7 +261,7 @@ const RecentDataTabs = ({
         <TabPane
           tab={
             <span>
-              <UserOutlined />
+              <UserOutlined style={{ paddingRight: 10 }} />
               Recent Users
             </span>
           }
@@ -276,7 +283,7 @@ const RecentDataTabs = ({
         <TabPane
           tab={
             <span>
-              <BookOutlined />
+              <BookOutlined style={{ paddingRight: 10 }} />
               Recent Courses
             </span>
           }
@@ -298,7 +305,7 @@ const RecentDataTabs = ({
         <TabPane
           tab={
             <span>
-              <AppstoreOutlined />
+              <AppstoreOutlined style={{ paddingRight: 10 }} />
               Recent Bundles
             </span>
           }
@@ -317,27 +324,27 @@ const RecentDataTabs = ({
           />
         </TabPane>
 
-        {/* <TabPane 
+        <TabPane
           tab={
             <span>
-              <TeamOutlined />
+              <TeamOutlined style={{ paddingRight: 10 }} />
               Recent Groups
             </span>
-          } 
+          }
           key="4"
         >
           <div style={{ marginBottom: 16 }}>
             <Title level={4} style={{ margin: 0 }}>Recently Added Groups</Title>
           </div>
-          <Table 
-            columns={groupsColumns} 
-            dataSource={recentGroupList} 
+          <Table
+            columns={groupsColumns}
+            dataSource={recentGroupList}
             pagination={false}
             style={{ backgroundColor: 'white' }}
             bordered
             rowKey="id"
           />
-        </TabPane> */}
+        </TabPane>
       </Tabs>
     </Card>
   );

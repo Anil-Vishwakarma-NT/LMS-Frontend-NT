@@ -1,6 +1,6 @@
 import AdminHOC from "../../shared/HOC/AdminHOC";
 import Toast from "../../shared/toast/Toast";
-import { Layout, Typography, Divider } from 'antd';
+import { Layout, Typography, Divider, Tooltip } from 'antd';
 import { useState, useEffect } from 'react';
 import { getAllGroups, deleteGroup } from "../../../service/GroupService";
 import { Table, Empty, Button, Tag, Space } from "antd";
@@ -9,7 +9,7 @@ import GroupModal from "./GroupModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import "./Group.css";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -23,7 +23,7 @@ const AllGroup = ({ setLoading }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState(null);
-    const [isConfirmPopupOpen,setIsConfirmPopupOpen] = useState(false);
+    const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
     const [groupToDelete, setGroupToDelete] = useState(null);
 
     async function getGroups() {
@@ -133,55 +133,75 @@ const AllGroup = ({ setLoading }) => {
 
 
     return (
-        <div className="admin-section">
-            <Content style={{ margin: '0 16px' }}>
-                <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                        {/* <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} /> */}
-                        <Title level={2} style={{ margin: 0 }}>Groups Overview</Title>
-                    
-                        <Button style={{ marginLeft: 100 }}
-                            icon={<UsergroupAddOutlined />}
-                            onClick={handleAddNew}
-                        >
-                            Add new Group
-                        </Button>
-                    </div>
-                    <Divider style={{ marginTop: 0 }} />
-                    <div className="user-table">
-                        {processedGroups?.length > 0 ? (
-                            <Table
-                                dataSource={processedGroups}
-                                columns={fields}
-                                bordered
-                                scroll={{ x: "100%", y: "100%" }}
-                                locale={{ emptyText: "No users found." }}
-                                rowKey="id"
-                                pagination={{ position: 'bottomCenter' }}
-                            />
-                        ) : (
-                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                        )}
-                    </div>
+        <div className="group-container">
+            <div className="group-header">
+                <Title level={2} className="group-title"><UsergroupAddOutlined style={{ paddingRight: 12 }} />Active Groups Overview</Title>
 
-                </div>
-            </Content>
-            <GroupModal isModalOpen={isModalOpen} getGroups={getGroups} handleCloseModal={handleCloseModal} setShowToast={setShowToast}
+            </div>
+            <div className="add-btn-div">
+                <Tooltip title="create new group">
+                    <Button
+                        icon={<UsergroupAddOutlined />}
+                        onClick={handleAddNew}
+                        className="add-btn"
+                    >
+                        Add new Group
+                    </Button>
+                </Tooltip>
+                <Button
+                    icon={<ExportOutlined />}
+                    onClick={() => navigate("/group-report")}
+                    className="add-btn"
+                >
+                    Report
+                </Button>
+
+            </div>
+
+
+            <Divider />
+
+            <div className="group-table">
+                {processedGroups?.length > 0 ? (
+                    <Table
+                        dataSource={processedGroups}
+                        columns={fields}
+                        bordered
+                        scroll={{ x: true }}
+                        locale={{ emptyText: "No groups found." }}
+                        rowKey="id"
+                        pagination={{ position: 'bottomCenter' }}
+                    />
+                ) : (
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+            </div>
+
+            {/* Modals and Popups */}
+            <GroupModal
+                isModalOpen={isModalOpen}
+                getGroups={getGroups}
+                handleCloseModal={handleCloseModal}
+                setShowToast={setShowToast}
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
-                setLoading={setLoading} />
+                setLoading={setLoading}
+            />
+
             <Toast
                 message={toastMessage}
                 type={toastType}
                 show={showToast}
                 onClose={() => setShowToast(false)}
             />
+
             <ConfirmDeletePopup
                 isOpen={isConfirmPopupOpen}
                 onClose={() => setIsConfirmPopupOpen(false)}
                 onConfirm={handleDeleteGroup}
             />
         </div>
+
     );
 };
 

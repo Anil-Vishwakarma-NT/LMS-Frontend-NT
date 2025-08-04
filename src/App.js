@@ -33,8 +33,8 @@ const App = () => {
       const { accessToken } = res.data;
       localStorage.setItem("authtoken", accessToken);
 
-      const { email, roles } = jwtDecode(accessToken);
-      dispatch(login({ email, roles, accessToken }));
+      const { email, roles, fullName } = jwtDecode(accessToken);
+      dispatch(login({ email, roles, accessToken, fullName }));
 
     } catch (err) {
       console.error("Refresh token failed:", err);
@@ -49,7 +49,7 @@ const App = () => {
     if (token && !auth.accessToken) {
       try {
         const decoded = jwtDecode(token);
-        const { email, roles, exp } = decoded;
+        const { email, roles, exp, fullName } = decoded;
 
         const currentTime = Math.floor(Date.now() / 1000);
 
@@ -57,7 +57,7 @@ const App = () => {
           console.log("Access token expired. Trying refresh token...");
           refreshTokenApi();
         } else {
-          dispatch(login({ email, roles, accessToken: token }));
+          dispatch(login({ email, roles, accessToken: token, fullName }));
         }
 
       } catch (err) {

@@ -9,6 +9,10 @@ import {
   fetchCourseById,
 } from "../../../service/BookService";
 import CourseContentModal from "../booksAdmin/CourseContentModal";
+import { Tag, Space, Progress, Tooltip, Row } from "antd";
+import { BookOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined, ExportOutlined, FolderOpenOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+
+
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -43,8 +47,10 @@ const CourseContentAdmin = ({ setLoading }) => {
         ...item,
         isActive: item.active,
       }));
+      console.log("Mapped Content:", mappedContent);
       setCourseContent(mappedContent);
       setFilteredContent(mappedContent);
+
     } catch (error) {
       setErrorMessage("Failed to fetch course content.");
       // message.error("Failed to fetch course content.");
@@ -155,7 +161,14 @@ const CourseContentAdmin = ({ setLoading }) => {
   return (
     <div className="admin-section">
       <div className="admin-page-mid">
+
         <Title level={3}>{`Manage Content for "${courseTitle}"`}</Title>
+
+      </div>
+      <div
+        className="add-btn-div"
+
+      >
         <div className="search-container" style={{ marginBottom: 16 }}>
           <Input
             placeholder="Search by title"
@@ -164,28 +177,19 @@ const CourseContentAdmin = ({ setLoading }) => {
             style={{ width: 300 }}
           />
         </div>
-        <div
-          className="action-buttons"
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginBottom: 16,
-          }}
-        >
-          <Button type="primary" onClick={handleAddNewCourseContent}>
-            Add New Content
-          </Button>
-          <Button onClick={toggleFilterType}>
-            {filterType === "all"
-              ? "Show Active"
-              : filterType === "active"
+        <Button onClick={handleAddNewCourseContent} className="add-btn">
+          Add New Content
+        </Button>
+        <Button onClick={toggleFilterType} className="add-btn">
+          {filterType === "all"
+            ? "Show Active"
+            : filterType === "active"
               ? "Show Inactive"
               : "Show All"}
-          </Button>
-          <Button onClick={() => navigate("/books")}>Back to Courses</Button>
-        </div>
+        </Button>
+        <Button onClick={() => navigate("/books")} className="add-btn">Back to Courses</Button>
       </div>
+
       {filteredContent.length === 0 && !errorMessage ? (
         <div className="no-data-found">No content available for this course.</div>
       ) : (
@@ -197,12 +201,12 @@ const CourseContentAdmin = ({ setLoading }) => {
         />
       )}
       <CourseContentModal
-      isModalOpen={isModalOpen}
-      handleCloseModal={closeModal}
-      selectedContent={selectedContent}
-      setLoading={setLoading}
-      loadContent={loadCourseContent}
-      courseId={courseId}
+        isModalOpen={isModalOpen}
+        handleCloseModal={closeModal}
+        selectedContent={selectedContent}
+        setLoading={setLoading}
+        loadContent={loadCourseContent}
+        courseId={courseId}
       />
 
     </div>

@@ -5,7 +5,9 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
-
+  const [roles, setRoles] = useState([]);
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   useEffect(() => {
     const storedToken = localStorage.getItem('authtoken');
     if (storedToken) {
@@ -21,6 +23,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('authtoken');
     setToken(null);
+    console.log("Logged out successfully", localStorage.getItem('authtoken'));;
+    setRoles([]);
+    setFullName("")
   };
 
   return (

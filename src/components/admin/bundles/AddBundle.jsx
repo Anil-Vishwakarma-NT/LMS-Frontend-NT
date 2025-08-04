@@ -21,7 +21,7 @@ const AddBundle = ({
     const [form] = Form.useForm();
     const [courseList, setCourseList] = useState([]);
     const [searchValue, setSearchValue] = useState('');
-
+    
     const filteredCourses = courseList?.filter(user =>
         user.label.toLowerCase().includes(searchValue.toLowerCase())
         // user.email.toLowerCase().includes(searchValue.toLowerCase())

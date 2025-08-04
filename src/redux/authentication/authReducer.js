@@ -1,13 +1,10 @@
 import { LOGIN, LOGOUT, SET_USER_ID } from "./authTypes";
 
 const initialState = {
-  id: "",
-  name: "",
   email: "",
-  mobileNumber: "",
-  role: "",
-  token: "",
-  userId: "",
+  roles: "",
+  accessToken: "",
+  fullName: ""
 };
 
 const authReducer = (state = initialState, action) => {

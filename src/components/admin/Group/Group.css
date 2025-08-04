@@ -1,0 +1,68 @@
+.group-container {
+    padding: 80px 24px 24px;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 64px);
+}
+
+.group-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.group-title-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.group-title {
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.group-table {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Reuse button styling from bundles if needed */
+.back-btn {
+    background-color: white;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s;
+}
+
+.back-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.group-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 16px 0;
+    padding-left: 8px;
+    color: #333;
+    border-left: 4px solid #1890ff;
+}
+
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .group-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .group-title {
+        font-size: 20px;
+        text-align: left;
+    }
+}
