@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 import AdminHOC from "../../shared/HOC/AdminHOC";
 
-=======
->>>>>>> origin/latest-dev
 import React, { useEffect, useState } from 'react';
-import { Typography, Divider } from 'antd';
+import { Layout, Typography, Divider } from 'antd';
 import { DashboardOutlined } from '@ant-design/icons';
 import {
   getDashboardStats,
@@ -21,20 +18,22 @@ import {
 } from "../../../service/AdminService";
 import DashboardStats from './DashboardStats';
 import RecentDataTabs from './RecentDataTabs';
-import AdminHOC from "../../shared/HOC/AdminHOC";
-import './AdminDashboard.css'; // New CSS file we'll create
+import './AdminDashboard.css';
 
+const { Content } = Layout;
 const { Title } = Typography;
 
 const AdminDashboard = () => {
+  // State for statistics
   const [userCount, setUserCount] = useState(0);
   const [courseCount, setCourseCount] = useState(0);
   const [bundleCount, setBundleCount] = useState(0);
   const [groupCount, setGroupCount] = useState(0);
   const [enrollmentCount, setEnrollmentCount] = useState(0);
-  const [activeUsers, setActiveUsers] = useState(5);
-  const [stalledProgress, setStalledProgress] = useState(10);
+  const [activeUsers, setActiveUsers] = useState(5); // Could be replaced with API data
+  const [stalledProgress, setStalledProgress] = useState(10); // Could be replaced with API data
 
+  // State for recent data
   const [recentUserList, setRecentUserList] = useState([]);
   const [recentCourseList, setRecentCourseList] = useState([]);
   const [recentBundleList, setRecentBundleList] = useState([]);
@@ -44,46 +43,18 @@ const AdminDashboard = () => {
     fetchAllData();
   }, []);
 
+  // Fetch all data at once
   const fetchAllData = async () => {
     try {
-<<<<<<< HEAD
       fetchDashboardStats();
       fetchRecentUser();
       fetchRecentCoursesAndBundles();
       // fetchRecentGroup();
-=======
-      const [
-        users, courses, bundles, groups, enrollments,
-        recentUsers, recentCourses, recentBundles, recentGroups
-      ] = await Promise.all([
-        getTotalUsers(),
-        getTotalCourses(),
-        getTotalBundles(),
-        getTotalGroups(),
-        getTotalEnrollment(),
-        getRecentUser(),
-        getRecentCourse(),
-        getRecentBundle(),
-        getRecentGroups()
-      ]);
-
-      setUserCount(users);
-      setCourseCount(courses);
-      setBundleCount(bundles);
-      setGroupCount(groups);
-      setEnrollmentCount(enrollments?.totalEnrollments ?? 0);
-
-      setRecentUserList(recentUsers);
-      setRecentCourseList(recentCourses);
-      setRecentBundleList(recentBundles);
-      setRecentGroupList(recentGroups);
->>>>>>> origin/latest-dev
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
   };
 
-<<<<<<< HEAD
   // Fetch consolidated dashboard stats
   const fetchDashboardStats = async () => {
     try {
@@ -211,8 +182,6 @@ const AdminDashboard = () => {
     }
   };
 
-=======
->>>>>>> origin/latest-dev
   const statProps = {
     userCount,
     courseCount,
@@ -231,14 +200,22 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
+    <div className="admin-section">
+      <Content style={{ margin: '0 16px' }}>
+        <div className="site-layout-background" style={{ padding: 24, minHeight: 360, backgroundColor: '#f5f7fa' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+            <DashboardOutlined style={{ fontSize: 28, marginRight: 16, color: '#1890ff' }} />
+            <Title level={2} style={{ margin: 0 }}>Admin Dashboard Overview</Title>
+          </div>
+          <Divider style={{ marginTop: 0 }} />
 
-        <Title level={2} className="dashboard-title"><DashboardOutlined className="dashboard-icon" />Admin Dashboard Overview</Title>
-      </div>
-      <Divider className='header-divider' />
-      <DashboardStats {...statProps} />
-      <RecentDataTabs {...tabsProps} />
+          {/* Key Metrics Cards */}
+          <DashboardStats {...statProps} />
+
+          {/* Activity Timeline / Recent Additions Tabs */}
+          <RecentDataTabs {...tabsProps} />
+        </div>
+      </Content>
     </div>
   );
 };

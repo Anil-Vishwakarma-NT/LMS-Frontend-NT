@@ -24,10 +24,7 @@ const AdminHOC = (Component) => function HOC() {
     { path: '/group', label: 'Groups', img: sideIssuance },
     { path: '/users', label: 'Users', img: sideUsers },
     { path: '/enroll', label: 'Enrollments', img: enrollment },
-<<<<<<< HEAD
     { path: '/quiz-report', label: 'Quiz Report', img: quiz },
-=======
->>>>>>> origin/latest-dev
   ];
   const [visible, setVisible] = useState(true);
 
