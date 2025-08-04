@@ -2,6 +2,7 @@ import { app } from "../../../service/serviceLMS";
 import useConfirmNavigation  from "./useConfirmNavigation";
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import {
   Typography, Spin, Alert, Card, Tag,
@@ -19,7 +20,9 @@ const { Title, Paragraph } = Typography;
 const CourseQuizAttempt = () => {
   const { courseId } = useParams();
   const location = useLocation();
-  const userId = location.state?.userId || Number(localStorage.getItem("userId"));
+  const auth = useSelector((state) => state.auth);
+  const userId = auth?.userId;
+  // const userId = location.state?.userId || Number(localStorage.getItem("userId"));
 
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -35,7 +38,12 @@ const CourseQuizAttempt = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-
+  useEffect(() => {
+  if (!userId || userId <= 0) {
+    message.error("Invalid or missing user session. Please login again.");
+    navigate("/login"); // or any fallback route
+  }
+}, [userId]);
   // Load quiz metadata
   useEffect(() => {
     const loadQuiz = async () => {

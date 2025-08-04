@@ -1,61 +1,48 @@
-// import React from "react";
-// import ReactPlayer from "react-player";
-// import "./VideoModal.css";
+import { useEffect, useState } from 'react';
+import { app } from "../../../service/serviceLMS"
+import ReactPlayer from 'react-player';
 
-// const VideoModal = ({ isOpen, videoUrl, onClose }) => {
-//   if (!isOpen) return null;
+export default function VideoModal({ isOpen, fileName, resourceType, onClose }) {
+  const [videoUrl, setVideoUrl] = useState(null);
 
-//   return (
-//     <div className="modal-overlay">
-//       <div className="modal-content">
-//         <button className="close-button" onClick={onClose}>
-//           ✖ Close
-//         </button>
-//         <div className="player-container">
-//           <ReactPlayer
-//             url={videoUrl}
-//             controls
-//             width="100%"
-//             height="400px"
-//             playing={true} // Video auto-plays when modal opens
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  useEffect(() => {
+    if (isOpen && fileName) {
 
-// export default VideoModal;
+      if(resourceType === "youtube-link" || fileName.includes("youtube.com")) {
+        console.log("YouTube link detected:", fileName);
+        setVideoUrl(fileName); // Directly use YouTube link
+      } else if (resourceType === "video" || fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+        // const url = app.get(`/course/api/client-api/streaming/video/${fileName}`)
+        // console.log("Video URL:", url);
+        // Set video URL directly – browser handles range requests
+        const url = `http://localhost:8080/api/service-api/streaming/video/${fileName}`;
+        console.log("Video URL set to:", url);
+        setVideoUrl(url);
+      }else{
+        setVideoUrl(fileName)
+      }
 
-import React from "react";
-import { Modal } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
-import ReactPlayer from "react-player";
 
-const VideoModal = ({ isOpen, videoUrl, onClose }) => {
+    }
+   
+
+    return () => {
+      setVideoUrl(null); // Clear URL on close or re-render
+    };
+  }, [isOpen, fileName]);
+
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      open={isOpen}
-      onCancel={onClose}
-      footer={null}
-      width={800}
-      centered
-      closeIcon={<CloseOutlined style={{ fontSize: 18, color: "#000" }} />}
-      bodyStyle={{ padding: 0 }}
-      destroyOnClose
-    >
-      <div style={{ position: "relative", paddingTop: "56.25%" /* 16:9 ratio */ }}>
-        <ReactPlayer
-          url={videoUrl}
-          controls
-          playing
-          width="100%"
-          height="100%"
-          style={{ position: "absolute", top: 0, left: 0 }}
-        />
-      </div>
-    </Modal>
+    <div>
+      <ReactPlayer
+        url={videoUrl}
+        controls
+        width="95%"
+        height="550px"
+      />
+      <button onClick={onClose}>Close</button>
+    </div>
   );
-};
+}
 
-export default VideoModal;
