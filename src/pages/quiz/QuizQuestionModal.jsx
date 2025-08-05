@@ -223,21 +223,27 @@ const QuizQuestionModal = ({ open, onCancel, onSuccess, courseId, quizId }) => {
               <Radio.Group
                 value={correctAnswers[0] || ""}
                 onChange={(e) => setCorrectAnswers([e.target.value])}
+                disabled={options.some(opt => !opt.trim()) || options.length < 2}
               >
                 <Space direction="vertical">
                   {options.map((opt, idx) => (
                     <Radio key={idx} value={opt}>
-                      {opt}
+                      {opt || `Option ${idx + 1}`}
                     </Radio>
                   ))}
                 </Space>
               </Radio.Group>
             ) : (
-              <Checkbox.Group value={correctAnswers} onChange={setCorrectAnswers}>
+              <Checkbox.Group 
+                value={correctAnswers}
+                onChange={setCorrectAnswers}
+                disabled={options.some(opt => !opt.trim()) || options.length < 2}
+                
+                >
                 <Space direction="vertical">
                   {options.map((opt, idx) => (
                     <Checkbox key={idx} value={opt}>
-                      {opt}
+                      {opt || `Option ${idx + 1}`}
                     </Checkbox>
                   ))}
                 </Space>
