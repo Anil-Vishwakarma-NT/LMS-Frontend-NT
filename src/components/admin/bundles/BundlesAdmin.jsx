@@ -5,7 +5,7 @@ import searchLogo from "../../../assets/magnifying-glass.png";
 import Toast from "../../shared/toast/Toast";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import { Table, Empty, Button, Tag, Space, Layout, Typography, Divider } from "antd";
-import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined, EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAllBundles, deleteBundle } from "../../../service/BundleService";
@@ -115,6 +115,12 @@ const BundlesAdmin = ({ setLoading }) => {
               onClick={() =>
                 handleViewBundleClick(record?.id, record?.bundleName)
               }
+            />
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => {
+                navigate(`/bundle-report/${record?.id}`);
+              }}
             />
           </Space>
         </>

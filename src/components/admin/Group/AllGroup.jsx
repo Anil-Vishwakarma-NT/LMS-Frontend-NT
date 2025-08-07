@@ -3,8 +3,8 @@ import Toast from "../../shared/toast/Toast";
 import { Layout, Typography, Divider } from 'antd';
 import { useState, useEffect } from 'react';
 import { getAllGroups, deleteGroup } from "../../../service/GroupService";
-import { Table, Empty, Button, Tag, Space } from "antd";
-import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined } from "@ant-design/icons";
+import { Table, Empty, Button, Tag, Space, Tooltip } from "antd";
+import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined, EyeOutlined } from "@ant-design/icons";
 import GroupModal from "./GroupModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import { useNavigate } from "react-router-dom";
@@ -121,6 +121,12 @@ const AllGroup = ({ setLoading }) => {
                             onClick={() =>
                                 handleViewGroupClick(record?.id, record?.groupName)
                             }
+                        />
+                        <Button
+                            icon={<EyeOutlined />}
+                            onClick={() => {
+                            navigate(`/group-report/${record?.id}`);
+                            }}
                         />
                     </Space>
                 </>

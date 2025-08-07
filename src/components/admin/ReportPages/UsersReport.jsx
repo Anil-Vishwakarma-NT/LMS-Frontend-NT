@@ -5,7 +5,7 @@ import AdminHOC from "../../shared/HOC/AdminHOC";
 const UserReportPage = () => {
   return (
     <div style={{ padding: 24 }}>
-      <h2>User KPI Report</h2>
+      <h2>User Dashboard Report</h2>
       <UserKpiReportTable /> 
     </div>
   );

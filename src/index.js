@@ -31,9 +31,13 @@ import UserRoutes from "./routes/UserRoutes";
 import BundlesHistory from "./components/admin/bundles/BundlesHistory";
 import BundlesAdmin from "./components/admin/bundles/BundlesAdmin";
 import UserReportPage from "./components/admin/ReportPages/UsersReport";
+import SingleUserReport from "./components/admin/ReportPages/SingleUserReport";
 import CourseReportPage from "./components/admin/ReportPages/CoursesReport";
+import SingleCourseReport from "./components/admin/ReportPages/SingleCourseReport";
 import GroupReportPage from "./components/admin/ReportPages/GroupsReport";
+import SingleGroupReport from "./components/admin/ReportPages/SingleGroupReport";
 import BundleReportPage from "./components/admin/ReportPages/BundlesReport";
+import SingleBundleReport from "./components/admin/ReportPages/SingleBundleReport"
 
 import "./App.css";
 const router = createBrowserRouter([
@@ -198,11 +202,29 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/user-report/:userId",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <SingleUserReport />
+          </AdminRoutes>
+        ),
+      },
+      {
         path: "/course-report",
         element: (
           <AdminRoutes>
             {" "}
             <CourseReportPage />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "/course-report/:courseId",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <SingleCourseReport />
           </AdminRoutes>
         ),
       },
@@ -216,11 +238,29 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/group-report/:groupId",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <SingleGroupReport />
+          </AdminRoutes>
+        ),
+      },
+      {
         path: "/bundle-report",
         element: (
           <AdminRoutes>
             {" "}
             <BundleReportPage />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "/bundle-report/:bundleId",
+        element: (
+          <AdminRoutes>
+            {" "}
+            <SingleBundleReport />
           </AdminRoutes>
         ),
       },

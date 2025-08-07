@@ -10,7 +10,7 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Table, Empty, Button, Tag, Space, message, Tooltip } from "antd";
-import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FilePdfOutlined} from "@ant-design/icons";
+import { UserAddOutlined, EditOutlined, DeleteOutlined, ExportOutlined, FilePdfOutlined, EyeOutlined} from "@ant-design/icons";
 import UsersModal from "./UsersModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
 import "./UsersAdmin.css"; // Importing CSS
@@ -226,6 +226,14 @@ const UsersAdmin = ({ setLoading }) => {
                   }}
                 />
               </Tooltip>
+              <Tooltip title="Detailed View">
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  navigate(`/user-report/${record?.id}`);
+                }}
+              />
+            </Tooltip>
             </Space>
           </>
         )
