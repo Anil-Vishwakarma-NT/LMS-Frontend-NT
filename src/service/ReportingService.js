@@ -2,28 +2,28 @@ import { app } from "./serviceLMS";
 
 export const getSingleUserReport = async (userId) => {
   const response = await app.get(`user/api/client-api/reports/user/${userId}`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getSingleGroupReport = async (groupId) => {
   const response = await app.get(
     `user/api/client-api/reports/group/${groupId}`
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const getSingleCourseReport = async (courseId) => {
   const response = await app.get(
     `user/api/client-api/reports/course/${courseId}`
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const getSingleBundleReport = async (bundleId) => {
   const response = await app.get(
     `user/api/client-api/reports/bundle/${bundleId}`
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const getUserKpiReport = async (page, size) => {
