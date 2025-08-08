@@ -8,6 +8,7 @@ import {
   FilePdfOutlined,
   UnorderedListOutlined,
   PlusOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import QuizModal from "./QuizModal";
@@ -187,6 +188,8 @@ const CourseTable = ({ onEditClick, onDeleteClick, entries, fields, type }) => {
               type="text"
             />
           </Tooltip>
+          <Button icon={<TableOutlined />} onClick={() => navigate(`/course-report/${record.courseId}`)} />
+
 
           {record.quizCreated ? (
             <Tooltip title="Manage Quiz">

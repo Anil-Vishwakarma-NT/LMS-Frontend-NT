@@ -7,7 +7,7 @@ import { Table, Empty, Button, Typography, Divider, Space, Tooltip } from "antd"
 import {
   DeleteOutlined,
   ExportOutlined,
-  UsergroupAddOutlined,
+  UsergroupAddOutlined, EyeOutlined,
   GroupOutlined,
   PlusOutlined
 } from "@ant-design/icons";
@@ -106,21 +106,32 @@ const BundlesAdmin = ({ setLoading }) => {
       key: "actions",
       width: 180,
       render: (text, record) => (
-        <Space>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => handleOpenConfirmDeletePopup(record)}
-          />
-          <Button
-            icon={<ExportOutlined />}
-            onClick={() =>
-              handleViewBundleClick(record?.id, record?.bundleName)
-            }
-          />
-        </Space>
-      ),
-    },
-  ];
+        <>
+          <Space >
+            <Button
+              icon={<DeleteOutlined />}
+              style={{ marginRight: 8 }}
+              onClick={() => handleOpenConfirmDeletePopup(record)}
+            />
+            <Button
+              icon={<ExportOutlined />}
+              onClick={() =>
+                handleViewBundleClick(record?.id, record?.bundleName)
+              }
+            />
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => {
+                navigate(`/bundle-report/${record?.id}`);
+              }}
+            />
+          </Space>
+        </>
+      )
+    }
+
+  ]
+
 
   return (
     <div className="bundle-container">
