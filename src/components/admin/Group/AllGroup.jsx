@@ -3,7 +3,7 @@ import Toast from "../../shared/toast/Toast";
 import { Layout, Typography, Divider, Tooltip } from 'antd';
 import { useState, useEffect } from 'react';
 import { getAllGroups, deleteGroup } from "../../../service/GroupService";
-import { Table, Empty, Button, Tag, Space, Tooltip } from "antd";
+import { Table, Empty, Button, Tag, Space } from "antd";
 import { EditOutlined, DeleteOutlined, ExportOutlined, UsergroupAddOutlined, EyeOutlined } from "@ant-design/icons";
 import GroupModal from "./GroupModal";
 import ConfirmDeletePopup from "../../shared/confirmDeletePopup/ConfirmDeletePopup";
